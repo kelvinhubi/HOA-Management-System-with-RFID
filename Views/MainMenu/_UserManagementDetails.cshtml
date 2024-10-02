@@ -1,0 +1,33 @@
+﻿@model Homeowner_details
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+    Homeowner_details details = Model;
+    int Year = Convert.ToInt32(details.Birthdate.Year);
+    int Age = Convert.ToInt32(DateTime.Today.Year) - Year;
+}
+<div id="UserPartial">
+    <h2>User Details</h2>
+    <table class="table">
+        <thead class="table-light">
+            <tr>
+                <th>Full Name</th>
+                <th>Phone Number</th>
+                <td>Age</td>
+                <td>Block No</td>
+                <td>Lot No</td>
+                <td>RFID_number</td>
+            </tr>
+        </thead>
+        <tbody>
+                <tr>
+                <td>@Html.DisplayFor(m => m.Firstname) @Html.DisplayFor(m => m.Middlename) @Html.DisplayFor(m => m.Surname)</td>
+                    <td>@Html.DisplayFor(m => m.PhoneNo)</td>
+                    <td>@Age</td>
+                    <td>@Html.DisplayFor(m=> m.BlkNO)</td>
+                    <td>@Html.DisplayFor(m=> m.LotNo)</td>
+                    <td>@Html.DisplayFor(m=> m.RFID_number)</td>
+                </tr>
+        </tbody>
+    </table>
+    <a class="btn btn-primary" asp-controller="MainMenu" asp-action="UserManagement" style="background-color:#16a085;color:black;">Back to Accounts</a>
+</div>

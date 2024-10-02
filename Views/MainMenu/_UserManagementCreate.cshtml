@@ -1,0 +1,80 @@
+﻿@model User_Account
+<Button runat="server" id="bution" class="btn btn-primary" style="background-color:#16a085;color:black;">Create User Account</Button>
+<form asp-action="View" class="form" id="thisform">
+    <p class="title">Add Homeowner User Account</p>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="Username" class="control-label"></label>
+        <input asp-for="Username" class="form-control" class="input" oninput="UserCheck();" />
+        <p id="Status" />
+        <span asp-validation-for="Username" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email" class="control-label"></label>
+        <input asp-for="Email" class="form-control" class="input" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Password" class="control-label"></label>
+        <input id="forpass" asp-for="Password" type="password" class="form-control" class="input" disabled />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <Button onclick="GeneratePass();" type="button" class="btn btn-primary" style="background-color:#16a085;color:black;">Generate Password</Button>
+    </div>
+    <div class="form-group">
+        <input asp-controller="MainMenu" asp-action="CreatUserAcc" type="submit" id="button1" value="Create" class="btn btn-primary" style="background-color:#16a085;color:black;" />
+    </div>
+</form>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    var btn = document.getElementById("bution")
+    var text;
+    $(".form").css("display", "none");
+    btn.onclick = function () {
+        if ($(".form").css("display") == "block") {
+            $(".form").css("display", "none");
+            $("#UserPartial").css("display", "block");
+            
+            $("#bution").html('Create User Account');
+            $("body").css("background", "rgba(0, 0, 0, 0)");
+            $('#forpass').val("")
+            $("#forpass").attr('disabled', 'disabled');
+        }
+        else {
+            this.blur();
+            $(".form").css("display", "block"); 
+            $("#UserPartial").css("display", "none");
+            $("#bution").html('Hide');
+            $("body").css("background", "rgba(0, 0, 0, 0.4)");
+
+        }
+    }
+
+    function GeneratePass() {
+        $.post("@Url.Action("GeneratePass", "MainMenu")", { userdata: $("#Username").val() },
+            function (data) {
+                $('#forpass').removeAttr('disabled')
+                $('#forpass').val(data)
+            });
+    }
+    function UserCheck() {
+        $("#Status").html("Checking...");
+        $.post("@Url.Action("CheckUsername", "Login")",
+            {
+                userdata: $("#Username").val()
+            },
+            function (data) {
+                if (data == 0) {
+                    $("#Status").html('<font color = "Green"> Username Available!.</font>');
+                    $("#Username").css("border-color", "Green");
+                    $("#button1").removeAttr('disabled');
+                }
+                else {
+                    $("#Status").html('<font color = "Red"> Username already Taken!.</font>');
+                    $("#Username").css("border-color", "Green");
+                    $("#button1").attr('disabled', 'disabled');
+                }
+            });
+    }
+</script>

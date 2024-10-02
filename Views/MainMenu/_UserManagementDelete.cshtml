@@ -1,0 +1,23 @@
+﻿@model User_Account
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<form  class="form" id="thisform" style="bottom:29rem; display:block">
+    <p class="title">Delete Homeowner User Account</p>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="AccountID" />
+    <div class="form-group">
+        <label asp-for="Username" class="control-label"></label>
+        <input asp-for="Username" class="form-control" class="input" disabled/>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email" class="control-label"></label>
+        <input asp-for="Email" class="form-control" class="input" disabled/>
+    </div>
+    <div class="form-group">
+        <input asp-controller="MainMenu" asp-action="UserDelete" type="submit" id="button1" value="Delete" class="btn btn-primary" style="background-color:#16a085;color:black;" />
+    </div>
+</form>
+
+<a asp-controller="MainMenu" asp-action="UserManagement" class="btn - btn-primary" style="background-color:#16a085;color:black; padding:5px;">Back to List</a>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>

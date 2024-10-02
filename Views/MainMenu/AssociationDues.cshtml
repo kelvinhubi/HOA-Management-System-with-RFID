@@ -1,0 +1,62 @@
+﻿@model IEnumerable<Dues>
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<div id="UserPartial">
+    <h2>Association Dues </h2>
+    <table class="table">
+        <thead class="table-light">
+            <tr>
+                <th><a asp-action="AssociationDues" asp-route-sortOrder="@ViewData["NameSortParam"]">@Html.DisplayNameFor(m => m.FullName)</a></th>
+                <th><a asp-action="AssociationDues" asp-route-sortOrder="@ViewData["AmountSortParam"]">@Html.DisplayNameFor(m => m.Amount)</a></th>
+
+                <th><a asp-action="AssociationDues" asp-route-sortOrder="@ViewData["DateSortParam"]">@Html.DisplayNameFor(m=> m.Date)</a></th>
+                <th>Type of Due</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model)
+            {
+                <tr>
+                    <td>@obj.FullName</td>
+                    <td>@obj.Amount</td>
+                    <td>@obj.Date</td>
+                    <td>@obj.TypeofDues</td>
+                    <td>@obj.Status</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@obj.AccountID">Details</a>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+@{
+    Dues dues = new Dues();
+    <partial name="_CreateDues" model="dues"/>
+}
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    window.onload = function () { 
+        var table = document.querySelectorAll("td");
+        for (let i = 0; i < table.length; i++) { 
+            let col = table[i].innerHTML;
+            if (col == "Unpaid") { 
+                table[i].classList.add('bx', 'bxs-user-x', 'card-danger','bg-danger')
+                table[i].style.cssText = "font-size:15px;"
+            }
+            if (col == "Paid") { 
+                table[i].classList.add('bx', 'bxs-user-x', 'card-success', 'bg-success')
+                table[i].style.cssText = "font-size:15px;"
+            }
+        }
+    }
+</script>

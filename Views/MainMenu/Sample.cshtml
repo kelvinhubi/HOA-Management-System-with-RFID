@@ -1,0 +1,60 @@
+﻿@model IEnumerable<User_Account>
+@{
+
+}
+    @{
+        User_Account user = new User_Account();
+        <partial name="UserManagementCreate" model="user"/>
+    }
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    var btn = document.getElementById("bution")
+    var text;
+    btn.onclick = function () {
+        if ($(".form").css("display") == "block") {
+            $(".form").css("display", "none");
+            $("#bution").html('Create User Account');
+            $("body").css("background", "rgba(0, 0, 0, 0)");
+            $('#forpass').val("")
+            $("#forpass").attr('disabled', 'disabled');
+        }
+        else {
+            $(".form").css("display", "block");
+            $("#bution").html('Hide');
+            $("body").css("background", "rgba(0, 0, 0, 0.4)");
+
+        }
+    }
+
+    function GeneratePass() {
+        $.post("@Url.Action("GeneratePass", "MainMenu")", { userdata: $("#Username").val() },
+            function (data) {
+                $('#forpass').removeAttr('disabled')
+                $('#forpass').val(data)
+            });
+    }
+    function UserCheck() {
+        $("#Status").html("Checking...");
+        $.post("@Url.Action("CheckUsername", "Login")",
+            {
+                userdata: $("#Username").val()
+            },
+            function (data) {
+                if (data == 0) {
+                    $("#Status").html('<font color = "Green"> Username Available!.</font>');
+                    $("#Username").css("border-color", "Green");
+                    $("#button1").removeAttr('disabled');
+                }
+                else {
+                    $("#Status").html('<font color = "Red"> Username already Taken!.</font>');
+                    $("#Username").css("border-color", "Green");
+                    $("#button1").attr('disabled', 'disabled');
+                }
+            });
+    }
+</script>

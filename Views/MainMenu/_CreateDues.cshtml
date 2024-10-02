@@ -1,0 +1,92 @@
+﻿@model Dues
+@{
+    string[] typeofdue = {"Facilities","Amortization",};
+    
+    IEnumerable<Homeowner_details> ListOwners = ViewData["ListOwners"] as IEnumerable<Homeowner_details>;
+}
+<Button runat="server" id="bution" class="btn btn-primary" style="position:sticky;background-color:#16a085;color:black;">Create Dues</Button>
+<form asp-action="View" class="form" id="thisform">
+    <p class="title">Add Dues</p>
+    <div class="form-group">
+        <label asp-for="AccountID"  class="control-label"></label>
+        <input asp-for="AccountID" value="" id="AccountID" class="form-control" class="input" readonly/>
+    </div>
+    <div class="form-group">
+        <label asp-for="FullName"  class="control-label">Select Homeowner</label>
+        <select asp-for="FullName" onclick="CheckName()"  class="form-control">
+            @foreach (Homeowner_details obj in ListOwners)
+            {
+
+                var fullname = obj.Firstname + " " + obj.Middlename + " " + obj.Surname;
+                <option id="FullName" value="@fullname">@fullname</option>
+                <i class="arrow up"></i>
+            }
+        </select>
+        <span asp-validation-for="AccountID" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Amount" class="control-label"></label>
+        <input asp-for="Amount" class="form-control" class="input" />
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="TypeofDues" class="control-label">Type of Due</label>
+        <select asp-for="TypeofDues" class="form-control">
+            @foreach (string obj in typeofdue)
+            {
+                <option value="@obj">@obj</option>
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="Date"  class="control-label">Set Due Date</label>
+        <input asp-for="Date" type="date" class="form-control" class="input"/>
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input asp-controller="MainMenu" asp-action="CreateUserdue" type="submit" id="button1" value="Create" class="btn btn-primary" style="background-color:#16a085;color:black;" />
+    </div>
+</form>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    var btn = document.getElementById("bution")
+    $(".form").css("display", "none");
+    btn.onclick = function () {
+        if ($(".form").css("display") == "block") {
+            $(".form").css("display", "none");
+            $("#UserPartial").css("display", "block");
+            $("#bution").html('Create Dues'); 
+            document.getElementById("bution").style.cssText = "display: block; position: inherit; background-color:#16a085; color: black";
+            $("body").css("background", "rgba(0, 0, 0, 0)");
+            $('#forpass').val("")
+            $("#forpass").attr('disabled', 'disabled');
+        }
+        else {
+            this.blur();
+            $(".form").css("display", "block");
+            CheckName();
+            document.getElementById("bution").style.cssText = "position: fixed; background-color:#16a085;color:black;";
+            $("#UserPartial").css("display", "none");
+            $("#bution").html('Hide');
+            $("body").css("background", "rgba(0, 0, 0, 0.4)");
+
+        }
+    }
+
+    function CheckName() {
+        $.post("@Url.Action("CheckName", "MainMenu")",
+            {
+                userdata: $("#FullName").val()
+            },
+            function (data) {
+                if (data == 0) {
+
+                }
+                else {
+
+                    $("#AccountID").val(data);
+
+                }
+            });
+    }
+</script>

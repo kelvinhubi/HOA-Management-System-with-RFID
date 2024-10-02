@@ -1,0 +1,41 @@
+﻿@model IEnumerable<User_Account>
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+@Html.AntiForgeryToken();
+<div id="UserPartial">
+    <h2>Accounts</h2>
+    <table class="table">
+        <thead class="table-light">
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model)
+            {
+                <tr>
+                    <td>@obj.Username</td>
+                    <td>@obj.Email</td>
+                    <td>
+                        <a asp-action="_UserManagementDetails" class="btn - btn-primary" style="background-color:#16a085;color:black; padding:5px;" asp-route-id="@obj.AccountID">Details</a>
+                        <a asp-action="_UserManagementDelete" class="btn - btn-primary" style="background-color:#16a085;color:black; padding:5px;" asp-route-id="@obj.AccountID">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@{
+    User_Account user = new User_Account();
+    <partial name="_UserManagementCreate" model="user" />
+}
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
+<script>
+</script>
