@@ -1,18 +1,12 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿
 @{
     Layout = "~/Views/Shared/_Layout1.cshtml";
-    var obj = Model;
+    var UserRegisterdCount = ViewData["User Registrations"];
+    var PendingPaymentsCount = ViewData["Pending Payments"];
 }
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>AdminLTE 4 | General Form Elements</title><!--begin::Primary Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="title" content="AdminLTE 4 | General Form Elements">
-    <meta name="author" content="ColorlibHQ">
-    <meta name="description" content="AdminLTE is a Free Bootstrap 5 Admin Dashboard, 30 example pages using Vanilla JS.">
-    <meta name="keywords" content="bootstrap 5, bootstrap, bootstrap 5 admin dashboard, bootstrap 5 dashboard, bootstrap 5 charts, bootstrap 5 calendar, bootstrap 5 datepicker, bootstrap 5 tables, bootstrap 5 datatable, vanilla js datatable, colorlibhq, colorlibhq dashboard, colorlibhq admin dashboard"><!--end::Primary Meta Tags--><!--begin::Fonts-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/styles/overlayscrollbars.min.css" integrity="sha256-dSokZseQNT08wYEWiz5iLI8QPlKxG+TswNRD8k35cpg=" crossorigin="anonymous"><!--end::Third Party Plugin(OverlayScrollbars)--><!--begin::Third Party Plugin(Bootstrap Icons)-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css" integrity="sha256-Qsx5lrStHZyR9REqhUF8iQt73X06c8LGIUPzpOhwRrI=" crossorigin="anonymous"><!--end::Third Party Plugin(Bootstrap Icons)--><!--begin::Required Plugin(AdminLTE)-->
     <link rel="stylesheet" href="../../../dist/css/adminlte.css"><!--end::Required Plugin(AdminLTE)-->
@@ -27,18 +21,18 @@
                 <!--begin::Small Box Widget 1-->
                 <div class="small-box text-bg-primary">
                     <div class="inner">
-                        <h3>12</h3>
+                        <h3>@UserRegisterdCount</h3>
                         <p>User Registrations</p>
-                    </div>  <a href="#" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+                    </div>  <a asp-action="UserManagement" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
                         More info <i class="bi bi-link-45deg"></i>
                     </a>
                 </div> <!--end::Small Box Widget 1-->
             </div> <!--end::Col-->
             <div class="col-lg-3 col-6">
                 <!--begin::Small Box Widget 2-->
-                <div class="small-box text-bg-success">
+                <div class="small-box text-bg-warning">
                     <div class="inner">
-                        <h3>53</h3>
+                        <h3>@PendingPaymentsCount</h3>
                         <p>User Pending Payments</p>
                     </div>  <a asp-action="AssociationDues" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
                         More info <i class="bi bi-link-45deg"></i>

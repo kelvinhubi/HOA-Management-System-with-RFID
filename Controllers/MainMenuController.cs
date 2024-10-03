@@ -26,6 +26,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         //Dashboard Controller
         public IActionResult Dashboard()
         {
+            ViewData["User Registrations"] = _db.Homeowner_Details.Count();
+            Console.WriteLine("Pending pay" + _db.Due_Details.Where(x => x.Status == "Unpaid").Count());
+            ViewData["Pending Payments"] = _db.Due_Details.Where(x => x.Status == "Unpaid").Count();
             return View();
         }
 
@@ -59,17 +62,20 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         {
             try
             {
-                var forhomeowner = _db.Homeowner_Details.Find(obj.AccountID);
+                var forhomeowner = _db.Homeowner_Details.FirstOrDefault(x=> x.AccountID == obj.AccountID);
+                var forUserDues = _db.Due_Details.Where(x => x.AccountID == obj.AccountID).ToList();
+                Console.WriteLine("dUES" + forUserDues.ToList());
                 _db.User_Accounts.Remove(obj);
-                Console.WriteLine("tHIS IS BUG" + forhomeowner);
-                if (forhomeowner == null)
+                if (forhomeowner != null)
                 {
-                    _db.SaveChanges();
-                    return RedirectToAction("UserManagement");
-                }
-                else
-                {
+                    Console.WriteLine("Dues should be deleted");
                     _db.Homeowner_Details.Remove(forhomeowner);
+                    _db.SaveChanges();
+                }
+                if (forUserDues != null) {
+                    Console.WriteLine("Dues should be deleted");
+                    _db.Due_Details.RemoveRange(forUserDues);
+                    _db.SaveChanges();
                 }
                 _db.SaveChanges();
                 return RedirectToAction("UserManagement");
@@ -189,35 +195,39 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         [HttpPost]
         public JsonResult CheckName(string userdata)
         {
-            Console.WriteLine(userdata);
-            char[] trimchars = { ' ', '!' };
-            string[] trimmedArray = userdata.Split(trimchars, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
+            if (userdata!= null) {
+                Console.WriteLine(userdata);
+                char[] trimchars = { ' ', '!' };
+                string[] trimmedArray = userdata.Split(trimchars, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
 
-            if (trimmedArray.Count() == 4)
-            {
-               var SearchData = _db.Homeowner_Details.Where(x => x.Firstname == trimmedArray[0] + " " + trimmedArray[1]).SingleOrDefault();
-                if (SearchData != null)
+                if (trimmedArray.Count() == 4)
                 {
-                    return Json(SearchData.AccountID);
+                    var SearchData = _db.Homeowner_Details.Where(x => x.Firstname == trimmedArray[0] + " " + trimmedArray[1]).SingleOrDefault();
+                    if (SearchData != null)
+                    {
+                        return Json(SearchData.AccountID);
+                    }
+                    else
+                    {
+                        return Json(0);
+                    }
                 }
                 else
                 {
-                    return Json(0);
+                    var SearchData = _db.Homeowner_Details.Where(x => x.Firstname == trimmedArray[0]).SingleOrDefault();
+
+                    if (SearchData != null)
+                    {
+                        return Json(SearchData.AccountID);
+                    }
+                    else
+                    {
+                        return Json(0);
+                    }
+
                 }
             }
-            else {  
-                var SearchData =_db.Homeowner_Details.Where(x => x.Firstname == trimmedArray[0]).SingleOrDefault();
-
-                if (SearchData != null)
-                {
-                    return Json(SearchData.AccountID);
-                }
-                else
-                {
-                    return Json(0);
-                }
-
-            }
+            return Json(0);
         }
 
         //Logs Controller
