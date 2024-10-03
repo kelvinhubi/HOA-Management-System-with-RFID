@@ -2,7 +2,7 @@
 @{
     string[] typeofdue = {"Facilities","Amortization",};
     
-    IEnumerable<Homeowner_details> ListOwners = ViewData["ListOwners"] as IEnumerable<Homeowner_details>;
+    IEnumerable<Homeowner_details>? ListOwners = ViewData["ListOwners"] as IEnumerable<Homeowner_details>;
 }
 <Button runat="server" id="bution" class="btn btn-primary" style="position:sticky;background-color:#16a085;color:black;">Create Dues</Button>
 <form asp-action="View" class="form" id="thisform">
