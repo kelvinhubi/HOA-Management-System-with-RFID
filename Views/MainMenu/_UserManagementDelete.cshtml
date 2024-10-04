@@ -8,11 +8,11 @@
     <input type="hidden" asp-for="AccountID" />
     <div class="form-group">
         <label asp-for="Username" class="control-label"></label>
-        <input asp-for="Username" class="form-control" class="input" disabled/>
+        <input asp-for="Username" class="form-control" class="input" readonly/>
     </div>
     <div class="form-group">
         <label asp-for="Email" class="control-label"></label>
-        <input asp-for="Email" class="form-control" class="input" disabled/>
+        <input asp-for="Email" class="form-control" class="input" readonly/>
     </div>
     <div class="form-group">
         <input asp-controller="MainMenu" asp-action="UserDelete" type="submit" id="button1" value="Delete" class="btn btn-primary" style="background-color:#16a085;color:black;" />
