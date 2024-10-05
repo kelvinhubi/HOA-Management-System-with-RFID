@@ -22,7 +22,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             _db = db;
             _logger = logger;
         }
-
+        //Test
+        public IActionResult Sample() { return View(); }
         //Dashboard Controller
         public IActionResult Dashboard()
         {
