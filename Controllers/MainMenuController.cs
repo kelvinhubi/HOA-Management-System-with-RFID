@@ -5,6 +5,7 @@ using MailKit.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting.Internal;
 using MimeKit;
 using MySqlConnector;
 using System.Text;
@@ -111,14 +112,14 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             if (ModelState.IsValid)
             {
                 var mailMessage = new MimeMessage();
+                var Username = info.Username;
+                var Password = info.Password;
+                var bodybuild = new BodyBuilder();
+                bodybuild.HtmlBody = CreateMailBody(Username, Password);
                 mailMessage.From.Add(new MailboxAddress("Cessna", "krfortin15@gmail.com"));
                 mailMessage.To.Add(new MailboxAddress(info.Username, info.Email));
-                mailMessage.Subject = "subject";
-                mailMessage.Body = new TextPart("plain")
-                {
-                    Text = "Username:" + info.Username + " " +
-                    "Password: " + info.Password
-                };
+                mailMessage.Subject = "Username and Password";
+                mailMessage.Body = bodybuild.ToMessageBody();
                 using (var smtpclient = new SmtpClient())
                 {
                     smtpclient.Connect("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
@@ -332,6 +333,18 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return false;
         }
+        private string CreateMailBody(string Username, string password  ) {
 
+            string body = string.Empty;
+            using (StreamReader reader = new StreamReader("C:\\Users\\krfor\\source\\repos\\Cessna HOA MANAGEMENT SYSTEM WITH RFID\\Views\\Home\\index.html"))
+            {
+                body = reader.ReadToEnd();
+            };
+
+            body = body.Replace("{Username}", Username);
+            body = body.Replace("{Password}", Username);
+            return body;
+        }
+        
     }
 }
