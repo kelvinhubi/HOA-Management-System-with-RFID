@@ -35,7 +35,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 ViewData["Pending Payments"] = _db.Due_Details.Where(x => x.Status == "Unpaid").Count();
                 return View();
             }
-            return RedirectToAction("AccessDenied", "Shared");
+            return RedirectToAction("AccessDenied", "Home");
 
         }
 
@@ -43,7 +43,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public IActionResult UserManagement()
         {
             if (CheckRole()) { return View(_db.User_Accounts.ToList()); }
-            return RedirectToAction("AccessDenied", "Shared");
+            return RedirectToAction("AccessDenied", "Home");
         }
 
         public IActionResult _UserManagementCreate()
@@ -189,7 +189,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 ViewData["ListOwners"] = _db.Homeowner_Details.ToList();
                 return View(result.AsNoTracking().ToList());
             }
-            return RedirectToAction("AccessDenied", "Shared");
+            return RedirectToAction("AccessDenied", "Home");
 
         }
         public IActionResult _CreateDues() {
@@ -246,7 +246,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public IActionResult Logs()
         {
             if (CheckRole()) { return View(); }
-            return RedirectToAction("AccessDenied", "Shared");
+            return RedirectToAction("AccessDenied", "Home");
         }
 
         public IActionResult _PrintLogs() { return PartialView(); }
@@ -255,7 +255,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public IActionResult Guards()
         {
             if (CheckRole()) { return View(); }
-            return RedirectToAction("AccessDenied", "Shared");
+            return RedirectToAction("AccessDenied", "Home");
         }
         
         //Vehicle List
@@ -264,7 +264,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public IActionResult RFIDManagement()
         {
             if (CheckRole()) { return View(); }
-            return RedirectToAction("AccessDenied", "Shared");
+            return RedirectToAction("AccessDenied", "Home");
         }
 
         public IActionResult _CreateRFID() { return PartialView(); }

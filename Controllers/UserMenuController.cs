@@ -11,40 +11,40 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public IActionResult Dashboard()
         {
             if (CheckRole()) { return View(); }
-            return RedirectToAction("AccessDenied", "Shared");
+            return RedirectToAction("AccessDenied", "Home");
         }
         public IActionResult AssociationDues()
         {
             if (CheckRole()) { return View(); }
-            return RedirectToAction("AccessDenied", "Shared");
+            return RedirectToAction("AccessDenied", "Home");
         }
 
 
         public IActionResult Logs()
         {
             if (CheckRole()) { return View(); }
-            return RedirectToAction("AccessDenied", "Shared");
+            return RedirectToAction("AccessDenied", "Home");
         }
 
 
         public IActionResult VisitorsList()
         {
             if (CheckRole()) { return View(); }
-            return RedirectToAction("AccessDenied", "Shared");
+            return RedirectToAction("AccessDenied", "Home");
         }
 
 
         public IActionResult VehiclesList()
         {
             if (CheckRole()) { return View(); }
-            return RedirectToAction("AccessDenied", "Shared");
+            return RedirectToAction("AccessDenied", "Home");
         }
 
 
         public IActionResult HomeList()
         {
             if (CheckRole()) { return View(); }
-            return RedirectToAction("AccessDenied", "Shared");
+            return RedirectToAction("AccessDenied", "Home");
         }
 
         public bool CheckRole()

@@ -22,7 +22,7 @@
                 <tr>
                     <td>@obj.FullName</td>
                     <td>@obj.Amount</td>
-                    <td>@obj.Date</td>
+                    <td id="duedate">@obj.Date</td>
                     <td>@obj.TypeofDues</td>
                     <td>@obj.Status</td>
                     <td>
@@ -36,16 +36,17 @@
 </div>
 @{
     Dues dues = new Dues();
-    <partial name="_CreateDues" model="dues"/>
+            <partial name="_CreateDues" model="dues"/>
 }
 @section Scripts {
     @{
-        <partial name="_ValidationScriptsPartial" />
+                <partial name="_ValidationScriptsPartial" />
     }
 }
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
     window.onload = function () { 
+        
         var table = document.querySelectorAll("td");
         for (let i = 0; i < table.length; i++) { 
             let col = table[i].innerHTML;
@@ -57,6 +58,18 @@
                 table[i].classList.add('bx', 'bxs-user-x', 'card-success', 'bg-success')
                 table[i].style.cssText = "font-size:14px;"
             }
+        }
+
+        var table = document.querySelectorAll("#duedate");
+        for (let i = 0; i < table.length; i++) {
+            let col = table[i].innerHTML
+            var due = new Date(col)
+            var date = new Date()
+            if (due.getDate() > date.getDate() && due.getMonth >= date.getMonth && due.getFullYear() >= date.getFullYear()) {
+                table[i].classList.add('bx','bxs-error-alt','card-warning','bg-warning')
+            }
+            else { console.log("false")}
+            
         }
     }
 </script>
