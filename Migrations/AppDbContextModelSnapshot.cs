@@ -177,8 +177,18 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
             modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.Vehicle_Information", b =>
                 {
+                    b.Property<int>("VehicleID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("VehicleID"));
+
+                    b.Property<int>("AccountID")
+                        .HasColumnType("int");
+
                     b.Property<string>("PlateNo")
-                        .HasColumnType("varchar(255)");
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("RFID_number")
                         .IsRequired()
@@ -192,7 +202,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.HasKey("PlateNo");
+                    b.HasKey("VehicleID");
 
                     b.ToTable("Vehicle_Information");
                 });

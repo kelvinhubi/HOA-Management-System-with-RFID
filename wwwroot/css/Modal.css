@@ -1,7 +1,7 @@
 ﻿.form {
     display: none;
     flex-direction: column;
-    gap: 10px;
+    gap:10px;
     max-width: 350px;
     background-color: #16a085;
     padding: 25px;
@@ -9,8 +9,8 @@
     position: fixed;
     z-index: 1;
     overflow: auto;
-    left:50rem;
-    bottom:16rem;
+    left:50%;
+    top:10%;
 }
 
 .title {
@@ -136,23 +136,20 @@
 @media screen and (max-width: 1153px) {
 
     .form {
-        position: fixed;
-        left: 30rem;
-        bottom: 16rem;
+        left: 45%;
+        top: 10%;
     }
 }
 @media screen and (max-width: 835px) {
 
     .form {
-        position: fixed;
-        left: 15rem;
-        bottom: 16rem;
+        left: 30%;
+        top: 10%;
     }
 }
 @media screen and (max-width: 586px) {
 
-    .form {
-        position: inherit;                    
-        bottom: 16rem;
+    .form {               
+        top: 10%;
     }
 }

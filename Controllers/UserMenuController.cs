@@ -10,40 +10,60 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
         public IActionResult Dashboard()
         {
-            var name = HttpContext.Session.GetString("SessionUsername");
-            ViewData["name"] = name;
-            //_logger.LogInformation("Session Name: {Username}", name);
-            Console.WriteLine(name);
-            return View();
+            if (CheckRole()) { return View(); }
+            return RedirectToAction("AccessDenied", "Shared");
         }
         public IActionResult AssociationDues()
         {
-            return View();
+            if (CheckRole()) { return View(); }
+            return RedirectToAction("AccessDenied", "Shared");
         }
 
 
         public IActionResult Logs()
         {
-            return View();
+            if (CheckRole()) { return View(); }
+            return RedirectToAction("AccessDenied", "Shared");
         }
 
 
         public IActionResult VisitorsList()
         {
-            return View();
+            if (CheckRole()) { return View(); }
+            return RedirectToAction("AccessDenied", "Shared");
         }
 
 
         public IActionResult VehiclesList()
         {
-            return View();
+            if (CheckRole()) { return View(); }
+            return RedirectToAction("AccessDenied", "Shared");
         }
 
 
         public IActionResult HomeList()
         {
-            return View();
+            if (CheckRole()) { return View(); }
+            return RedirectToAction("AccessDenied", "Shared");
         }
-       
+
+        public bool CheckRole()
+        {
+            var usertype = HttpContext.Session.GetString("UserType");
+            Console.WriteLine(usertype);
+            if (usertype != null)
+            {
+                if (usertype == "User")
+                {
+                    return true;
+
+                }
+                else {
+                    return false;
+                }
+            }
+            return false;
+        }
+
     }
 }

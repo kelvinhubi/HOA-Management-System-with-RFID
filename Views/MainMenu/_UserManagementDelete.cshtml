@@ -3,7 +3,7 @@
     Layout = "~/Views/Shared/_Layout1.cshtml";
 }
 <form  class="form" id="thisform" style="bottom:29rem; display:block">
-    <p class="title">Delete Homeowner User Account</p>
+    <p class="title">Delete Homeowner User Account?</p>
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input type="hidden" asp-for="AccountID" />
     <div class="form-group">
@@ -19,5 +19,5 @@
     </div>
 </form>
 
-<a asp-controller="MainMenu" asp-action="UserManagement" class="btn - btn-primary" style="background-color:#16a085;color:black; padding:5px;">Back to List</a>
+<a asp-controller="MainMenu" asp-action="UserManagement" class="btn btn-primary" style="background-color:#16a085;color:black; padding:5px;">Back to List</a>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>

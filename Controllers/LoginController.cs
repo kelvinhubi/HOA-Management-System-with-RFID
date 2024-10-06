@@ -1,5 +1,6 @@
 ﻿using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
 using Newtonsoft.Json;
@@ -41,11 +42,15 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 {
                     if (!reader["Password"].Equals(info.Password))
                     {
+                        
+                        
                         ModelState.AddModelError("PasswordError", "Password failed!");
                     }
                     else
                     {
-                        HttpContext.Session.SetString("SessionUsername", info.Username); //JsonConvert.SerializeObject
+                        HttpContext.Session.SetString("SessionUsername", info.Username);
+                        HttpContext.Session.SetString("UserType", "Admin");
+                        //JsonConvert.SerializeObject
                         return RedirectToAction("Dashboard", "MainMenu");
                     }
                 }
@@ -75,9 +80,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 {
                     if (!reader["Password"].Equals(info.Password))
                     {
+                        
                         ModelState.AddModelError("PasswordError", "Password failed!");
                     }
                     else {
+                        HttpContext.Session.SetString("SessionUsername", info.Username);
                         Console.WriteLine("Hello");
                         isLoggedIn = true;
                     }
@@ -96,7 +103,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     }
                     else
                     {
-                        HttpContext.Session.SetString("SessionUsername", info.Username); //JsonConvert.SerializeObject
+                        HttpContext.Session.SetString("UserType", "User");//JsonConvert.SerializeObject
                         Console.WriteLine("Logged In");
                         return RedirectToAction("Dashboard", "UserMenu");
                     }

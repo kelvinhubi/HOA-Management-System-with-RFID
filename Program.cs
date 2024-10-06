@@ -10,12 +10,9 @@ var connectionString = builder.Configuration.GetConnectionString("AppDbConnectio
 var serverVersion = new MySqlServerVersion(ServerVersion.AutoDetect(connectionString));
 //For Entity Framework
 builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connectionString, serverVersion));
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AppDbContext>();
 //For Identity
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => {
-    options.Password.RequiredUniqueChars = 1;
-})
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
 //Adding Authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -55,7 +52,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
-//app.MapRazorPages();
+app.UseAuthentication();
+app.MapRazorPages();
 app.UseSession();
 app.MapControllerRoute(
     name: "default",

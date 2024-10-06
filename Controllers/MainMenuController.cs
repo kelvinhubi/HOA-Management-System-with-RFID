@@ -2,6 +2,7 @@
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
@@ -21,22 +22,28 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         {
             _db = db;
             _logger = logger;
+
         }
         //Test
         public IActionResult Sample() { return View(); }
         //Dashboard Controller
         public IActionResult Dashboard()
         {
-            ViewData["User Registrations"] = _db.Homeowner_Details.Count();
-            Console.WriteLine("Pending pay" + _db.Due_Details.Where(x => x.Status == "Unpaid").Count());
-            ViewData["Pending Payments"] = _db.Due_Details.Where(x => x.Status == "Unpaid").Count();
-            return View();
+            if (CheckRole()) {
+                ViewData["User Registrations"] = _db.Homeowner_Details.Count();
+                Console.WriteLine("Pending pay" + _db.Due_Details.Where(x => x.Status == "Unpaid").Count());
+                ViewData["Pending Payments"] = _db.Due_Details.Where(x => x.Status == "Unpaid").Count();
+                return View();
+            }
+            return RedirectToAction("AccessDenied", "Shared");
+
         }
 
         //UserManagement Controller
         public IActionResult UserManagement()
         {
-            return View(_db.User_Accounts.ToList());
+            if (CheckRole()) { return View(_db.User_Accounts.ToList()); }
+            return RedirectToAction("AccessDenied", "Shared");
         }
 
         public IActionResult _UserManagementCreate()
@@ -102,10 +109,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
         public async Task<IActionResult> CreatUserAcc(User_Account info)
         {
-
             if (ModelState.IsValid)
             {
-
                 var mailMessage = new MimeMessage();
                 mailMessage.From.Add(new MailboxAddress("Cessna", "krfortin15@gmail.com"));
                 mailMessage.To.Add(new MailboxAddress(info.Username, info.Email));
@@ -148,38 +153,44 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         //AssciationDues Controller
         public IActionResult AssociationDues(string sortOrder)
         {
-            ViewData["NameSortParam"] = String.IsNullOrEmpty(sortOrder) ? "nameDesc" : "";
-            ViewData["DateSortParam"] = sortOrder == "date" ? "dateDesc" : "date";
-            ViewData["AmountSortParam"] = sortOrder == "amount" ? "amountDesc" : "amount";
-            var result = (from due in _db.Due_Details
-                          join
-                          homeacc in _db.Homeowner_Details on due.AccountID equals homeacc.AccountID
-                          select new Dues
-                          {
-                              AccountID = due.AccountID,
-                              FullName = homeacc.Firstname + " " + homeacc.Middlename + " " + homeacc.Surname,
-                              Amount = due.Amount,
-                              Date = due.Date,
-                              TypeofDues = due.TypeofDues,
-                              Status = due.Status
-                          });
-            switch (sortOrder) {
-                case "nameDesc":
-                    result = result.OrderByDescending(r => r.FullName);
-                    break;
-                case "date":
-                    result = result.OrderBy(r => r.Date); break;
-                case "dateDesc":
-                    result = result.OrderByDescending(r => r.Date); break;
-                case "amount":
-                    result = result.OrderBy(r => r.Amount); break;
-                case "amountDesc":
-                    result = result.OrderByDescending(r => r.Amount); break;
-                default:
-                    result = result.OrderBy(r => r.FullName); break;
+
+            if (CheckRole()) {
+                ViewData["NameSortParam"] = String.IsNullOrEmpty(sortOrder) ? "nameDesc" : "";
+                ViewData["DateSortParam"] = sortOrder == "date" ? "dateDesc" : "date";
+                ViewData["AmountSortParam"] = sortOrder == "amount" ? "amountDesc" : "amount";
+                var result = (from due in _db.Due_Details
+                              join
+                              homeacc in _db.Homeowner_Details on due.AccountID equals homeacc.AccountID
+                              select new Dues
+                              {
+                                  AccountID = due.AccountID,
+                                  FullName = homeacc.Firstname + " " + homeacc.Middlename + " " + homeacc.Surname,
+                                  Amount = due.Amount,
+                                  Date = due.Date,
+                                  TypeofDues = due.TypeofDues,
+                                  Status = due.Status
+                              });
+                switch (sortOrder)
+                {
+                    case "nameDesc":
+                        result = result.OrderByDescending(r => r.FullName);
+                        break;
+                    case "date":
+                        result = result.OrderBy(r => r.Date); break;
+                    case "dateDesc":
+                        result = result.OrderByDescending(r => r.Date); break;
+                    case "amount":
+                        result = result.OrderBy(r => r.Amount); break;
+                    case "amountDesc":
+                        result = result.OrderByDescending(r => r.Amount); break;
+                    default:
+                        result = result.OrderBy(r => r.FullName); break;
+                }
+                ViewData["ListOwners"] = _db.Homeowner_Details.ToList();
+                return View(result.AsNoTracking().ToList());
             }
-            ViewData["ListOwners"] = _db.Homeowner_Details.ToList();
-            return View(result.AsNoTracking().ToList());
+            return RedirectToAction("AccessDenied", "Shared");
+
         }
         public IActionResult _CreateDues() {
             return PartialView();
@@ -234,22 +245,57 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         //Logs Controller
         public IActionResult Logs()
         {
-            return View();
+            if (CheckRole()) { return View(); }
+            return RedirectToAction("AccessDenied", "Shared");
         }
+
+        public IActionResult _PrintLogs() { return PartialView(); }
 
         //Guards Controller
         public IActionResult Guards()
         {
-            return View();
+            if (CheckRole()) { return View(); }
+            return RedirectToAction("AccessDenied", "Shared");
         }
-        //VisitorsList Controller
-        public IActionResult VisitorsList()
+        
+        //Vehicle List
+
+        //RFID Management Controller
+        public IActionResult RFIDManagement()
         {
-            return View();
+            if (CheckRole()) { return View(); }
+            return RedirectToAction("AccessDenied", "Shared");
         }
+
+        public IActionResult _CreateRFID() { return PartialView(); }
+
+        public IActionResult _DeleteRFID() { return View(); }
+
+        public IActionResult _EditRFID() { return View(); }
+
         public IActionResult Error(Homeowner_details ID)
         {
             return View(ID);
+        }
+
+
+        public bool CheckRole()
+        {
+            var usertype = HttpContext.Session.GetString("UserType");
+            Console.WriteLine(usertype);
+            if (usertype != null)
+            {
+                if (usertype == "Admin")
+                {
+                    return true;
+
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return false;
         }
     }
 }
