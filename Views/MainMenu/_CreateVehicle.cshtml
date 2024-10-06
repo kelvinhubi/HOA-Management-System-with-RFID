@@ -1,16 +1,15 @@
-﻿@model Dues
+﻿@model Vehicle_Information
 @{
-    string[] typeofdue = {"Facilities","Amortization",};
-    
+    string[] typeofdue = { "Facilities", "Amortization", };
     IEnumerable<Homeowner_details>? ListOwners = ViewData["ListOwners"] as IEnumerable<Homeowner_details>;
 }
-<Button runat="server" id="bution" class="btn btn-primary" style="position:sticky;background-color:#16a085;color:black;">Create Dues</Button>
+<Button runat="server" id="bution" class="btn btn-primary" style="position:sticky;background-color:#16a085;color:black;">Create RFID</Button>
 <form asp-action="View" class="form" id="thisform">
-    <p class="title">Add Dues</p>
-        <input asp-for="AccountID" value="" id="AccountID" class="form-control" hidden/>
+    <p class="title">Add RFID</p>
+    <input asp-for="AccountID" value="" id="AccountID" class="form-control" hidden />
     <div class="form-group">
-        <label asp-for="FullName"  class="control-label">Select Homeowner</label>
-        <select asp-for="FullName" onclick="CheckName()"  class="form-control">
+        <label asp-for="FullName" class="control-label">Select Homeowner</label>
+        <select asp-for="FullName" onclick="CheckName()" class="form-control">
             @foreach (Homeowner_details obj in ListOwners)
             {
 
@@ -22,26 +21,26 @@
         <span asp-validation-for="AccountID" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="Amount" class="control-label"></label>
-        <input asp-for="Amount" class="form-control" class="input" />
-        <span asp-validation-for="Amount" class="text-danger"></span>
+        <label asp-for="PlateNo" class="control-label"></label>
+        <input asp-for="PlateNo" class="form-control input" />
+        <span asp-validation-for="PlateNo" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="TypeofDues" class="control-label">Type of Due</label>
-        <select asp-for="TypeofDues" class="form-control">
-            @foreach (string obj in typeofdue)
-            {
-                <option value="@obj">@obj</option>
-            }
-        </select>
+        <label asp-for="VehicleModel" class="control-label"></label>
+        <input asp-for="VehicleModel" class="form-control input" />
+        <span asp-validation-for="VehicleModel" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="Date"  class="control-label">Set Due Date</label>
-        <input asp-for="Date" type="date" class="form-control" class="input"/>
-        <span asp-validation-for="Date" class="text-danger"></span>
+        <label asp-for="VehicleType" class="control-label">Vehicle Type</label>
+        <input asp-for="VehicleType" class="form-control input" />
     </div>
     <div class="form-group">
-        <input asp-controller="MainMenu" asp-action="CreateUserdue" type="submit" id="button1" value="Create" class="btn btn-primary" style="background-color:#16a085;color:black;" />
+        <label asp-for="RFID_number" class="control-label">RFID Number</label>
+        <input asp-for="RFID_number" class="form-control input" />
+        <span asp-validation-for="RFID_number" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input asp-controller="MainMenu" asp-action="_CreateVehicle" type="submit" id="button1" value="Create" class="btn btn-primary" style="background-color:#16a085;color:black;" />
     </div>
 </form>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -53,7 +52,7 @@
         if ($(".form").css("display") == "block") {
             $(".form").css("display", "none");
             $("#UserPartial").css("display", "block");
-            $("#bution").html('Create Dues'); 
+            $("#bution").html('Create Dues');
             document.getElementById("bution").style.cssText = "display: block; position: inherit; background-color:#16a085; color: black";
             $("body").css("background", "rgba(0, 0, 0, 0)");
             $('#forpass').val("")

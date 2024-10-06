@@ -43,7 +43,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     if (!reader["Password"].Equals(info.Password))
                     {
                         
-                        
                         ModelState.AddModelError("PasswordError", "Password failed!");
                     }
                     else

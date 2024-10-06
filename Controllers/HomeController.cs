@@ -1,3 +1,4 @@
+using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -7,10 +8,16 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly AppDbContext _db;
+        public HomeController(ILogger<HomeController> logger, AppDbContext db)
         {
             _logger = logger;
+            _db = db;
+            var CheckAdmin = _db.Admin_Accounts.Count();
+            if (CheckAdmin == 0) {
+                _db.Admin_Accounts.Add(new Admin_Account { Username="ADMIN", Password = "ADMIN1234" });
+                _db.SaveChanges();
+            }
         }
 
         public IActionResult Index()

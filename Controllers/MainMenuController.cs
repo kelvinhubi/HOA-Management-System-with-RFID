@@ -31,7 +31,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         {
             if (CheckRole()) {
                 ViewData["User Registrations"] = _db.Homeowner_Details.Count();
-                Console.WriteLine("Pending pay" + _db.Due_Details.Where(x => x.Status == "Unpaid").Count());
+                ViewData["RFID Registrations"] = _db.Vehicle_Information.Where(x=> x.RFID_number !=null).Count();
                 ViewData["Pending Payments"] = _db.Due_Details.Where(x => x.Status == "Unpaid").Count();
                 return View();
             }
@@ -261,17 +261,53 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         //Vehicle List
 
         //RFID Management Controller
-        public IActionResult RFIDManagement()
+        public IActionResult VehicleManagement(string sortOrder)
         {
-            if (CheckRole()) { return View(); }
+            if (CheckRole())
+            {
+                ViewData["NameSortParam"] = String.IsNullOrEmpty(sortOrder) ? "nameDesc" : "";
+                var result = (from vehicle in _db.Vehicle_Information
+                              join
+                              homeacc in _db.Homeowner_Details on vehicle.AccountID equals homeacc.AccountID
+                              select new Vehicle_Information
+                              {
+                                  AccountID = vehicle.AccountID,
+                                  FullName = homeacc.Firstname + " " + homeacc.Middlename + " " + homeacc.Surname,
+                                  PlateNo = vehicle.PlateNo,
+                                  VehicleModel = vehicle.VehicleModel,
+                                  VehicleType = vehicle.VehicleType,
+                                  RFID_number = vehicle.RFID_number
+                              });
+                switch (sortOrder)
+                {
+                    case "nameDesc":
+                        result = result.OrderByDescending(r => r.FullName);
+                        break;
+                    default:
+                        result = result.OrderBy(r => r.FullName); break;
+                }
+                ViewData["ListOwners"] = _db.Homeowner_Details.ToList();
+                return View(result.AsNoTracking().ToList());
+            }
             return RedirectToAction("AccessDenied", "Home");
         }
 
-        public IActionResult _CreateRFID() { return PartialView(); }
+        public IActionResult _CreateVehicle() { return PartialView(); }
+        [HttpPost]
+        public async Task<IActionResult> _CreateVehicle(Vehicle_Information info)
+        {
+            if (ModelState.IsValid)
+            {
+                _db.Vehicle_Information.Add(info);
+                await _db.SaveChangesAsync();
+                return RedirectToAction("RFIDManagement");
+            }
+            return RedirectToAction("RFIDManagement");
+        }
 
-        public IActionResult _DeleteRFID() { return View(); }
+        public IActionResult _DeleteVehicle() { return View(); }
 
-        public IActionResult _EditRFID() { return View(); }
+        public IActionResult _EditVehicle() { return View(); }
 
         public IActionResult Error(Homeowner_details ID)
         {

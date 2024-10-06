@@ -1,0 +1,51 @@
+﻿@model IEnumerable<Vehicle_Information>
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<div id="UserPartial">
+    <h2>Vehicle Management </h2>
+    <table class="table">
+        <thead class="table-light">
+            <tr>
+                <th><a asp-action="AssociationDues" asp-route-sortOrder="@ViewData["NameSortParam"]">@Html.DisplayNameFor(m => m.FullName)</a></th>
+                <th>Plate No.</th>
+                <th>Vehicle Model</th>
+                <th>Vehicle Type</th>
+                <th>RFID No.</th>
+                <th>RFID Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model)
+            {
+                <tr>
+                    <td>@obj.FullName</td>
+                    <td>@obj.PlateNo</td>
+                    <td>@obj.VehicleModel</td>
+                    <td>@obj.VehicleType</td>
+                    <td>@obj.RFID_number</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@obj.AccountID">Details</a>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+@{
+    Vehicle_Information vehicle = new Vehicle_Information();
+    <partial name="_CreateRFID" model="vehicle" />
+}
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+
+
+
+
