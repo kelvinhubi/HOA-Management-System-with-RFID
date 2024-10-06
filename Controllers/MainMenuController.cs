@@ -333,7 +333,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return false;
         }
-        private string CreateMailBody(string Username, string password  ) {
+        private string CreateMailBody(string Username, string Password  ) {
 
             string body = string.Empty;
             using (StreamReader reader = new StreamReader("C:\\Users\\krfor\\source\\repos\\Cessna HOA MANAGEMENT SYSTEM WITH RFID\\Views\\Home\\index.html"))
@@ -342,7 +342,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             };
 
             body = body.Replace("{Username}", Username);
-            body = body.Replace("{Password}", Username);
+            body = body.Replace("{Password}", Password);
             return body;
         }
         
