@@ -22,7 +22,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         {
             _db = db;
             _logger = logger;
-
         }
         //Test
         public IActionResult Sample() { return View(); }
@@ -317,7 +316,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
         public bool CheckRole()
         {
-            var usertype = HttpContext.Session.GetString("UserType");
+            string? usertype = HttpContext.Session.GetString("UserType");
             Console.WriteLine(usertype);
             if (usertype != null)
             {
@@ -333,5 +332,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return false;
         }
+
     }
 }

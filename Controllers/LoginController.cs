@@ -49,7 +49,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     {
                         HttpContext.Session.SetString("SessionUsername", info.Username);
                         HttpContext.Session.SetString("UserType", "Admin");
-                        //JsonConvert.SerializeObject
                         return RedirectToAction("Dashboard", "MainMenu");
                     }
                 }
