@@ -65,7 +65,7 @@
             let col = table[i].innerHTML
             var due = new Date(col)
             var date = new Date()
-            if (due.getDate() > date.getDate() && due.getMonth >= date.getMonth && due.getFullYear() >= date.getFullYear()) {
+            if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
                 table[i].classList.add('bx','bxs-error-alt','card-warning','bg-warning')
             }
             else { console.log("false")}
