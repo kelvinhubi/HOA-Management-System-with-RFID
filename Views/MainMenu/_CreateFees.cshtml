@@ -1,0 +1,47 @@
+﻿@model FeesList
+<Button runat="server" id="bution" class="btn btn-primary" style="position:sticky;background-color:#16a085;color:black;">Create Fees</Button>
+<form asp-action="View" class="form" id="thisform">
+    <p class="title">Add Fees</p>
+    <input asp-for=IDFees hidden/>
+    <input asp-for=Status hidden />
+    <div class="form-group">
+        
+        <label asp-for="TypeOfFees" class="control-label"></label>
+        <input asp-for="TypeOfFees" class="form-control" class="input" />
+        <span asp-validation-for="TypeOfFees" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Amount" class="control-label"></label>
+        <input asp-for="Amount" class="form-control" class="input"/>
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input asp-controller="MainMenu" asp-action="_CreateFees" type="submit" id="button1" value="Create" class="btn btn-primary" style="background-color:#16a085;color:black;" />
+    </div>
+</form>
+
+<script>
+    var btn = document.getElementById("bution")
+    $(".form").css("display", "none");
+    btn.onclick = function () {
+        if ($(".form").css("display") == "block") {
+            $(".form").css("display", "none");
+            $("#UserPartial").css("display", "block");
+            $("#bution").html('Create Fees');
+            document.getElementById("bution").style.cssText = "display: block; position: inherit; background-color:#16a085; color: black";
+            $("body").css("background", "rgba(0, 0, 0, 0)");
+            $('#forpass').val("")
+            $("#forpass").attr('disabled', 'disabled');
+        }
+        else {
+            console.log("This BLur?");
+            this.blur();
+            $(".form").css("display", "block");
+            document.getElementById("bution").style.cssText = "position: fixed; background-color:#16a085;color:black;";
+            $("#UserPartial").css("display", "none");
+            $("#bution").html('Hide');
+            $("body").css("background", "rgba(0, 0, 0, 0.4)");
+
+        }
+    }
+</script>

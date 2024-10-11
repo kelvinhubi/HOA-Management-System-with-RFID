@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Dues>
+﻿@using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
+@model NewModel
 @{
     Layout = "~/Views/Shared/_Layout1.cshtml";
 }
@@ -8,16 +9,16 @@
     <table class="table">
         <thead class="table-light">
             <tr>
-                <th><a asp-action="AssociationDues" asp-route-sortOrder="@ViewData["NameSortParam"]">@Html.DisplayNameFor(m => m.FullName)</a></th>
-                <th><a asp-action="AssociationDues" asp-route-sortOrder="@ViewData["AmountSortParam"]">@Html.DisplayNameFor(m => m.Amount)</a></th>
+                <th><a asp-action="AssociationDues" asp-route-sortOrder="@ViewData["NameSortParam"]">Full Name</a></th>
+                <th><a asp-action="AssociationDues" asp-route-sortOrder="@ViewData["DateSortParam"]">Amount</a></th>
 
-                <th><a asp-action="AssociationDues" asp-route-sortOrder="@ViewData["DateSortParam"]">Due Date</a></th>
+                <th><a asp-action="AssociationDues" asp-route-sortOrder="@ViewData["AmountSortParam"]">Due Date</a></th>
                 <th>Type of Due</th>
                 <th>Status</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var obj in Model)
+            @foreach (Dues obj in Model.ListDues)
             {
                 <tr>
                     <td>@obj.FullName</td>
@@ -35,8 +36,7 @@
     </table>
 </div>
 @{
-    Dues dues = new Dues();
-            <partial name="_CreateDues" model="dues"/>
+            <partial name="_CreateDues" model="Model"/>
 }
 @section Scripts {
     @{

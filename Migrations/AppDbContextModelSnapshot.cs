@@ -75,6 +75,32 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                     b.ToTable("Due_Details");
                 });
 
+            modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.FeesList", b =>
+                {
+                    b.Property<int>("IDFees")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IDFees"));
+
+                    b.Property<string>("Amount")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("varchar(8)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("TypeOfFees")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("IDFees");
+
+                    b.ToTable("feesLists");
+                });
+
             modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.Guard_Information", b =>
                 {
                     b.Property<int>("ID")
@@ -148,6 +174,35 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                     b.HasKey("AccountID");
 
                     b.ToTable("Homeowner_Details");
+                });
+
+            modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.UserFeesStatus", b =>
+                {
+                    b.Property<int>("UserFeeID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("UserFeeID"));
+
+                    b.Property<int>("AccountID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Amount")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("varchar(8)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("TypeOfFees")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("UserFeeID");
+
+                    b.ToTable("userFeesStatuses");
                 });
 
             modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.User_Account", b =>

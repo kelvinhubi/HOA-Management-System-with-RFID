@@ -1,51 +1,43 @@
-﻿@model Dues
-@{
-    string[] typeofdue = {"Facilities","Amortization",};
-    
-    IEnumerable<Homeowner_details>? ListOwners = ViewData["ListOwners"] as IEnumerable<Homeowner_details>;
-}
-<Button runat="server" id="bution" class="btn btn-primary" style="position:sticky;background-color:#16a085;color:black;">Create Dues</Button>
-<form asp-action="View" class="form" id="thisform">
-    <p class="title">Add Dues</p>
-        <input asp-for="AccountID" value="" id="AccountID" class="form-control" hidden/>
-    <div class="form-group">
-        <label asp-for="FullName"  class="control-label">Select Homeowner</label>
-        <select asp-for="FullName" onclick="CheckName()"  class="form-control">
-            @foreach (Homeowner_details obj in ListOwners)
-            {
+﻿@model NewModel
 
-                var fullname = obj.Firstname + " " + obj.Middlename + " " + obj.Surname;
-                <option id="FullName" value="@fullname">@fullname</option>
+<Button runat="server" id="bution" class="btn btn-primary" style="position:sticky;background-color:#16a085;color:black;">Create Dues</Button>
+<form method="post" class="form" id="thisform">
+    <p class="title">Add Dues</p>
+    <input asp-for="@Model.dues.payID" name="payID" id="AccountID" class="form-control" hidden />
+    <input asp-for="@Model.dues.payID" name="AccountID" id="AccountID" class="form-control" hidden />
+    <input asp-for="@Model.dues.Status" name="Status" class="form-control" hidden />
+    <div class="form-group">
+        <label asp-for="@Model.dues.FullName" class="control-label">Select Homeowner</label>
+        <select asp-for="@Model.dues.FullName" onclick="CheckName();CheckFees()" id="FullName" class="form-control">
+            @foreach (var obj in Model.Homeacc)
+            {
+                <option  value="@obj.FullName" data-another="@obj.AccountID">@obj.FullName</option>
                 <i class="arrow up"></i>
             }
         </select>
-        <span asp-validation-for="AccountID" class="text-danger"></span>
+        <span asp-validation-for="@Model.dues.AccountID" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="Amount" class="control-label"></label>
-        <input asp-for="Amount" class="form-control" class="input" />
-        <span asp-validation-for="Amount" class="text-danger"></span>
+        <label asp-for="@Model.dues.Amount" class="control-label"></label>
+        <input asp-for="@Model.dues.Amount" name="Amount" class="form-control input" id="Amount" readonly />
+        <span asp-validation-for="@Model.dues.Amount" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="TypeofDues" class="control-label">Type of Due</label>
-        <select asp-for="TypeofDues" class="form-control">
-            @foreach (string obj in typeofdue)
-            {
-                <option value="@obj">@obj</option>
-            }
+        <label asp-for="@Model.dues.TypeofDues" class="control-label">Type of Due</label>
+        <select asp-for="@Model.dues.TypeofDues" name="TypeofDues" onclick="CheckAmount()" id="Typeoffees" class="form-control">
+            <option></option>
         </select>
     </div>
     <div class="form-group">
-        <label asp-for="Date"  class="control-label">Set Due Date</label>
-        <input asp-for="Date" type="date" class="form-control" class="input"/>
-        <span asp-validation-for="Date" class="text-danger"></span>
+        <label asp-for="@Model.dues.Date"  class="control-label">Set Due Date</label>
+        <input asp-for="@Model.dues.Date" type="date" name="Date" class="form-control input" />
+        <span asp-validation-for="@Model.dues.Date" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <input asp-controller="MainMenu" asp-action="CreateUserdue" type="submit" id="button1" value="Create" class="btn btn-primary" style="background-color:#16a085;color:black;" />
+        <input asp-controller="MainMenu" asp-action="_CreateDues" type="submit" id="button1" value="Create" class="btn btn-primary" style="background-color:#16a085;color:black;" />
     </div>
 </form>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
-
 <script>
     var btn = document.getElementById("bution")
     $(".form").css("display", "none");
@@ -61,7 +53,7 @@
         }
         else {
             this.blur();
-            $(".form").css("display", "inline");
+            $(".form").css("display", "block");
             CheckName();
             document.getElementById("bution").style.cssText = "position: fixed; background-color:#16a085;color:black;";
             $("#UserPartial").css("display", "none");
@@ -72,6 +64,7 @@
     }
 
     function CheckName() {
+        console.log($("#FullName").val());
         $.post("@Url.Action("CheckName", "MainMenu")",
             {
                 userdata: $("#FullName").val()
@@ -83,8 +76,51 @@
                 else {
 
                     $("#AccountID").val(data);
-
                 }
             });
+    }
+    function CheckAmount() {
+        var id = $("#Typeoffees").find($("select option:selected")).data('another1');
+        console.log("Hello amountid:"+id);
+        $.post("@Url.Action("CheckAmount", "MainMenu")",
+            {
+                userdata: id
+            },
+            function (data) {
+                if (data == 0) {
+
+                }
+                else {
+
+                    $("#Amount").val(data);
+                }
+            });
+    }
+    function CheckFees() {
+        console.log("hELLO" + $("select option:selected").data('another'));
+        $.post("@Url.Action("CheckFees", "MainMenu")",
+            {
+                userdata: $("select option:selected").data('another')
+            },
+            function (data) {
+                if (data == 0) {
+
+                }
+                else {
+
+                    $("#Typeoffees").find('option').remove().end();
+                    for (var j = 0; j < data.length; j++) {
+                        console.log(data[j].userFeeID);
+                        $("#Typeoffees").append('<option value="' + data[j].typeOfFees + '" data-another1="' + data[j].userFeeID + '">' + data[j].typeOfFees + '</option>');
+                    }
+                    $("#Typeoffees").val("");
+                }
+            });
+    
+    }
+    function Clear() { 
+            
+        $("#Amount").val("0");
+        
     }
 </script>
