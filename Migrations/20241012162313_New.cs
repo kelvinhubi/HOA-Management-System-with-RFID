@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 {
     /// <inheritdoc />
-    public partial class Updated : Migration
+    public partial class New : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,7 +36,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                 name: "Due_Details",
                 columns: table => new
                 {
-                    payID = table.Column<long>(type: "bigint", nullable: false)
+                    payID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     AccountID = table.Column<int>(type: "int", nullable: false),
                     Amount = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: false)

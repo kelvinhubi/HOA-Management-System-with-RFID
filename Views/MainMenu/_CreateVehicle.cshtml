@@ -3,9 +3,9 @@
     string[] typeofdue = { "Facilities", "Amortization", };
     IEnumerable<Homeowner_details>? ListOwners = ViewData["ListOwners"] as IEnumerable<Homeowner_details>;
 }
-<Button runat="server" id="bution" class="btn btn-primary" style="position:sticky;background-color:#16a085;color:black;">Create RFID</Button>
+<Button runat="server" id="bution" class="btn btn-primary" style="position:sticky;background-color:#16a085;color:black;">Add Vehicle</Button>
 <form asp-action="View" class="form" id="thisform">
-    <p class="title">Add RFID</p>
+    <p class="title">Add Vehicle</p>
     <input asp-for="AccountID" value="" id="AccountID" class="form-control" hidden />
     <div class="form-group">
         <label asp-for="FullName" class="control-label">Select Homeowner</label>
@@ -52,7 +52,7 @@
         if ($(".form").css("display") == "block") {
             $(".form").css("display", "none");
             $("#UserPartial").css("display", "block");
-            $("#bution").html('Create Dues');
+            $("#bution").html('Add Vehicle');
             document.getElementById("bution").style.cssText = "display: block; position: inherit; background-color:#16a085; color: black";
             $("body").css("background", "rgba(0, 0, 0, 0)");
             $('#forpass').val("")

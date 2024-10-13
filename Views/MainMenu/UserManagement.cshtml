@@ -5,7 +5,7 @@
 @Html.AntiForgeryToken();
 <div id="UserPartial">
     <h2>Accounts</h2>
-    <table class="table">
+    <table id="mytable" class="table">
         <thead class="table-light">
             <tr>
                 <th>Username</th>
@@ -38,4 +38,5 @@
     }
 }
 <script>
+    new DataTable('#mytable');
 </script>

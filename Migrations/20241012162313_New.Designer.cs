@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241010091257_Updated")]
-    partial class Updated
+    [Migration("20241012162313_New")]
+    partial class New
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,11 +48,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
             modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.Dues", b =>
                 {
-                    b.Property<long>("payID")
+                    b.Property<int>("payID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("payID"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("payID"));
 
                     b.Property<int>("AccountID")
                         .HasColumnType("int");

@@ -3,8 +3,7 @@
 <Button runat="server" id="bution" class="btn btn-primary" style="position:sticky;background-color:#16a085;color:black;">Create Dues</Button>
 <form method="post" class="form" id="thisform">
     <p class="title">Add Dues</p>
-    <input asp-for="@Model.dues.payID" name="payID" id="AccountID" class="form-control" hidden />
-    <input asp-for="@Model.dues.payID" name="AccountID" id="AccountID" class="form-control" hidden />
+    <input asp-for="@Model.dues.AccountID" name="AccountID" id="AccountID" class="form-control" readonly />
     <input asp-for="@Model.dues.Status" name="Status" class="form-control" hidden />
     <div class="form-group">
         <label asp-for="@Model.dues.FullName" class="control-label">Select Homeowner</label>
@@ -97,10 +96,11 @@
             });
     }
     function CheckFees() {
-        console.log("hELLO" + $("select option:selected").data('another'));
+        
+        var id = $("#FullName").find($("select option:selected")).data('another');
         $.post("@Url.Action("CheckFees", "MainMenu")",
             {
-                userdata: $("select option:selected").data('another')
+                userdata: id
             },
             function (data) {
                 if (data == 0) {
