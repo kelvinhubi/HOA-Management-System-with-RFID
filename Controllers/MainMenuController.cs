@@ -75,6 +75,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return PartialView(useracc);
         }
         //Delete all info in the users
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult UserDelete(User_Account obj)
         {
             try
@@ -119,14 +121,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
             return View(useracc);
         }
-        public async Task<IActionResult> _UserManagementEdit(int ID) {
-            try
-            {
-                //Edit Permission Fees
-            }
-            catch (Exception) { return RedirectToAction("UserManagement"); }
-            return View();
-        }
+
 
         public async Task<IActionResult> CreatUserAcc(User_Account info)
         {
