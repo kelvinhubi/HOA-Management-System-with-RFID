@@ -87,7 +87,6 @@
             },
             function (data) {
                 if (data == 0) {
-
                 }
                 else {
 
@@ -104,10 +103,12 @@
             },
             function (data) {
                 if (data == 0) {
-
+                    $("#Typeoffees").find('option').remove().end();
+                    $("#Typeoffees").append('<option></option>');
+                    $("#Amount").val("");
                 }
                 else {
-
+                    console.log("Check Fees:" + data[0].typeOfFees);
                     $("#Typeoffees").find('option').remove().end();
                     for (var j = 0; j < data.length; j++) {
                         console.log(data[j].userFeeID);

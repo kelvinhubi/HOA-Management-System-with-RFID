@@ -6,7 +6,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
     {
         [Key]
         public int UserFeeID { get; set; }
-
+        public int IDFees {  get; set; }
         public int AccountID { get; set; }
         public string TypeOfFees { get; set; } = string.Empty;
         [Required(ErrorMessage = "Please not more than 8 digits"), MaxLength(8)]

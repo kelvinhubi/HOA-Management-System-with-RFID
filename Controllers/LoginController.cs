@@ -161,6 +161,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     var data2 = new UserFeesStatus
                     {
                         AccountID = _account.AccountID,
+                        IDFees = x.IDFees,
                         TypeOfFees = x.TypeOfFees,
                         Amount = x.Amount,
                         Status = x.Status

@@ -14,7 +14,6 @@
                 <th>Due Date</th>
                 <th>Type of Due</th>
                 <th>Status</th>
-                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -26,9 +25,6 @@
                     <td id="duedate">@obj.Date</td>
                     <td>@obj.TypeofDues</td>
                     <td>@obj.Status</td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@obj.AccountID">Details</a>
-                    </td>
                 </tr>
             }
 
