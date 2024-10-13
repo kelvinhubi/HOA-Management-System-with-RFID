@@ -14,11 +14,17 @@ using MySqlConnector;
 using NuGet.Packaging.Signing;
 using System.Linq;
 using System.Text;
+using QuestPDF.Infrastructure;
 using System.Text.Json;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using QuestPDF.Fluent;
+using QuestPDF.Previewer;
+using QuestPDF.Companion;
+using QuestPDF.Helpers;
 
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
+    
 
     public class MainMenuController : Controller
     {
@@ -37,6 +43,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public IActionResult Dashboard()
         {
             if (CheckRole()) {
+                _db.logsLists.Add(new LogsList
+                {
+                    LogName = "Log In",
+                    LogDescription = "Logged In Username:" + HttpContext.Session.GetString("SessionUsername"),
+                    LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+                });
+                _db.SaveChanges();
                 ViewData["User Registrations"] = _db.Homeowner_Details.Count();
                 ViewData["RFID Registrations"] = _db.Vehicle_Information.Where(x => x.RFID_number != null).Count();
                 ViewData["Pending Payments"] = _db.Due_Details.Where(x => x.Status == "Unpaid").Count();
@@ -100,6 +113,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     _db.userFeesStatuses.RemoveRange(forUserfeestatus);
                     _db.SaveChanges();
                 }
+                _db.SaveChanges();
+                _db.logsLists.Add(new LogsList
+                {
+                    LogName = "Delete User Account",
+                    LogDescription = "Logged In Username:" + HttpContext.Session.GetString("SessionUsername"),
+                    LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+                });
                 _db.SaveChanges();
                 return RedirectToAction("UserManagement");
             }
@@ -259,11 +279,62 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         //Logs Controller
         public IActionResult Logs()
         {
-            if (CheckRole()) { return View(); }
+            if (CheckRole()) { 
+                
+                return View(_db.logsLists.ToList()); 
+            }
             return RedirectToAction("AccessDenied", "Home");
         }
+        public IActionResult PrintLogs() {
 
-        public IActionResult _PrintLogs() { return PartialView(); }
+            QuestPDF.Settings.License = LicenseType.Community;
+            void ComposeTable(IContainer container) {
+                container.Border(1).Table(table =>
+                {
+                    table.ColumnsDefinition(columns =>
+                    {
+                        columns.ConstantColumn(100);
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                    });
+
+                    table.Header(header =>
+                    {
+                        header.Cell().Text("Log Name");
+                        header.Cell().Text("Log Description");
+                        header.Cell().Text("User Role");
+                        header.Cell().Text("Log Date");
+                    });
+                    var result = _db.logsLists.ToList();
+                    if (result != null) {
+                        foreach (var item in result)
+                        {
+                            table.Cell().Text(item.LogName.ToString());
+                            table.Cell().Text(item.LogDescription.ToString());
+                            table.Cell().Text(item.LogUserRole.ToString());
+                            table.Cell().Text(item.LogDate.ToString());
+                        }
+                    }
+                });
+            }
+             Document.Create(Print =>
+            {
+                Print.Page(page =>
+                {
+                    page.Content()
+                    .Column(c => ComposeTable(c.Item()));
+                    page.Size(PageSizes.A4);
+                    page.Header()
+                    .Text("Logs")
+                    .SemiBold()
+                    .FontSize(30);
+                  
+                });
+            }).GeneratePdf("Logs.pdf"); //RENAMING USING RANDOM WORDS
+
+            return RedirectToAction("Logs");
+           }
 
         //Guards Controller
         public IActionResult Guards()
