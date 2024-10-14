@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241006125742_Updateme")]
-    partial class Updateme
+    [Migration("20241007081515_New")]
+    partial class New
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -195,9 +195,14 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
                     b.Property<string>("PlateNo")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(8)
+                        .HasColumnType("varchar(8)");
 
                     b.Property<string>("RFID_number")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("RFID_status")
                         .IsRequired()
                         .HasColumnType("longtext");
 
