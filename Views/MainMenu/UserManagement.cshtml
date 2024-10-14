@@ -5,12 +5,12 @@
 @Html.AntiForgeryToken();
 <div id="UserPartial">
     <h2>Accounts</h2>
-    <table class="table">
+    <table id="mytable" class="table">
         <thead class="table-light">
             <tr>
                 <th>Username</th>
                 <th>Email</th>
-                <td></td>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -23,6 +23,7 @@
                         <a asp-action="_UserManagementDetails" class="btn - btn-primary" style="background-color:#16a085;color:black; padding:5px;" asp-route-id="@obj.AccountID">Details</a>
                         <a asp-action="_UserManagementDelete" class="btn - btn-primary" style="background-color:#16a085;color:black; padding:5px;" asp-route-id="@obj.AccountID">Delete</a>
                     </td>
+                        
                 </tr>
             }
         </tbody>
@@ -38,4 +39,5 @@
     }
 }
 <script>
+    new DataTable('#mytable');
 </script>

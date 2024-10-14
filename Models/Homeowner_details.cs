@@ -29,6 +29,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         public string LotNo { get; set; } = string.Empty;
         [ValidateNever]
         public string RFID_number { get; set; } = string.Empty;
+        [NotMapped]
+        [Display(Name = "Full Name")]
+        public string FullName { get { return Firstname + " " + Middlename + " " + Surname; } }
     }
 }
 //[RegularExpression(@"^\(?([0-10]{3})\)?[-. ]?([0-10]{3})[-. ]?([0-10]{4})$", ErrorMessage = "Not a valid phone number")]

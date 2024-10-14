@@ -1,23 +1,23 @@
-﻿@model IEnumerable<Dues>
+﻿@using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
+@model NewModel
 @{
     Layout = "~/Views/Shared/_Layout1.cshtml";
 }
 
 <div id="UserPartial">
     <h2>Association Dues </h2>
-    <table class="table">
+    <table id="mytable" class="table table-bordered" style="width:100%">
         <thead class="table-light">
             <tr>
-                <th><a asp-action="AssociationDues" asp-route-sortOrder="@ViewData["NameSortParam"]">@Html.DisplayNameFor(m => m.FullName)</a></th>
-                <th><a asp-action="AssociationDues" asp-route-sortOrder="@ViewData["AmountSortParam"]">@Html.DisplayNameFor(m => m.Amount)</a></th>
-
-                <th><a asp-action="AssociationDues" asp-route-sortOrder="@ViewData["DateSortParam"]">Due Date</a></th>
+                <th>Full Name</th>
+                <th>Amount</th>
+                <th>Due Date</th>
                 <th>Type of Due</th>
                 <th>Status</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var obj in Model)
+            @foreach (Dues obj in Model.ListDues)
             {
                 <tr>
                     <td>@obj.FullName</td>
@@ -25,9 +25,6 @@
                     <td id="duedate">@obj.Date</td>
                     <td>@obj.TypeofDues</td>
                     <td>@obj.Status</td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@obj.AccountID">Details</a>
-                    </td>
                 </tr>
             }
 
@@ -35,19 +32,19 @@
     </table>
 </div>
 @{
-    Dues dues = new Dues();
-            <partial name="_CreateDues" model="dues"/>
+                                <partial name="_CreateDues" model="Model"/>
 }
 @section Scripts {
     @{
-                <partial name="_ValidationScriptsPartial" />
+                                    <partial name="_ValidationScriptsPartial" />
     }
 }
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
+    new DataTable('#mytable');
     window.onload = function () { 
-        
         var table = document.querySelectorAll("td");
+        console.log(table.length);
         for (let i = 0; i < table.length; i++) { 
             let col = table[i].innerHTML;
             if (col == "Unpaid") { 
@@ -72,4 +69,35 @@
             
         }
     }
+    $(document).ready(function () {
+        $(document,"dt-column-title").on('click change',function () {
+            var table = document.querySelectorAll("td");
+            console.log(table.length);
+            for (let i = 0; i < table.length; i++) {
+                let col = table[i].innerHTML;
+                if (col == "Unpaid") {
+                    table[i].classList.add('bx', 'bxs-user-x', 'card-danger', 'bg-danger')
+                    table[i].style.cssText = "font-size:15px;"
+                }
+                if (col == "Paid") {
+                    table[i].classList.add('bx', 'bxs-user-x', 'card-success', 'bg-success')
+                    table[i].style.cssText = "font-size:14px;"
+                }
+            }
+
+            var table = document.querySelectorAll("#duedate");
+            for (let i = 0; i < table.length; i++) {
+                let col = table[i].innerHTML
+                var due = new Date(col)
+                var date = new Date()
+                if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
+                    table[i].classList.add('bx', 'bxs-error-alt', 'card-warning', 'bg-warning')
+                }
+                else { console.log("false") }
+
+            }
+        })
+    });
+
+
 </script>

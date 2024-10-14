@@ -5,7 +5,7 @@
 
 <div id="UserPartial">
     <h2>Vehicle Management </h2>
-    <table class="table">
+    <table id="mytable" class="table">
         <thead class="table-light">
             <tr>
                 <th><a asp-action="AssociationDues" asp-route-sortOrder="@ViewData["NameSortParam"]">@Html.DisplayNameFor(m => m.FullName)</a></th>
@@ -36,7 +36,7 @@
 </div>
 @{
     Vehicle_Information vehicle = new Vehicle_Information();
-    <partial name="_CreateRFID" model="vehicle" />
+    <partial name="_CreateVehicle" model="vehicle" />
 }
 @section Scripts {
     @{
@@ -44,6 +44,9 @@
     }
 }
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    new DataTable('#mytable');
+</script>
 
 
 

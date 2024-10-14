@@ -154,7 +154,21 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                         LotNo = info.LotNo,
                         RFID_number = info.RFID_number,
                     });
-                    await _db.SaveChangesAsync();
+                _db.SaveChanges();
+                var data1 = _db.feesLists.ToList();
+                foreach (var x in data1)
+                {
+                    var data2 = new UserFeesStatus
+                    {
+                        AccountID = _account.AccountID,
+                        IDFees = x.IDFees,
+                        TypeOfFees = x.TypeOfFees,
+                        Amount = x.Amount,
+                        Status = x.Status
+                    };
+                    _db.userFeesStatuses.Add(data2);
+                }
+                await _db.SaveChangesAsync();
                     return RedirectToAction("Index", "Home");
                 }
             return View();

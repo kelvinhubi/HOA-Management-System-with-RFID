@@ -36,7 +36,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                 name: "Due_Details",
                 columns: table => new
                 {
-                    payID = table.Column<long>(type: "bigint", nullable: false)
+                    payID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     AccountID = table.Column<int>(type: "int", nullable: false),
                     Amount = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: false)
@@ -50,6 +50,25 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Due_Details", x => x.payID);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "feesLists",
+                columns: table => new
+                {
+                    IDFees = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    TypeOfFees = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Amount = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Status = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_feesLists", x => x.IDFees);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -122,12 +141,34 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "userFeesStatuses",
+                columns: table => new
+                {
+                    UserFeeID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    AccountID = table.Column<int>(type: "int", nullable: false),
+                    TypeOfFees = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Amount = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Status = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_userFeesStatuses", x => x.UserFeeID);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Vehicle_Information",
                 columns: table => new
                 {
                     VehicleID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    PlateNo = table.Column<string>(type: "longtext", nullable: false)
+                    PlateNo = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    FullName = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     AccountID = table.Column<int>(type: "int", nullable: false),
                     VehicleModel = table.Column<string>(type: "longtext", nullable: false)
@@ -135,6 +176,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                     VehicleType = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RFID_number = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RFID_status = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -154,6 +197,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                 name: "Due_Details");
 
             migrationBuilder.DropTable(
+                name: "feesLists");
+
+            migrationBuilder.DropTable(
                 name: "Guard_Information");
 
             migrationBuilder.DropTable(
@@ -161,6 +207,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
             migrationBuilder.DropTable(
                 name: "User_Accounts");
+
+            migrationBuilder.DropTable(
+                name: "userFeesStatuses");
 
             migrationBuilder.DropTable(
                 name: "Vehicle_Information");
