@@ -165,7 +165,14 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     smtpclient.Disconnect(true);
                 }
                 _db.User_Accounts.Add(info);
+                _db.logsLists.Add(new LogsList
+                {
+                    LogName = "Create User Account",
+                    LogDescription = "Logged In Username:" + HttpContext.Session.GetString("SessionUsername"),
+                    LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+                });
                 await _db.SaveChangesAsync();
+                
                 return RedirectToAction("UserManagement");
             }
             return View();
@@ -227,6 +234,12 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     TypeofDues = TypeofDues,
                     Date = Date,
                     Status = Status,
+                });
+                _db.logsLists.Add(new LogsList
+                {
+                    LogName = "Create Dues",
+                    LogDescription = "Dues Name:" + TypeofDues + "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                    LogUserRole = "" + HttpContext.Session.GetString("UserType"),
                 });
                 await _db.SaveChangesAsync();
                 return RedirectToAction("AssociationDues");
@@ -331,7 +344,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     .FontSize(30);
                   
                 });
-            }).GeneratePdf("Logs.pdf"); //RENAMING USING RANDOM WORDS
+            }).GeneratePdf("Logs"); //RENAMING USING RANDOM WORDS
 
             return RedirectToAction("Logs");
            }
@@ -420,6 +433,12 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     };
                     _db.userFeesStatuses.Add(data2);
                 }
+                _db.logsLists.Add(new LogsList
+                {
+                    LogName = "Create Fees",
+                    LogDescription = "Fees Name:" + info.TypeOfFees + "Logged In Username: "+ HttpContext.Session.GetString("SessionUsername"),
+                    LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+                });
                 await _db.SaveChangesAsync();
                 return RedirectToAction("Fees");
             }
@@ -458,6 +477,12 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                         }
 
                     }
+                    _db.logsLists.Add(new LogsList
+                    {
+                        LogName = "Create Fees",
+                        LogDescription = "Fees Name:" + info.TypeOfFees + "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                        LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+                    });
                     await _db.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -489,6 +514,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 _db.SaveChanges();
                 var userfeesstatus = _db.userFeesStatuses.Where(_d => _d.IDFees == id);
                 _db.userFeesStatuses.RemoveRange(userfeesstatus);
+                _db.SaveChanges();
+                _db.logsLists.Add(new LogsList
+                {
+                    LogName = "Delete Fees",
+                    LogDescription = "Fees Name:" + result.TypeOfFees + "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                    LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+                });
                 _db.SaveChanges();
             }
             else { 
