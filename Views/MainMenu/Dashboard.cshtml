@@ -53,7 +53,23 @@
         </div> <!--end::Row--> <!--begin::Row-->
 </div>
 </div>
-
+<asp:button runat="server" asp-controller="RFID" onclick="CheckButton()" class="btn btn-primary" >Click ME</asp:button>
 <script>
-    document.getElementById('a').classList.add('active')
+
+    function CheckButton() {
+        $.post("@Url.Action("RfidPopMe", "Rfid")",
+            {
+                userdata: ""
+            },
+            function (data) {
+                if (data == 0) {
+
+                }
+                else {
+
+                    console.log("Hello RFID is working")
+                }
+            });
+        
+    }
 </script>

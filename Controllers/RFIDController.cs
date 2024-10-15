@@ -1,22 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.Mvc;
+using System.IO.Ports;
 
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
-    public class RFIDController : Controller
+    public class RfidController : Controller
     {
-        public IActionResult RFID() { return View(); }
-        public IActionResult AddRFID() { return View(); }
-
-
         [HttpPost]
-        public IActionResult AddRFID() {   return View(); }
-
-        public IActionResult DeleteRFID() { return View(); }
-
-
-
-        public IActionResult EditRFID() { return View(); }
-
-
+        public JsonResult RfidPopMe(string userdata) {
+            ;
+            string[] ports = SerialPort.GetPortNames();
+            foreach (string port in ports) {
+                Console.WriteLine(port);
+            }
+            return Json(1);
+        }
     }
 }
