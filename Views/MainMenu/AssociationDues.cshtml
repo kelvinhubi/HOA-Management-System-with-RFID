@@ -9,6 +9,7 @@
     <table id="mytable" class="table table-bordered" style="width:100%">
         <thead class="table-light">
             <tr>
+                <th>Select</th>
                 <th>Full Name</th>
                 <th>Amount</th>
                 <th>Due Date</th>
@@ -20,6 +21,7 @@
             @foreach (Dues obj in Model.ListDues)
             {
                 <tr>
+                    <td><input type="checkbox"/>select</td>
                     <td>@obj.FullName</td>
                     <td>@obj.Amount</td>
                     <td id="duedate">@obj.Date</td>
