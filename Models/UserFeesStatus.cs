@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
 {
@@ -13,5 +14,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         [RegularExpression(@"^[0-9]*$", ErrorMessage = "Error pls only enter numbers")]
         public string Amount { get; set; } = string.Empty;
         public string Status { get; set; } = "Disabled";
+        [NotMapped]
+        public List<CheckBoxItem> EnabledItems { get; set; }
     }
 }

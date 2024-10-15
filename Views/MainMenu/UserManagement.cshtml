@@ -1,6 +1,7 @@
-﻿@model IEnumerable<User_Account>
+﻿@model NewModel
 @{
     Layout = "~/Views/Shared/_Layout1.cshtml";
+    
 }
 @Html.AntiForgeryToken();
 <div id="UserPartial">
@@ -14,13 +15,13 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var obj in Model)
+            @foreach (var obj in Model.useracc)
             {
                 <tr>
                     <td>@obj.Username</td>
                     <td>@obj.Email</td>
                     <td>
-                        <a asp-action="_UserManagementDetails" class="btn - btn-primary" style="background-color:#16a085;color:black; padding:5px;" asp-route-id="@obj.AccountID">Details</a>
+                        <a asp-action="_UserManagementDetails" class="btn - btn-primary" style="background-color:#16a085;color:black; padding:5px;" asp-route-id="@obj.AccountID" model="@Model">Details</a>
                         <a asp-action="_UserManagementDelete" class="btn - btn-primary" style="background-color:#16a085;color:black; padding:5px;" asp-route-id="@obj.AccountID">Delete</a>
                     </td>
                         

@@ -21,6 +21,9 @@ using QuestPDF.Fluent;
 using QuestPDF.Previewer;
 using QuestPDF.Companion;
 using QuestPDF.Helpers;
+using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
+using System.Reflection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
@@ -63,8 +66,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public IActionResult UserManagement()
         {
             if (CheckRole()) {
+                var model = new NewModel();
+                model.useracc = _db.User_Accounts.ToList();
 
-                return View(_db.User_Accounts.ToList()); }
+                return View(model);
+                 }
             return RedirectToAction("AccessDenied", "Home");
         }
 
@@ -132,14 +138,20 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             {
                 return RedirectToAction("Error", "MainMenu", ID);
             }
-
+            var model = new NewModel();
             var useracc = _db.Homeowner_Details.FirstOrDefault(m => m.AccountID == ID);
+            model.CheckBoxItems = _db.userFeesStatuses.Where(x=> x.AccountID == ID).Select(vm => new CheckBoxItem()
+            {
+                ID = vm.UserFeeID,
+                FeesName = vm.TypeOfFees,
+                IsChecked = vm.Status.Equals("Enabled") ? true : false
+            }).ToList();
             if (useracc == null)
             {
                 return RedirectToAction("Error", "MainMenu", ID);
             }
-
-            return View(useracc);
+            model.Homeowner = useracc;
+            return View(model);
         }
 
 

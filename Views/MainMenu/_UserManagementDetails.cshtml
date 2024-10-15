@@ -1,7 +1,7 @@
-﻿@model Homeowner_details
+﻿@model NewModel
 @{
     Layout = "~/Views/Shared/_Layout1.cshtml";
-    Homeowner_details details = Model;
+    Homeowner_details details = Model.Homeowner;
     int Year = Convert.ToInt32(details.Birthdate.Year);
     int Age = Convert.ToInt32(DateTime.Today.Year) - Year;
 }
@@ -20,14 +20,22 @@
         </thead>
         <tbody>
                 <tr>
-                <td>@Html.DisplayFor(m => m.Firstname) @Html.DisplayFor(m => m.Middlename) @Html.DisplayFor(m => m.Surname)</td>
-                    <td>@Html.DisplayFor(m => m.PhoneNo)</td>
+                <td>@Html.DisplayFor(m => m.Homeowner.Firstname) @Html.DisplayFor(m => m.Homeowner.Middlename) @Html.DisplayFor(m => m.Homeowner.Surname)</td>
+                <td>@Html.DisplayFor(m => m.Homeowner.PhoneNo)</td>
                     <td>@Age</td>
-                    <td>@Html.DisplayFor(m=> m.BlkNO)</td>
-                    <td>@Html.DisplayFor(m=> m.LotNo)</td>
-                    <td>@Html.DisplayFor(m=> m.RFID_number)</td>
+                <td>@Html.DisplayFor(m => m.Homeowner.BlkNO)</td>
+                <td>@Html.DisplayFor(m => m.Homeowner.LotNo)</td>
+                <td>@Html.DisplayFor(m => m.Homeowner.RFID_number)</td>
                 </tr>
         </tbody>
+        
     </table>
+    @{
+        foreach (var items in Model.CheckBoxItems)
+        {
+            <label asp-for="@items.FeesName">@items.FeesName</label>
+            <input asp-for="@items.IsChecked" />
+       }
+    }
     <a class="btn btn-primary" asp-controller="MainMenu" asp-action="UserManagement" style="background-color:#16a085;color:black;">Back to Accounts</a>
 </div>
