@@ -6,11 +6,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Net.Mail;
 using System.Net;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
+using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Hubs;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("AppDbConnectionString") ?? throw new InvalidOperationException("Connection string 'AppDbConnectionString' not found.");
 var serverVersion = new MySqlServerVersion(ServerVersion.AutoDetect(connectionString));
 //For Entity Framework
-
+builder.Services.AddSignalR();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connectionString, serverVersion));
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AppDbContext>();
@@ -50,9 +51,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
+app.MapHub<MyHub>("/Chat");
 app.UseAuthorization();
 app.UseAuthentication();
 app.MapRazorPages();

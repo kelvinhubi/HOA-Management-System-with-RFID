@@ -24,6 +24,7 @@ using QuestPDF.Helpers;
 using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
 using System.Reflection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {

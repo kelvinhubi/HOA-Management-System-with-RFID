@@ -7,6 +7,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
     public class HomeController : Controller
     {
+        
         private readonly ILogger<HomeController> _logger;
         private readonly AppDbContext _db;
         public HomeController(ILogger<HomeController> logger, AppDbContext db)
