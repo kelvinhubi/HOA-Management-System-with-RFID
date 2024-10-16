@@ -151,7 +151,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                         Birthdate = info.Birthdate,
                         PhoneNo = info.PhoneNo,
                         BlkNO = info.BlkNO,
-                        LotNo = info.LotNo,
+                        Address = info.Address,
                         RFID_number = info.RFID_number,
                     });
                 _db.SaveChanges();

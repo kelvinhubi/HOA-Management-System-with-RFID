@@ -25,8 +25,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         [RegularExpression(@"^[0-9]*$", ErrorMessage = "Error pls only enter numbers") ]
         public string BlkNO { get; set; } = string.Empty;
         [Required]
-        [RegularExpression(@"^[0-9]*$", ErrorMessage = "Error pls only enter numbers")]
-        public string LotNo { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
         [ValidateNever]
         public string RFID_number { get; set; } = string.Empty;
         [NotMapped]
