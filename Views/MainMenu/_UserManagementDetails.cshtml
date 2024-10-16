@@ -30,12 +30,38 @@
         </tbody>
         
     </table>
-    @{
-        foreach (var items in Model.CheckBoxItems)
-        {
-            <label asp-for="@items.FeesName">@items.FeesName</label>
-            <input asp-for="@items.IsChecked" />
-       }
-    }
-    <a class="btn btn-primary" asp-controller="MainMenu" asp-action="UserManagement" style="background-color:#16a085;color:black;">Back to Accounts</a>
+    <form asp-action="_UserManagementDetails" class="add">
+        <input type="hidden" name="ID" value="@Html.DisplayFor(m => m.Homeowner.AccountID)" />
+        @{
+            for (int i = 0; i < Model.CheckMe.Count(); i++)
+            {
+                <input  asp-for="@Model.CheckMe[i].ID" hidden/>
+                <label for="@Model.CheckMe[i].FeesName">@Model.CheckMe[i].FeesName</label>
+                <input asp-for="@Model.CheckMe[i].FeesName" hidden/>
+
+                <input  asp-for="@Model.CheckMe[i].IsChecked" type="checkbox"/>
+                
+            }
+
+        }
+        <a class="btn btn-primary" id="Back" asp-controller="MainMenu" asp-action="UserManagement" style="background-color:#16a085;color:black;">Back to Accounts</a>
+    </form>
+   
+    
 </div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+
+        $("input").change(function () {
+            $("#Back").remove();
+            $(".btn").remove();
+        $(".add").append('<input type="submit" value="Save" class="btn btn-primary"/>');
+        $(".add").append('<input type="cancel" value="Cancel" class="btn btn-primary cancel1"/>');
+        });
+    $(".cancel1").click(function () { 
+        $(".btn").remove();
+        $(".add").append('<a class="btn btn-primary" id="Back"  asp-controller="MainMenu" asp-action="UserManagement" style="background-color:#16a085;color:black;">Back to Accounts</a>');
+    });
+    
+
+</script>

@@ -25,6 +25,7 @@ using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
 using System.Reflection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
@@ -140,8 +141,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 return RedirectToAction("Error", "MainMenu", ID);
             }
             var model = new NewModel();
-            var useracc = _db.Homeowner_Details.FirstOrDefault(m => m.AccountID == ID);
-            model.CheckBoxItems = _db.userFeesStatuses.Where(x=> x.AccountID == ID).Select(vm => new CheckBoxItem()
+            var useracc = _db.Homeowner_Details.AsNoTracking().FirstOrDefault(m => m.AccountID == ID);
+            model.CheckMe = _db.userFeesStatuses.Where(x=> x.AccountID == ID).Select(vm => new CheckBoxItem()
             {
                 ID = vm.UserFeeID,
                 FeesName = vm.TypeOfFees,
@@ -153,6 +154,19 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             model.Homeowner = useracc;
             return View(model);
+        }
+        [HttpPost]
+        public async Task<IActionResult> _UserManagementDetails(NewModel info, int ID) {
+            var userfeestatus = _db.userFeesStatuses.Where(_=> _.AccountID == ID);
+            
+            if (userfeestatus == null) { return NotFound(); }
+            /*foreach (var x in userfeestatus) {
+                foreach (var y in info1) { 
+                    x.Status = y.IsChecked == true ? "Enabled" : "Disabled";
+                }
+            }*/
+            await _db.SaveChangesAsync();
+            return RedirectToAction("UserManagement");
         }
 
 
