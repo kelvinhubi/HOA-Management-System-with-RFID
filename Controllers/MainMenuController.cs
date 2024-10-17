@@ -160,11 +160,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             var userfeestatus = _db.userFeesStatuses.Where(_=> _.AccountID == ID);
             
             if (userfeestatus == null) { return NotFound(); }
-            /*foreach (var x in userfeestatus) {
-                foreach (var y in info1) { 
-                    x.Status = y.IsChecked == true ? "Enabled" : "Disabled";
-                }
-            }*/
+            var x = userfeestatus.ToList();
+            var y = info.CheckMe;
+            for (int i = 0; i < info.CheckMe.Count(); i++) {
+                x[i].Status = y[i].IsChecked == true ? "Enabled" : "Disabled";
+            }
             await _db.SaveChangesAsync();
             return RedirectToAction("UserManagement");
         }
