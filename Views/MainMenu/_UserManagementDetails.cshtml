@@ -30,7 +30,9 @@
         </tbody>
         
     </table>
+    
     <form asp-action="_UserManagementDetails">
+        <p style="margin-bottom:0px;">Fees Option:</p>
         <input type="hidden" name="ID" value="@Html.DisplayFor(m => m.Homeowner.AccountID)" />
         @{
             for (int i = 0; i < Model.CheckMe.Count(); i++)
@@ -45,7 +47,7 @@
 
         }
         <div class="add">
-
+            
             <a class="btn btn-primary" id="Back" asp-controller="MainMenu" asp-action="UserManagement" style="background-color:#16a085;color:black;">Back to Accounts</a>
         </div>
         
@@ -60,7 +62,7 @@
             $("#Back").remove();
         htmlStr = "";
         htmlStr += '<input type="submit" value="Save" class="btn btn-primary"/>';
-        htmlStr += '<input type="reset" value="Cancel" onclick="Hello()" class="btn btn-primary"/>';
+        htmlStr += '<input type="reset" value="Cancel" onclick="Hello()" class="btn btn-danger"/>';
         $(".add").html(htmlStr);
             
         });
@@ -68,7 +70,7 @@
     function Hello() { 
         $(".btn").remove();
         htmlStr = "";
-        htmlStr += '<a class="btn btn-primary" id="Back" onclick="GoBack()" style="background-color:#16a085;color:black;">Back to Accounts</a>';
+        htmlStr += '<a class="btn btn-success" id="Back" onclick="GoBack()">Back to Accounts</a>';
         $(".add").html(htmlStr);
         $("form").trigger("reset");
     }

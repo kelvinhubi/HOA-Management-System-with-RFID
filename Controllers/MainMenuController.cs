@@ -97,8 +97,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
         //Delete all info in the users
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult UserDelete(User_Account obj)
+        public async Task<IActionResult> UserDelete(User_Account obj)
         {
             try
             {
@@ -128,7 +127,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     LogDescription = "Logged In Username:" + HttpContext.Session.GetString("SessionUsername"),
                     LogUserRole = "" + HttpContext.Session.GetString("UserType"),
                 });
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
                 return RedirectToAction("UserManagement");
             }
             catch (Exception) { return RedirectToAction("UserManagement"); }

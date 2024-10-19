@@ -1,5 +1,5 @@
 ﻿@model User_Account
-<Button runat="server" id="bution" class="btn btn-primary" style="background-color:#16a085;color:black;">Create User Account</Button>
+<Button runat="server" id="bution" class="btn btn-success" >Create User Account</Button>
 <form asp-action="View" class="form" id="thisform">
     <p class="title">Add Homeowner User Account</p>
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -21,10 +21,18 @@
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <Button onclick="GeneratePass();" type="button" class="btn btn-primary" style="background-color:#16a085;color:black;">Generate Password</Button>
+        <Button onclick="GeneratePass();" type="button" class="btn btn-secondary" style="margin-top:5px;margin-bottom:5px;">Generate Password</Button>
     </div>
     <div class="form-group">
-        <input asp-controller="MainMenu" asp-action="CreatUserAcc" type="submit" id="button1" value="Create" class="btn btn-primary" style="background-color:#16a085;color:black;" />
+        <input asp-controller="MainMenu" asp-action="CreatUserAcc" type="submit" id="button1" value="Create" class="btn btn-primary"  />
+        <!--<div class="add">
+            <div class="loading-wave">
+                <div class="loading-bar"></div>
+                <div class="loading-bar"></div>
+                <div class="loading-bar"></div>
+                <div class="loading-bar"></div>
+            </div>
+        </div>-->
     </div>
 </form>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -76,4 +84,8 @@
                 }
             });
     }
+    //$("#button1").on('click', function () { 
+        //$(".add").html('<div class="loading-wave"><div class="loading-bar"></div ><div class="loading-bar"></div><div class="loading-bar"></div><div class="loading-bar"></div></div>');
+    //});
+    
 </script>
