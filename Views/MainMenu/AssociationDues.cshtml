@@ -32,10 +32,14 @@
 
         </tbody>
     </table>
+
 </div>
-@{
-                                <partial name="_CreateDues" model="Model"/>
-}
+<div style="display:flex">
+    @{
+        <partial name="_CreateDues" model="Model" />
+    }
+    <Button id="PaidDues" asp-action="_ClearPaid" class="btn btn-danger" style="margin-left:5px;">Clear Paid Dues</Button>
+</div>
 @section Scripts {
     @{
                                     <partial name="_ValidationScriptsPartial" />

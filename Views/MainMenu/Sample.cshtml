@@ -1,51 +1,48 @@
-﻿
-<iframe width="1020" height="700" src="https://pm.link/CessnaHomes/test/xGswz44">
+﻿@model IEnumerable<Vehicle_Information>
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
 
-</iframe>
+<div id="UserPartial">
+    <h2>Vehicle Management </h2>
+    <table id="mytable" class="table">
+        <thead class="table-light">
+            <tr>
+                <th>VehicleID</th>
+                <th>Full Name</th>
+                <th>Plate No.</th>
+                <th>Vehicle Model</th>
+                <th>Vehicle Type</th>
+                <th>RFID No.</th>
+                <th>RFID Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model)
+            {
+                <tr>
+                    <td>@obj.VehicleID</td>
+                    <td>@obj.FullName</td>
+                    <td>@obj.PlateNo</td>
+                    <td>@obj.VehicleModel</td>
+                    <td>@obj.VehicleType</td>
+                    <td>@obj.RFID_number</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@obj.VehicleID">Details</a>
+                        <a asp-action="_DeleteVehicle" asp-route-ID="@obj.VehicleID">Delete</a>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
-    var btn = document.getElementById("bution")
-    var text;
-    btn.onclick = function () {
-        if ($(".form").css("display") == "block") {
-            $(".form").css("display", "none");
-            $("#bution").html('Create User Account');
-            $("body").css("background", "rgba(0, 0, 0, 0)");
-            $('#forpass').val("")
-            $("#forpass").attr('disabled', 'disabled');
-        }
-        else {
-            $(".form").css("display", "block");
-            $("#bution").html('Hide');
-            $("body").css("background", "rgba(0, 0, 0, 0.4)");
-
-        }
-    }
-
-    function GeneratePass() {
-        $.post("@Url.Action("GeneratePass", "MainMenu")", { userdata: $("#Username").val() },
-            function (data) {
-                $('#forpass').removeAttr('disabled')
-                $('#forpass').val(data)
-            });
-    }
-    function UserCheck() {
-        $("#Status").html("Checking...");
-        $.post("@Url.Action("CheckUsername", "Login")",
-            {
-                userdata: $("#Username").val()
-            },
-            function (data) {
-                if (data == 0) {
-                    $("#Status").html('<font color = "Green"> Username Available!.</font>');
-                    $("#Username").css("border-color", "Green");
-                    $("#button1").removeAttr('disabled');
-                }
-                else {
-                    $("#Status").html('<font color = "Red"> Username already Taken!.</font>');
-                    $("#Username").css("border-color", "Green");
-                    $("#button1").attr('disabled', 'disabled');
-                }
-            });
-    }
+    new DataTable('#mytable');
 </script>

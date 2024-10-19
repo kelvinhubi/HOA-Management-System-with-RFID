@@ -1,5 +1,34 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model Vehicle_Information
 @{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+    ViewData["Title"] = "Edit";
 }
+<form asp-action="_DeleteVehicle" class="form" id="thisform" style="bottom:29rem; display:block">
+    <p class="title">Delete User Vehicle ?</p>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="VehicleID" />
+    <input type="hidden" asp-for="AccountID" />
+    <div class="form-group">
+        <label asp-for="FullName" class="control-label"></label>
+        <input asp-for="FullName" class="form-control" class="input" readonly />
+
+    </div>
+    <div class="form-group">
+        <label asp-for="PlateNo" class="control-label"></label>
+        <input asp-for="PlateNo" class="form-control" class="input" readonly />
+    </div>
+    <div class="form-group">
+        <label asp-for="VehicleModel" class="control-label"></label>
+        <input asp-for="VehicleModel" class="form-control" class="input" readonly />
+    </div>
+    <div class="form-group">
+        <label asp-for="VehicleType" class="control-label"></label>
+        <input asp-for="VehicleType" class="form-control" class="input" readonly />
+    </div>
+    <div class="form-group">
+        <input type="submit" id="button1" value="Delete" class="btn btn-danger" style="margin-top:10px;" />
+    </div>
+</form>
+
+<a asp-controller="MainMenu" asp-action="VehicleManagement" class="btn btn-success" style="padding:5px; position:fixed">Back to List</a>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>

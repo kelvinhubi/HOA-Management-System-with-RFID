@@ -8,25 +8,30 @@
     <table id="mytable" class="table">
         <thead class="table-light">
             <tr>
+                <th>VehicleID</th>
                 <th>Full Name</th>
                 <th>Plate No.</th>
                 <th>Vehicle Model</th>
                 <th>Vehicle Type</th>
                 <th>RFID No.</th>
                 <th>RFID Status</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var obj in Model)
             {
                 <tr>
+                    <td>@obj.VehicleID</td>
                     <td>@obj.FullName</td>
                     <td>@obj.PlateNo</td>
                     <td>@obj.VehicleModel</td>
                     <td>@obj.VehicleType</td>
                     <td>@obj.RFID_number</td>
+                    <td>@obj.RFID_status</td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@obj.AccountID">Details</a>
+                        <a asp-action="_EditVehicle" class="btn btn-warning"  asp-route-ID="@obj.VehicleID">Edit</a>
+                        <a asp-action="_DeleteVehicle" class="btn btn-danger" asp-route-ID="@obj.VehicleID">Delete</a>
                     </td>
                 </tr>
             }

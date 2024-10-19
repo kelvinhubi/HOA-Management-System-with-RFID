@@ -1,9 +1,9 @@
 ﻿@model NewModel
 
-<Button runat="server" id="bution" class="btn btn-primary" style="position:sticky;background-color:#16a085;color:black;">Create Dues</Button>
+<Button runat="server" id="bution" class="btn btn-success" style="position:sticky;">Create Dues</Button>
 <form method="post" class="form" id="thisform">
     <p class="title">Add Dues</p>
-    <input asp-for="@Model.dues.AccountID" name="AccountID" id="AccountID" class="form-control" readonly />
+    <input asp-for="@Model.dues.AccountID" name="AccountID" id="AccountID" class="form-control" hidden />
     <input asp-for="@Model.dues.Status" name="Status" class="form-control" hidden />
     <div class="form-group">
         <label asp-for="@Model.dues.FullName" class="control-label">Select Homeowner</label>
@@ -33,7 +33,7 @@
         <span asp-validation-for="@Model.dues.Date" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <input asp-controller="MainMenu" asp-action="_CreateDues" type="submit" id="button1" value="Create" class="btn btn-primary" style="background-color:#16a085;color:black;" />
+        <input asp-controller="MainMenu" asp-action="_CreateDues" type="submit" id="button1" value="Create" class="btn btn-primary"/>
     </div>
 </form>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -44,6 +44,7 @@
         if ($(".form").css("display") == "block") {
             $(".form").css("display", "none");
             $("#UserPartial").css("display", "block");
+            $("#PaidDues").css("display", "block");
             $("#bution").html('Create Dues'); 
             document.getElementById("bution").style.cssText = "display: block; position: inherit; background-color:#16a085; color: black";
             $("body").css("background", "rgba(0, 0, 0, 0)");
@@ -56,6 +57,7 @@
             CheckName();
             document.getElementById("bution").style.cssText = "position: fixed; background-color:#16a085;color:black;";
             $("#UserPartial").css("display", "none");
+            $("#PaidDues").css("display", "none");
             $("#bution").html('Hide');
             $("body").css("background", "rgba(0, 0, 0, 0.4)");
 

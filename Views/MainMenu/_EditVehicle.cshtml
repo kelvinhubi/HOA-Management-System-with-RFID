@@ -1,5 +1,36 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model Vehicle_Information
 @{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+    ViewData["Title"] = "Edit";
 }
+<form asp-action="_EditVehicle" class="form" id="thisform" style="bottom:29rem; display:block">
+    <p class="title">Edit Vehicle?</p>
+    <input asp-for="VehicleID" hidden/>
+    <input asp-for="AccountID" hidden />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="FullName" class="control-label"></label>
+        <input asp-for="FullName" class="form-control" class="input" readonly />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PlateNo" class="control-label"></label>
+        <input asp-for="PlateNo" class="form-control" class="input"  />
+        <span asp-validation-for="PlateNo" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="VehicleModel" class="control-label"></label>
+        <input asp-for="VehicleModel" class="form-control" class="input"  />
+        <span asp-validation-for="VehicleModel" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="VehicleType" class="control-label"></label>
+        <input asp-for="VehicleType" class="form-control" class="input"  />
+        <span asp-validation-for="VehicleType" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" id="button1" value="Save" class="btn btn-primary" style="margin-top:10px;" />
+    </div>
+</form>
+<a asp-controller="MainMenu" asp-action="VehicleManagement" class="btn btn-success" style="padding:5px; position:fixed">Back to List</a>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>

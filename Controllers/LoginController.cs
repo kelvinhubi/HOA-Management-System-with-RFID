@@ -49,6 +49,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     {
                         HttpContext.Session.SetString("SessionUsername", info.Username);
                         HttpContext.Session.SetString("UserType", "Admin");
+                        _db.logsLists.Add(new LogsList
+                        {
+                            LogName = "Log In",
+                            LogDescription = "Logged In Username:" + HttpContext.Session.GetString("SessionUsername"),
+                            LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+                        });
+                        _db.SaveChanges();
                         return RedirectToAction("Dashboard", "MainMenu");
                     }
                 }
