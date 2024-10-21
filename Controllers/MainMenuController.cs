@@ -2,30 +2,14 @@
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
 using MailKit.Net.Smtp;
 using MailKit.Security;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.Extensions.Hosting.Internal;
-using Microsoft.Identity.Client;
 using MimeKit;
 using MySqlConnector;
-using NuGet.Packaging.Signing;
-using System.Linq;
-using System.Text;
-using QuestPDF.Infrastructure;
-using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using QuestPDF.Fluent;
-using QuestPDF.Previewer;
-using QuestPDF.Companion;
 using QuestPDF.Helpers;
-using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
-using System.Reflection;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using QuestPDF.Infrastructure;
+using System.Text;
 
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
@@ -43,14 +27,17 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             _logger = logger;
         }
         //Test
-        public IActionResult Sample() {
+        public IActionResult Sample()
+        {
 
-            return View(_db.Vehicle_Information.ToList()); }
+            return View(_db.Vehicle_Information.ToList());
+        }
         //Dashboard Controller
         public IActionResult Dashboard()
         {
-            if (CheckRole()) {
-                
+            if (CheckRole())
+            {
+
                 ViewData["User Registrations"] = _db.Homeowner_Details.Count();
                 ViewData["RFID Registrations"] = _db.Vehicle_Information.Where(x => x.RFID_number != "").Count();
                 ViewData["Pending Payments"] = _db.Due_Details.Where(x => x.Status == "Unpaid").Count();
@@ -63,7 +50,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         //UserManagement Controller
         public IActionResult UserManagement()
         {
-            if (CheckRole()) {
+            if (CheckRole())
+            {
                 var model = new NewModel();
                 model.useracc = _db.User_Accounts.ToList();
 
@@ -107,12 +95,14 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     _db.Homeowner_Details.Remove(forhomeowner);
                     _db.SaveChanges();
                 }
-                if (forUserDues != null) {
+                if (forUserDues != null)
+                {
                     Console.WriteLine("Dues should be deleted");
                     _db.Due_Details.RemoveRange(forUserDues);
                     _db.SaveChanges();
                 }
-                if (forUserfeestatus != null) {
+                if (forUserfeestatus != null)
+                {
                     _db.userFeesStatuses.RemoveRange(forUserfeestatus);
                     _db.SaveChanges();
                 }
@@ -151,13 +141,15 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return View(model);
         }
         [HttpPost]
-        public async Task<IActionResult> _UserManagementDetails(NewModel info, int ID) {
+        public async Task<IActionResult> _UserManagementDetails(NewModel info, int ID)
+        {
             var userfeestatus = _db.userFeesStatuses.Where(_ => _.AccountID == ID);
 
             if (userfeestatus == null) { return NotFound(); }
             var x = userfeestatus.ToList();
             var y = info.CheckMe;
-            for (int i = 0; i < info.CheckMe.Count(); i++) {
+            for (int i = 0; i < info.CheckMe.Count(); i++)
+            {
                 x[i].Status = y[i].IsChecked == true ? "Enabled" : "Disabled";
             }
             await _db.SaveChangesAsync();
@@ -220,7 +212,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public IActionResult AssociationDues(string sortOrder)
         {
 
-            if (CheckRole()) {
+            if (CheckRole())
+            {
                 var result = (from due in _db.Due_Details
                               join
                               homeacc in _db.Homeowner_Details on due.AccountID equals homeacc.AccountID
@@ -242,15 +235,18 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return RedirectToAction("AccessDenied", "Home");
 
         }
-        public IActionResult _CreateDues() {
+        public IActionResult _CreateDues()
+        {
             return PartialView();
         }
         [HttpPost]
-        public async Task<IActionResult> _CreateDues(string AccountID, string Amount, string TypeofDues, DateOnly Date, string Status) {
+        public async Task<IActionResult> _CreateDues(string AccountID, string Amount, string TypeofDues, DateOnly Date, string Status)
+        {
 
             if (ModelState.IsValid)
             {
-                _db.Due_Details.Add(new Dues {
+                _db.Due_Details.Add(new Dues
+                {
                     AccountID = Convert.ToInt32(AccountID),
                     Amount = Amount,
                     TypeofDues = TypeofDues,
@@ -269,7 +265,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return RedirectToAction("AssociationDues");
 
         }
-        public IActionResult _ClearPaid() {
+        public IActionResult _ClearPaid()
+        {
             var result = _db.Due_Details.Where(_ => _.Status.Equals("Paid"));
             _db.Due_Details.RemoveRange(result);
             _db.SaveChanges();
@@ -278,7 +275,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         [HttpPost]
         public JsonResult CheckName(string userdata)
         {
-            if (userdata != null) {
+            if (userdata != null)
+            {
                 Console.WriteLine(userdata);
                 char[] trimchars = { ' ', '!' };
                 string[] trimmedArray = userdata.Split(trimchars, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
@@ -319,16 +317,19 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         //Logs Controller
         public IActionResult Logs()
         {
-            if (CheckRole()) {
+            if (CheckRole())
+            {
 
                 return View(_db.logsLists.ToList());
             }
             return RedirectToAction("AccessDenied", "Home");
         }
-        public IActionResult PrintLogs() {
+        public IActionResult PrintLogs()
+        {
 
             QuestPDF.Settings.License = LicenseType.Community;
-            void ComposeTable(IContainer container) {
+            void ComposeTable(IContainer container)
+            {
                 container.Border(1).Table(table =>
                 {
                     table.ColumnsDefinition(columns =>
@@ -347,7 +348,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                         header.Cell().Text("Log Date");
                     });
                     var result = _db.logsLists.ToList();
-                    if (result != null) {
+                    if (result != null)
+                    {
                         foreach (var item in result)
                         {
                             table.Cell().Text(item.LogName.ToString());
@@ -375,7 +377,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
             return RedirectToAction("Logs");
         }
-        public IActionResult _ClearLogs() {
+        public IActionResult _ClearLogs()
+        {
             var result = _db.logsLists.ToList();
             _db.logsLists.RemoveRange(result);
             _db.SaveChanges();
@@ -438,27 +441,33 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return RedirectToAction("VehicleManagement");
         }
 
-        public IActionResult _DeleteVehicle(int ID) {
+        public IActionResult _DeleteVehicle(int ID)
+        {
             var result = _db.Vehicle_Information.SingleOrDefault(_ => _.VehicleID == ID);
             if (result == null) { return NotFound(); }
             return PartialView(result);
         }
         [HttpPost]
-        public IActionResult _DeleteVehicle(Vehicle_Information info) {
-            if (ModelState.IsValid) {
+        public IActionResult _DeleteVehicle(Vehicle_Information info)
+        {
+            if (ModelState.IsValid)
+            {
                 _db.Vehicle_Information.Remove(info);
                 _db.SaveChanges();
             }
             return RedirectToAction("VehicleManagement");
         }
-        public IActionResult _EditVehicle(int ID) {
+        public IActionResult _EditVehicle(int ID)
+        {
             var result = _db.Vehicle_Information.SingleOrDefault(_ => _.VehicleID == ID);
             if (result == null) { return NotFound(); }
             return PartialView(result);
         }
         [HttpPost]
-        public IActionResult _EditVehicle(Vehicle_Information info) {
-            if (ModelState.IsValid) { 
+        public IActionResult _EditVehicle(Vehicle_Information info)
+        {
+            if (ModelState.IsValid)
+            {
                 _db.Vehicle_Information.Update(info);
                 _db.SaveChanges();
             }
@@ -471,8 +480,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
         public IActionResult _CreateFees() { return PartialView(); }
         [HttpPost]
-        public async Task<IActionResult> _CreateFees(FeesList info) {
-            if (ModelState.IsValid) {
+        public async Task<IActionResult> _CreateFees(FeesList info)
+        {
+            if (ModelState.IsValid)
+            {
                 _db.feesLists.Add(info);
                 _db.SaveChanges();
                 var data1 = _db.Homeowner_Details.ToList();
@@ -491,7 +502,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 _db.logsLists.Add(new LogsList
                 {
                     LogName = "Create Fees",
-                    LogDescription = "Fees Name:" + info.TypeOfFees + "Logged In Username: "+ HttpContext.Session.GetString("SessionUsername"),
+                    LogDescription = "Fees Name:" + info.TypeOfFees + "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
                     LogUserRole = "" + HttpContext.Session.GetString("UserType"),
                 });
                 await _db.SaveChangesAsync();
@@ -500,14 +511,17 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return RedirectToAction("Fees");
 
         }
-        public IActionResult _EditFees(int? ID) {
+        public IActionResult _EditFees(int? ID)
+        {
 
-            if (ID == null) {
+            if (ID == null)
+            {
                 return NotFound();
             }
 
             var result = _db.feesLists.FirstOrDefault(x => x.IDFees == ID);
-            if (result == null) {
+            if (result == null)
+            {
                 return NotFound();
             }
 
@@ -525,7 +539,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     var feeid = _db.userFeesStatuses.Where(_ => _.IDFees == info.IDFees);
                     if (feeid != null)
                     {
-                        foreach (var x in feeid) {
+                        foreach (var x in feeid)
+                        {
                             x.TypeOfFees = info.TypeOfFees;
                             x.Status = info.Status;
                             x.Amount = info.Amount;
@@ -549,20 +564,24 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return RedirectToAction("Fees");
 
         }
-        public IActionResult _DeleteFees(int? id) {
-            if (id == null) {
+        public IActionResult _DeleteFees(int? id)
+        {
+            if (id == null)
+            {
                 return NotFound();
             }
             var result = _db.feesLists.SingleOrDefault(_ => _.IDFees == id);
 
-            if (result == null) {
+            if (result == null)
+            {
                 return NotFound();
             }
             return View(result);
         }
         [HttpPost]
-        public IActionResult _DeleteFees(int id) {
-            var result = _db.feesLists.SingleOrDefault(_=>_.IDFees==id);
+        public IActionResult _DeleteFees(int id)
+        {
+            var result = _db.feesLists.SingleOrDefault(_ => _.IDFees == id);
             if (result != null)
             {
                 _db.feesLists.Remove(result);
@@ -578,7 +597,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 });
                 _db.SaveChanges();
             }
-            else { 
+            else
+            {
                 return NotFound();
             }
 
@@ -588,20 +608,20 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         [HttpPost]
         public JsonResult CheckAmount(string userdata)
         {
-            Console.WriteLine("Check aMOUNT:"+userdata);
+            Console.WriteLine("Check aMOUNT:" + userdata);
             if (userdata != null)
             {
-                
-                    var SearchData = _db.userFeesStatuses.Where(x => x.UserFeeID == Convert.ToInt32(userdata)).SingleOrDefault();
-                    if (SearchData != null)
-                    {
-                        return Json(SearchData.Amount);
-                    }
-                    else
-                    {
-                        return Json(0);
-                    }
+
+                var SearchData = _db.userFeesStatuses.Where(x => x.UserFeeID == Convert.ToInt32(userdata)).SingleOrDefault();
+                if (SearchData != null)
+                {
+                    return Json(SearchData.Amount);
                 }
+                else
+                {
+                    return Json(0);
+                }
+            }
             return Json(0);
         }
         [HttpPost]
@@ -647,7 +667,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return false;
         }
-        private string CreateMailBody(string Username, string Password  ) {
+        private string CreateMailBody(string Username, string Password)
+        {
             string? dir = System.IO.Path.GetFullPath("Views\\Home\\index.html");
             string body = string.Empty;
             using (StreamReader reader = new StreamReader(dir))
@@ -659,6 +680,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             body = body.Replace("{Password}", Password);
             return body;
         }
-        
+
     }
 }
