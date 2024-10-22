@@ -3,6 +3,7 @@ using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
 using MySqlConnector;
@@ -603,6 +604,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
 
             return RedirectToAction("Fees");
+        }
+
+        //Profile
+        public IActionResult Profile() {
+            Console.WriteLine(HttpContext.Session.GetString("SessionID"));
+            var result = _db.Admin_Accounts.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+             return View(result);
         }
         //Json Result
         [HttpPost]

@@ -48,6 +48,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     else
                     {
                         HttpContext.Session.SetString("SessionUsername", info.Username);
+                        var result = _db.Admin_Accounts.Where(_ => _.Username == info.Username && _.Password == info.Password).Select(_ => _.AccountID).FirstOrDefault();
+                        if (result != 0) {
+							HttpContext.Session.SetString("SessionID", Convert.ToString(result));
+						}
                         HttpContext.Session.SetString("UserType", "Admin");
                         _db.logsLists.Add(new LogsList
                         {
