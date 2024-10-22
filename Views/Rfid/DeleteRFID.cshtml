@@ -1,5 +1,37 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model Homeowner_details
+<button id="RFIDnumber">click Me</button>
 @{
 }
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    var isValue = false
+    $("#RFIDnumber").on('click', function () {
+        $(this).val("Listening...");
+        Timer(5000);
+        //do dome scanning on rfid
+        $.post("@Url.Action("ReadRFID", "Rfid")",
+            {
+                userdata: ""
+            },
+            function (data) {
+                if (data == 0) {
+                    isValue = false;
+                    console.log("should change value");
+                }
+                else {
+                    $("#RFIDnumber").val(data);
+                    isValue = true;
+                }
+            });
+
+    });
+    async function Timer(time) {
+        setTimeout(function () {
+            if (isValue == false) {
+                console.log("Hello");
+                $("#RFIDnumber").val("N/A");
+            }
+
+        }, time);
+    }
+</script>

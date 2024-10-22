@@ -3,6 +3,13 @@
     Layout = "~/Views/Shared/_Layout1.cshtml";
     
 }
+<head>
+    <title>
+        @{
+            ViewData["Title"] = "User Management";
+        }
+    </title>
+</head>
 @Html.AntiForgeryToken();
 <div id="UserPartial">
     <h2>Accounts</h2>

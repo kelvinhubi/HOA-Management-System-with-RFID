@@ -2,7 +2,13 @@
 @{
     Layout = "~/Views/Shared/_Layout1.cshtml";
 }
-
+<head>
+<title>
+    @{
+        ViewData["Title"] = "Fees";
+    }
+</title>
+</head>
 <div id="UserPartial">
     <h2>Association Dues </h2>
     <table class="table">
@@ -21,8 +27,8 @@
                     <td>@obj.Amount</td>
                     <td>@obj.Status</td>
                     <td>
-                        <a asp-action="_EditFees" asp-route-id="@obj.IDFees">Edit</a>
-                        <a asp-action="_DeleteFees" asp-route-id="@obj.IDFees">Delete</a>
+                        <a asp-action="_EditFees" class="btn btn-warning" asp-route-id="@obj.IDFees">Edit</a>
+                        <a asp-action="_DeleteFees" class="btn btn-danger" asp-route-id="@obj.IDFees">Delete</a>
                     </td>
                 </tr>
             }

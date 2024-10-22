@@ -36,7 +36,7 @@
     </div>
     <div class="form-group">
         <label asp-for="RFID_number" class="control-label">RFID Number</label>
-        <input asp-for="RFID_number" class="form-control input" />
+        <input asp-for="RFID_number" id="RFIDnumber" class="form-control input" readonly/>
         <span asp-validation-for="RFID_number" class="text-danger"></span>
     </div>
     <div class="form-group">
@@ -85,5 +85,30 @@
 
                 }
             });
+    }
+    var isValue = false
+    $("#RFIDnumber").on('click', function () {
+        $(this).val("Listening...");
+        Timer(5000);
+        //do dome scanning on rfid
+        $.get("@Url.Action("ReadRFID", "Rfid")", function (data) {
+            if (data == 0) {
+                isValue = false;
+                console.log("should change value");
+            }
+            else{
+                $("#RFIDnumber").val(data);
+                isValue = true;
+            }
+        });
+        
+    });
+    async function Timer(time) {
+        setTimeout(function () {
+            if (isValue == false) { 
+                console.log("Hello");
+                $("#RFIDnumber").val("N/A");
+            }
+        }, time);
     }
 </script>

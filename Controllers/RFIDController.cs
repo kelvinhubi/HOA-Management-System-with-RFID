@@ -1,37 +1,36 @@
 ﻿using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
-using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Mvc;
 using System.IO.Ports;
-
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
     public class RfidController : Controller
     {
         private readonly AppDbContext _db;
-        private readonly ILogger _logger;
 
-        public RfidController(AppDbContext db, ILogger logger) {
+        public RfidController(AppDbContext db)
+        {
             _db = db;
-            _logger = logger;
         }
 
-
-        [HttpPost]
-        public JsonResult ReadRfid(string userdata)
+        [HttpGet]
+        public JsonResult ReadRFID()
         {
-            ;
+
             string[] ports = SerialPort.GetPortNames();
             foreach (string port in ports)
             {
                 Console.WriteLine(port);
             }
-            return Json(1);
+            return Json(0);
         }
 
-        public IActionResult ShowRFID() {
+        public IActionResult ShowRFID()
+        {
 
-            return View(); }
-        public IActionResult DeleteRFID(int ID) {
+            return View();
+        }
+        public IActionResult DeleteRFID()
+        {
             /*
               if(ID == null){
                 return NotFound();
@@ -41,10 +40,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 return NotFound();
                 }
              */
-            return PartialView();//(result);
+            return View();//(result);
         }
         [HttpPost]
-        public IActionResult _DeleteRFID(RfidController info) {
+        public IActionResult _DeleteRFID(RfidController info)
+        {
             /*
              * if(ModelState.IsValid){ 
              * _db.rfid_Information.Remove(info); 
@@ -53,12 +53,15 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
              */
             return RedirectToAction();//MainMenu;
         }
-        public IActionResult CreateRFID() {
+        public IActionResult CreateRFID()
+        {
 
-            return PartialView(); }
+            return PartialView();
+        }
 
         [HttpPost]
-        public IActionResult _CreateRFID(RfidController info) {
+        public IActionResult _CreateRFID(RfidController info)
+        {
             /*
                 if(ModelState.IsValid){
                 _db.rfid_Information.Add(info);
@@ -68,7 +71,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return RedirectToAction();
         }
 
-        public IActionResult UpdateRFID(int ID) {
+        public IActionResult UpdateRFID(int ID)
+        {
             /*
               if(ID == null){
                 return NotFound();
@@ -78,18 +82,18 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 return NotFound();
                 }
              */
-            return PartialView(); }
+            return PartialView();
+        }
         [HttpPost]
-        public IActionResult _UpdateRFID(RfidController info) {
+        public IActionResult _UpdateRFID(RfidController info)
+        {
             /*
                 if(ModelState.IsValid){
                 _db.rfid_Information.Update(info);
                 _db.SaveChanges();
             }
              */
-            return RedirectToAction(); 
+            return RedirectToAction();
         }
-
     }
 }
-    
