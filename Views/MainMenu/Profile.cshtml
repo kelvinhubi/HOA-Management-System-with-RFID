@@ -96,7 +96,7 @@
 						<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
 							<div class="form-group">
 								<label asp-for="Password">Password</label>
-								<input type="password" id="Pass" class="form-control" asp-for="Password" value="*********"/>
+								<input type="password" id="Pass" class="form-control" asp-for="Password" placeholder="********"/>
 							</div>
 						</div>
 					</div>
@@ -115,12 +115,10 @@
 </div>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
-	$("#Pass").on('focus', function () {
-		console.log("hello")
-		$(this).val("")
+	$("#Pass").on('focus', function () {	
+		$(this).attr("placeholder", "")
 	});
     $("#Pass").on('focusout', function () {
-        console.log("hello")
-        $(this).val("*********")
+		$(this).attr("placeholder", "********")
     });
 </script>
