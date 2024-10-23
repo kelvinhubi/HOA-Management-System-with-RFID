@@ -90,13 +90,13 @@
 						<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
 							<div class="form-group">
 								<label asp-for="Username"></label>
-								<input type="text" class="form-control" asp-for="Username"/>
+								<input type="text" class="form-control" asp-for="Username" />
 							</div>
 						</div>
 						<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
 							<div class="form-group">
-								<label asp-for="Password">Email</label>
-								<input type="email" class="form-control" asp-for="Password"/>
+								<label asp-for="Password">Password</label>
+								<input type="password" id="Pass" class="form-control" asp-for="Password" value="*********"/>
 							</div>
 						</div>
 					</div>
@@ -113,3 +113,14 @@
 		</div>
 	</div>
 </div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+	$("#Pass").on('focus', function () {
+		console.log("hello")
+		$(this).val("")
+	});
+    $("#Pass").on('focusout', function () {
+        console.log("hello")
+        $(this).val("*********")
+    });
+</script>
