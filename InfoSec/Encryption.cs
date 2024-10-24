@@ -16,14 +16,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.InfoSec
             return keyBase64;
         }
 
-        public static string Encrpyt(string PlainText, string Key, out string IVKey) {
+        public static string Encrpyt(string PlainText, string Key, string IVKey) {
             using (Aes aes = Aes.Create()) {
                 aes.Padding = PaddingMode.Zeros;
                 aes.Key=Convert.FromBase64String(Key);
-                aes.GenerateIV();
-                IVKey=Convert.ToBase64String(aes.IV);
+                aes.IV = Convert.FromBase64String(IVKey);
 
-                ICryptoTransform encryptor = aes.CreateEncryptor();
+                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key,aes.IV);
 
                 byte[] encryptedData;
 
@@ -48,7 +47,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.InfoSec
                 aes.Key = Convert.FromBase64String(Key);
                 aes.IV = Convert.FromBase64String(IVKey);
 
-                ICryptoTransform decryptor = aes.CreateDecryptor();
+                ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key,aes.IV);
 
                 string PlainText = "";
                 byte[] ciper = Convert.FromBase64String(CipherText);
@@ -64,7 +63,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.InfoSec
                        
                     }
                 }
-                return PlainText;
+                return PlainText.Replace("\0","");
             }
 
         }

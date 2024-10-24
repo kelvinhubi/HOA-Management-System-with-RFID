@@ -1,5 +1,6 @@
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
 using Microsoft.EntityFrameworkCore;
+using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
 using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -7,13 +8,15 @@ using System.Net.Mail;
 using System.Net;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Hubs;
+using Microsoft.Extensions.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("AppDbConnectionString") ?? throw new InvalidOperationException("Connection string 'AppDbConnectionString' not found.");
 var serverVersion = new MySqlServerVersion(ServerVersion.AutoDetect(connectionString));
+var EnvModel = builder.Configuration.GetSection("Env");
+builder.Services.Configure<EnvironmentModel>(EnvModel);
 //For Entity Framework
 builder.Services.AddSignalR();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connectionString, serverVersion));
-
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AppDbContext>();
 //For Identity
 //Adding Authentication

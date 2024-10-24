@@ -1,10 +1,12 @@
 ﻿using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
+using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.InfoSec;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using MimeKit;
 using MySqlConnector;
 using QuestPDF.Fluent;
@@ -21,11 +23,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         const string connstr = "server=localhost;user=root;password=Kelvinfo14;database=hoa_sys";
         private readonly AppDbContext _db;
         private readonly ILogger _logger;
+        private readonly EnvironmentModel _env;
         MySqlConnection conn = new MySqlConnection(connstr);
-        public MainMenuController(AppDbContext db, ILogger<MainMenuController> logger)
+        public MainMenuController(AppDbContext db, ILogger<MainMenuController> logger,IOptions<EnvironmentModel> Accessor)
         {
             _db = db;
             _logger = logger;
+            _env = Accessor.Value;
         }
         //Test
         public IActionResult Sample()
@@ -42,8 +46,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 ViewData["User Registrations"] = _db.Homeowner_Details.Count();
                 ViewData["RFID Registrations"] = _db.Vehicle_Information.Where(x => x.RFID_number != "").Count();
                 ViewData["Pending Payments"] = _db.Due_Details.Where(x => x.Status == "Unpaid").Count();
-                return View();
+				string EncryptedKey = Encryption.GenerateKey();
+				return View();
             }
+            
             return RedirectToAction("AccessDenied", "Home");
 
         }
@@ -167,6 +173,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 var Username = info.Username;
                 var Password = info.Password;
                 var bodybuild = new BodyBuilder();
+                
                 bodybuild.HtmlBody = CreateMailBody(Username, Password);
                 mailMessage.From.Add(new MailboxAddress("Cessna", "krfortin15@gmail.com"));
                 mailMessage.To.Add(new MailboxAddress(info.Username, info.Email));
@@ -174,11 +181,17 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 mailMessage.Body = bodybuild.ToMessageBody();
                 using (var smtpclient = new SmtpClient())
                 {
-                    smtpclient.Connect("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
-                    smtpclient.Authenticate("krfortin15@gmail.com", "axji zqrc cooa ymwv");
+                    smtpclient.Connect(_env.Host, Convert.ToInt32(_env.Port), SecureSocketOptions.StartTls);
+                    smtpclient.Authenticate(_env.Email, _env.Password);
                     smtpclient.Send(mailMessage);
                     smtpclient.Disconnect(true);
                 }
+                info = new User_Account {
+					Username = info.Username,
+					Password = Encryption.Encrpyt(info.Password, _env.EncryptionKey, _env.IVKey),
+					Email = info.Email,
+					AccountID = info.AccountID
+				};
                 _db.User_Accounts.Add(info);
                 _db.logsLists.Add(new LogsList
                 {
@@ -199,7 +212,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             StringBuilder res = new StringBuilder();
             Random rnd = new Random();
             int i = 0;
-            while (i <= 32)
+            while (i <= 8)
             {
                 res.Append(valid[rnd.Next(valid.Length)]);
                 i++;

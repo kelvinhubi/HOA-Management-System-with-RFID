@@ -55,6 +55,7 @@
             this.blur();
             $(".form").css("display", "block");
             CheckName();
+            CheckFees();
             document.getElementById("bution").style.cssText = "position: fixed; background-color:#16a085;color:black;";
             $("#UserPartial").css("display", "none");
             $("#PaidDues").css("display", "none");
@@ -65,14 +66,12 @@
     }
 
     function CheckName() {
-        console.log($("#FullName").val());
         $.post("@Url.Action("CheckName", "MainMenu")",
             {
                 userdata: $("#FullName").val()
             },
             function (data) {
                 if (data == 0) {
-
                 }
                 else {
 
@@ -82,7 +81,6 @@
     }
     function CheckAmount() {
         var id = $("#Typeoffees").find($("select option:selected")).data('another1');
-        console.log("Hello amountid:"+id);
         $.post("@Url.Action("CheckAmount", "MainMenu")",
             {
                 userdata: id

@@ -1,7 +1,9 @@
 ﻿using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
+using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.InfoSec;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using MySqlConnector;
 using Newtonsoft.Json;
 using System.Reflection.PortableExecutable;
@@ -16,12 +18,14 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         const string connstr = "server=localhost;user=root;password=Kelvinfo14;database=hoa_sys";
         public static User _account = new User();
         private readonly AppDbContext _db;
-        private readonly ILogger _logger;
+		private readonly EnvironmentModel _env;
+		private readonly ILogger _logger;
         MySqlConnection conn = new MySqlConnection(connstr);
-        public LoginController(AppDbContext db, ILogger<LoginController> logger)
+        public LoginController(AppDbContext db, ILogger<LoginController> logger, IOptions<EnvironmentModel> Accessor)
         {
             _db = db;
             _logger = logger;
+            _env = Accessor.Value;
         }
 
 
@@ -77,7 +81,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult LoginForm(User info)
         {
-            _account.Username = info.Username;
+            var pass = info.Password;
+			_account.Username = info.Username;
             _account.AccountID = _db.User_Accounts.Where(x => x.Username == info.Username).Select(x => x.AccountID).FirstOrDefault();
             MySqlCommand mySqlCommand = new MySqlCommand("Select Username,Password From user_accounts", conn);
             conn.Open();
@@ -87,7 +92,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             {
                 if (reader["Username"].Equals(info.Username))
                 {
-                    if (!reader["Password"].Equals(info.Password))
+                    string password = Encryption.Decrypt(reader["Password"].ToString(), _env.EncryptionKey, _env.IVKey);
+                    if (!password.Equals(info.Password))
                     {
                         
                         ModelState.AddModelError("PasswordError", "Password failed!");
