@@ -18,5 +18,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data
         public DbSet<FeesList> feesLists { get; set; }
         public DbSet<UserFeesStatus> userFeesStatuses { get; set; }
         public DbSet<LogsList> logsLists { get; set; }
+        public DbSet<Announcements> Announcements { get; set; }
     }
 }
