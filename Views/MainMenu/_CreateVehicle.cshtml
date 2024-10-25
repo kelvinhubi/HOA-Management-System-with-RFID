@@ -1,6 +1,5 @@
 ﻿@model Vehicle_Information
 @{
-    Layout = "~/Views/Shared/_Layout1.cshtml";
     string[] typeofdue = { "Facilities", "Amortization", };
     IEnumerable<Homeowner_details>? ListOwners = ViewData["ListOwners"] as IEnumerable<Homeowner_details>;
 }
@@ -16,7 +15,6 @@
 
                 var fullname = obj.Firstname + " " + obj.Middlename + " " + obj.Surname;
                 <option id="FullName" value="@fullname">@fullname</option>
-                <i class="arrow up"></i>
             }
         </select>
         <span asp-validation-for="AccountID" class="text-danger"></span>
@@ -44,8 +42,6 @@
         <input asp-controller="MainMenu" asp-action="_CreateVehicle" type="submit" id="button1" value="Create" class="btn btn-primary" style="background-color:#16a085;color:black;" />
     </div>
 </form>
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-
 <script>
     var btn = document.getElementById("bution")
     $(".form").css("display", "none");
@@ -78,7 +74,6 @@
             },
             function (data) {
                 if (data == 0) {
-
                 }
                 else {
 
@@ -97,16 +92,16 @@
                 isValue = false;
                 console.log("should change value");
             }
-            else{
+            else {
                 $("#RFIDnumber").val(data);
                 isValue = true;
             }
         });
-        
+
     });
     async function Timer(time) {
         setTimeout(function () {
-            if (isValue == false) { 
+            if (isValue == false) {
                 console.log("Hello");
                 $("#RFIDnumber").val("N/A");
             }

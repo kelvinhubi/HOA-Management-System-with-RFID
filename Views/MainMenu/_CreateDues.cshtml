@@ -11,7 +11,6 @@
             @foreach (var obj in Model.Homeacc)
             {
                 <option  value="@obj.FullName" data-another="@obj.AccountID">@obj.FullName</option>
-                <i class="arrow up"></i>
             }
         </select>
         <span asp-validation-for="@Model.dues.AccountID" class="text-danger"></span>
