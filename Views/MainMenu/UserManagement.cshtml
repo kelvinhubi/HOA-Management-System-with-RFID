@@ -28,8 +28,9 @@
                     <td>@obj.Username</td>
                     <td>@obj.Email</td>
                     <td>
-                        <a asp-action="_UserManagementDetails" class="btn  btn-success" style="padding:5px;" asp-route-id="@obj.AccountID" model="@Model">Details</a>
-                        <a asp-action="_UserManagementDelete" class="btn btn-danger" style="padding:5px;" asp-route-id="@obj.AccountID">Delete</a>
+
+                        <a asp-action="_UserManagementDetails" class="btn btn-success btn-sm"  asp-route-id="@obj.AccountID" model="@Model">Details<i class='bx bxs-user-detail'></i></a>
+                        <a asp-action="_UserManagementDelete" class="btn btn-danger btn-sm"  asp-route-id="@obj.AccountID">Delete<i class='bx bxs-trash'></i></a>
                     </td>
                         
                 </tr>

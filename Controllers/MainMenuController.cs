@@ -4,11 +4,9 @@ using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.InfoSec;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MimeKit;
-using MySqlConnector;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -20,11 +18,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
     public class MainMenuController : Controller
     {
-        const string connstr = "server=localhost;user=root;password=Kelvinfo14;database=hoa_sys";
         private readonly AppDbContext _db;
         private readonly ILogger _logger;
         private readonly EnvironmentModel _env;
-        MySqlConnection conn = new MySqlConnection(connstr);
         public MainMenuController(AppDbContext db, ILogger<MainMenuController> logger,IOptions<EnvironmentModel> Accessor)
         {
             _db = db;
@@ -46,13 +42,24 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 ViewData["User Registrations"] = _db.Homeowner_Details.Count();
                 ViewData["RFID Registrations"] = _db.Vehicle_Information.Where(x => x.RFID_number != "").Count();
                 ViewData["Pending Payments"] = _db.Due_Details.Where(x => x.Status == "Unpaid").Count();
-				string EncryptedKey = Encryption.GenerateKey();
 				return View();
             }
             
             return RedirectToAction("AccessDenied", "Home");
 
         }
+        //Announcements
+        public IActionResult Announcements() {
+            if (CheckRole())
+            {
+                return View(_db.Announcements.ToList());
+            }
+            return RedirectToAction("AccessDenied", "Home");
+
+        }
+
+
+
 
         //UserManagement Controller
         public IActionResult UserManagement()

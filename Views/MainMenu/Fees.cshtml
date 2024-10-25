@@ -8,15 +8,17 @@
         ViewData["Title"] = "Fees";
     }
 </title>
+    <link rel=“stylesheet” href=“https://use.fontawesome.com/releases/v5.5.0/css/all.css” integrity=“sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU” crossorigin=“anonymous”>
 </head>
 <div id="UserPartial">
     <h2>Association Dues </h2>
-    <table class="table">
+    <table id="mytable" class="table">
         <thead class="table-light">
             <tr>
                 <th>Fees Name</a></th>
                 <th>Amount</th>
                 <th>Status</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -26,9 +28,9 @@
                     <td>@obj.TypeOfFees</td>
                     <td>@obj.Amount</td>
                     <td>@obj.Status</td>
-                    <td>
-                        <a asp-action="_EditFees" class="btn btn-warning" asp-route-id="@obj.IDFees">Edit</a>
-                        <a asp-action="_DeleteFees" class="btn btn-danger" asp-route-id="@obj.IDFees">Delete</a>
+                    <td style="white-space:nowrap;">
+                        <a class="btn btn-success btn-sm" asp-action="_EditFees" asp-route-id="@obj.IDFees">Edit<i class='bx bxs-edit-alt'></i></a>
+                        <a asp-action="_DeleteFees" asp-route-id="@obj.IDFees" class="btn btn-danger btn-sm">Delete<i class='bx bxs-trash'></i></a>
                     </td>
                 </tr>
             }
@@ -36,7 +38,6 @@
         </tbody>
     </table>
 </div>
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
 @{
     FeesList fees = new FeesList();
     <partial name="_CreateFees" model="fees"/>
@@ -46,21 +47,23 @@
         <partial name="_ValidationScriptsPartial" />
     }
 }
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
+    new DataTable('#mytable');
     window.onload = function () {
 
     var table = document.querySelectorAll("td");
     for (let i = 0; i < table.length; i++) {
         let col = table[i].innerHTML;
         if (col == "Disabled") {
-            table[i].classList.add('bx', 'bxs-user-x', 'card-danger','bg-danger')
-            table[i].style.cssText = "font-size:15px;"
+            table[i].classList.add('bx', 'bxs-user-x','bg-danger')
+                table[i].style.cssText = "font-size:15px;margin-top:10px;margin-left:10px;"
+
         }
         if (col == "Enabled") {
-            table[i].classList.add('bx', 'bxs-user-x', 'card-success', 'bg-success')
-            table[i].style.cssText = "font-size:14px;"
+            table[i].classList.add('bx', 'bxs-user-check', 'bg-success')
+                table[i].style.cssText = "font-size:15px;margin-top:10px;margin-left:10px;"
         }
         }
-
-
+    }
 </script>
