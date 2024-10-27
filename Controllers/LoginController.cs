@@ -44,18 +44,17 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             {
                 if (reader["Username"].Equals(info.Username))
                 {
-                    if (!reader["Password"].Equals(info.Password))
+                    string password = Encryption.Decrypt(reader["Password"].ToString(), _env.EncryptionKey, _env.IVKey);
+                    if (!password.Equals(info.Password))
                     {
                         
                         ModelState.AddModelError("PasswordError", "Password failed!");
                     }
                     else
                     {
-                        HttpContext.Session.SetString("SessionUsername", info.Username);//cookie
-                        var result = _db.Admin_Accounts.Where(_ => _.Username == info.Username && _.Password == info.Password).Select(_ => _.AccountID).FirstOrDefault();
-                        if (result != 0) {
-							HttpContext.Session.SetString("SessionID", Convert.ToString(result));
-						}
+                        HttpContext.Session.SetString("SessionUsername", info.Username);
+                        var result = _db.Admin_Accounts.Where(_ => _.Username == info.Username && _.Password == Encryption.Encrpyt(info.Password, _env.EncryptionKey, _env.IVKey)).Select(_ => _.AccountID).FirstOrDefault();
+					    HttpContext.Session.SetString("SessionID", Convert.ToString(result));
                         HttpContext.Session.SetString("UserType", "Admin");
                         _db.logsLists.Add(new LogsList
                         {
@@ -125,6 +124,57 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 }
                 catch (Exception ex) { Console.WriteLine(ex.Message); }
                 
+            }
+
+            ModelState.AddModelError("UsernameError", "Username Not Found");
+            return View();
+        }
+
+        //Guard Login
+        public IActionResult GuardLoginForm()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult GuardLoginForm(User info)
+        {
+            var pass = info.Password;
+            _account.Username = info.Username;
+            _account.AccountID = _db.Guard_Information.Where(x => x.Username == info.Username).Select(x => x.ID).FirstOrDefault();
+            MySqlCommand mySqlCommand = new MySqlCommand("Select Username,Password From guard_information", conn);
+            conn.Open();
+            bool isLoggedIn = false;
+            MySqlDataReader reader = mySqlCommand.ExecuteReader();
+            while (reader.Read())
+            {
+                if (reader["Username"].Equals(info.Username))
+                {
+                    string password = Encryption.Decrypt(reader["Password"].ToString(), _env.EncryptionKey, _env.IVKey);
+                    if (!password.Equals(info.Password))
+                    {
+
+                        ModelState.AddModelError("PasswordError", "Password failed!");
+                    }
+                    else
+                    {
+                        HttpContext.Session.SetString("SessionUsername", info.Username);
+                        isLoggedIn = true;
+                    }
+
+                }
+
+            }
+            if (isLoggedIn == true)
+            {
+                try
+                {
+                    
+                 HttpContext.Session.SetString("UserType", "Guard");//JsonConvert.SerializeObject
+                 return RedirectToAction("Create", "GuardMenu");
+                }
+                catch (Exception ex) { Console.WriteLine(ex.Message); }
+
             }
 
             ModelState.AddModelError("UsernameError", "Username Not Found");

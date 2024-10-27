@@ -1,0 +1,58 @@
+﻿@model Announcements
+<head>
+    <style>
+        .expandTextArea {
+            display: inline-block;
+            border: solid 1px #000;
+            min-height: 200px;
+            width: 300px;
+            background-color: white;
+        }
+    </style>
+</head>
+<Button runat="server" id="bution" class="btn btn-success">Add Announcements</Button>
+<form asp-action="_AddAnnouncement" class="form" id="thisform" style="height:500px;width:500px;" enctype="multipart/form-data">
+    <p class="title">Add Announcement</p>
+    <input asp-for="AnnouncementID" class="form-control" class="input" hidden />
+    <div class="form-group">
+        <label asp-for="AnnouncementTitle" class="control-label"></label>
+        <input asp-for="AnnouncementTitle" class="form-control" class="input" oninput="UserCheck();" />
+        <p id="Status" />
+        <span asp-validation-for="AnnouncementTitle" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Description" class="control-label"></label>
+        <textarea class="form-control-plaintext expandTextArea" asp-for="Description" class="form-control-plaintext input"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="backgroundFile" class="control-label">Upload Image</label>
+        <input asp-for="backgroundFile" class="form-control" accept="image/*" />
+    </div>
+    <div class="form-group">
+        <input type="submit" id="button1" value="Create" class="btn btn-primary" />
+    </div>
+</form>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    var btn = document.getElementById("bution")
+    $(".form").css("display", "none");
+    btn.onclick = function () {
+        if ($(".form").css("display") == "block") {
+            $(".form").css("display", "none");
+            $("#UserPartial").css("display", "block");
+
+            $("#bution").html('Create User Account');
+            $("body").css("background", "rgba(0, 0, 0, 0)");
+            $('#forpass').val("")
+        }
+        else {
+            this.blur();
+            $(".form").css("display", "block");
+            $("#UserPartial").css("display", "none");
+            $("#bution").html('Hide');
+            $("body").css("background", "rgba(0, 0, 0, 0.4)");
+
+        }
+    }
+</script>

@@ -7,7 +7,7 @@
 }
 
 header {
-    background-color: #2c3e50;
+    background-color: #16a085;
     color: white;
     padding: 1em 0;
     position: relative;
@@ -48,7 +48,7 @@ nav ul {
             }
 
 .hero {
-    background: url('hero-image.jpg') no-repeat center center/cover;
+    background: url('https://static.vecteezy.com/system/resources/previews/008/969/361/non_2x/multi-layers-gray-blue-dark-texture-3d-papercut-layers-in-gradient-banner-abstract-paper-cut-art-background-design-for-website-template-topography-map-concept-or-smooth-origami-paper-cut-vector.jpg') no-repeat center center/cover;
     height: 60vh;
     display: flex;
     justify-content: center;
@@ -110,7 +110,7 @@ nav ul {
         left: 0;
         width: 100%;
         height: 100px;
-        background-color: #2c3e50;
+        background-color: #16a085;
         clip-path: polygon(0 100%, 100% 0, 100% 100%);
     }
 
@@ -131,7 +131,7 @@ nav ul {
     flex-wrap: wrap;
 }
 
-.card {
+.cards {
     background-color: white;
     padding: 2em;
     border-radius: 20px;
@@ -141,7 +141,7 @@ nav ul {
     transition: transform 0.3s;
 }
 
-    .card:hover {
+    .cards:hover {
         transform: translateY(-10px);
     }
 

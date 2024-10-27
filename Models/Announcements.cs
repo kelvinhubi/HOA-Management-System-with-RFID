@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
 {
     public class Announcements
@@ -6,9 +7,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         [Key]
         public int AnnouncementID { get; set; }
         [Required]
-        public string AnnouncemenType {  get; set; } = string.Empty;
-        [RegularExpression(@"([A-Z][a-z][,()][0-9])\w+$", ErrorMessage = "Character input not supported")]
+        public string AnnouncementTitle {  get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public DateTime DatePosted { get; set; } = DateTime.Now;
+        public string bgFilePath { get; set; } = string.Empty;
+		[NotMapped]
+        public IFormFile? backgroundFile { get; set; }
     }
 }

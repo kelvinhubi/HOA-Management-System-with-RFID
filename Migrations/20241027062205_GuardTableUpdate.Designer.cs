@@ -4,6 +4,7 @@ using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241027062205_GuardTableUpdate")]
+    partial class GuardTableUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,7 +43,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
                     b.HasKey("AccountID");
 
-                    b.ToTable("Admin_Accounts", (string)null);
+                    b.ToTable("Admin_Accounts");
                 });
 
             modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.Announcements", b =>
@@ -51,7 +54,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("AnnouncementID"));
 
-                    b.Property<string>("AnnouncementTitle")
+                    b.Property<string>("AnnouncemenType")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -62,13 +65,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("bgFilePath")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.HasKey("AnnouncementID");
 
-                    b.ToTable("Announcements", (string)null);
+                    b.ToTable("Announcements");
                 });
 
             modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.Dues", b =>
@@ -100,7 +99,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
                     b.HasKey("payID");
 
-                    b.ToTable("Due_Details", (string)null);
+                    b.ToTable("Due_Details");
                 });
 
             modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.FeesList", b =>
@@ -126,7 +125,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
                     b.HasKey("IDFees");
 
-                    b.ToTable("feesLists", (string)null);
+                    b.ToTable("feesLists");
                 });
 
             modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.Guard_Information", b =>
@@ -147,7 +146,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Guard_Information", (string)null);
+                    b.ToTable("Guard_Information");
                 });
 
             modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.Homeowner_details", b =>
@@ -198,7 +197,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
                     b.HasKey("AccountID");
 
-                    b.ToTable("Homeowner_Details", (string)null);
+                    b.ToTable("Homeowner_Details");
                 });
 
             modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.LogsList", b =>
@@ -226,7 +225,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
                     b.HasKey("LogID");
 
-                    b.ToTable("logsLists", (string)null);
+                    b.ToTable("logsLists");
                 });
 
             modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.UserFeesStatus", b =>
@@ -258,7 +257,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
                     b.HasKey("UserFeeID");
 
-                    b.ToTable("userFeesStatuses", (string)null);
+                    b.ToTable("userFeesStatuses");
                 });
 
             modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.User_Account", b =>
@@ -283,7 +282,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
                     b.HasKey("AccountID");
 
-                    b.ToTable("User_Accounts", (string)null);
+                    b.ToTable("User_Accounts");
                 });
 
             modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.Vehicle_Information", b =>
@@ -324,7 +323,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
                     b.HasKey("VehicleID");
 
-                    b.ToTable("Vehicle_Information", (string)null);
+                    b.ToTable("Vehicle_Information");
                 });
 #pragma warning restore 612, 618
         }

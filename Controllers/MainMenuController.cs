@@ -21,11 +21,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         private readonly AppDbContext _db;
         private readonly ILogger _logger;
         private readonly EnvironmentModel _env;
-        public MainMenuController(AppDbContext db, ILogger<MainMenuController> logger,IOptions<EnvironmentModel> Accessor)
+        private readonly IWebHostEnvironment _webenv;
+        public MainMenuController(AppDbContext db, ILogger<MainMenuController> logger,IOptions<EnvironmentModel> Accessor,IWebHostEnvironment environment)
         {
             _db = db;
             _logger = logger;
             _env = Accessor.Value;
+            _webenv = environment;
         }
         //Test
         public IActionResult Sample()
@@ -52,10 +54,36 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public IActionResult Announcements() {
             if (CheckRole())
             {
-                return View(_db.Announcements.ToList());
+                NewModel model = new NewModel();
+                model.Announcements = _db.Announcements.OrderByDescending(_=>_.DatePosted);
+                model.Announcement = new Announcements();
+                return View(model);
             }
             return RedirectToAction("AccessDenied", "Home");
 
+        }
+
+        public IActionResult _AddAnnouncement() {
+            return PartialView();
+        }
+
+        [HttpPost]
+        public IActionResult _AddAnnouncement(Announcements info) 
+        {
+
+            if (ModelState.IsValid) {
+                if (info.backgroundFile != null) {
+                    string folder = "Images\\";
+                    folder += Guid.NewGuid().ToString() + info.backgroundFile.FileName;
+                    string serverFolder = Path.Combine(_webenv.ContentRootPath,folder);
+                    info.backgroundFile.CopyToAsync(new FileStream(serverFolder,FileMode.Create));
+                }
+
+                _db.Announcements.Add(info);
+                _db.SaveChanges();
+            }
+
+            return RedirectToAction("Announcements");
         }
 
 
@@ -84,7 +112,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             {
                 return RedirectToAction("Error", "MainMenu", ID);
             }
-
+                
             var useracc = _db.User_Accounts.FirstOrDefault(m => m.AccountID == ID);
             if (useracc == null)
             {

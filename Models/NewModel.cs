@@ -14,5 +14,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         public UserFeesStatus Userfeestatus { get; set; }
         public Dues dues { get; set; }
         public string sortOrder { get; set; }
+        public IEnumerable<Announcements> Announcements { get; set; }
+        public Announcements Announcement { get; set; }
     }
 }

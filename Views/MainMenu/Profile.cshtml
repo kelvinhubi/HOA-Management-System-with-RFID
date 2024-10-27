@@ -77,34 +77,36 @@
 
 	</style>
 </head>
-<div class="container">
-	<div class="row gutters">
-		
-		<div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
-			<div class="card h-100">
-				<div class="card-body">
-					<div class="row gutters">
-						<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-							<h6 class="mb-2 text-primary">Account Settings</h6>
-						</div>
-						<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-							<div class="form-group">
-								<label asp-for="Username"></label>
-								<input type="text" class="form-control" asp-for="Username" />
+<form>
+	<div class="container">
+		<div class="row gutters">
+
+			<div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+				<div class="card h-100">
+					<div class="card-body">
+						<div class="row gutters">
+							<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+								<h6 class="mb-2 text-primary">Account Settings</h6>
+							</div>
+							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+								<div class="form-group">
+									<label asp-for="Username"></label>
+									<input type="text" class="form-control" asp-for="Username" />
+								</div>
+							</div>
+							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+								<div class="form-group">
+									<label asp-for="Password">Password</label>
+									<input type="password" id="Pass" class="form-control" asp-for="Password" placeholder="********" />
+								</div>
 							</div>
 						</div>
-						<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-							<div class="form-group">
-								<label asp-for="Password">Password</label>
-								<input type="password" id="Pass" class="form-control" asp-for="Password" placeholder="********"/>
-							</div>
-						</div>
-					</div>
-					<div class="row gutters">
-						<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-							<div class="text-right">
-								<button type="button" id="submit" name="submit" class="btn btn-secondary">Cancel</button>
-								<button type="button" id="submit" name="submit" class="btn btn-primary">Update</button>
+						<div class="row gutters">
+							<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+								<div class="text-right">
+									<button type="button" id="submit" name="submit" class="btn btn-secondary">Cancel</button>
+									<button type="button" id="submit" name="submit" class="btn btn-primary">Update</button>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -112,7 +114,7 @@
 			</div>
 		</div>
 	</div>
-</div>
+</form>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
 	$("#Pass").on('focus', function () {	

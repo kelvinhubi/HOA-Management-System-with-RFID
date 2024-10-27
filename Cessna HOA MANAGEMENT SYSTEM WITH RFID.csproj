@@ -29,9 +29,14 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="Images\" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Views\Login\GuardLoginForm.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Update="Views\MainMenu\AssociationDues.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

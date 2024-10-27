@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - C.S.H.A_HOA_MANAGEMENT_SYSTEM_WITH_RFID</title>
+    <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
@@ -12,13 +12,15 @@
 <body>
     <header>
         <div class="container1">
-            <h1>Welcome to the C.S.H.A HOA Management System</h1>
+            <h1>C.S.H.A HOA Management System</h1>
             <nav>
                 <ul>
                     <li class="nav-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
                     <li class="nav-item"><a asp-controller="Home" asp-action="Privacy">Privacy</a></li>
+                    <li class="nav-item"><a asp-controller="Home" asp-action="Announcements">Announcements</a></li>
                     <li class="nav-item"><a asp-controller="Login" asp-action="Admin_LoginForm">Admin Login</a></li>
                     <li class="nav-item"><a asp-controller="Login" asp-action="LoginForm">User Login</a></li>
+                    <li class="nav-item"><a asp-controller="Login" asp-action="GuardLoginForm">Guard Login</a></li>
                 </ul>
             </nav>
         </div>
