@@ -373,7 +373,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return RedirectToAction("AccessDenied", "Home");
         }
-        public IActionResult PrintLogs()
+        public IActionResult PrintLogs(string? nameformat)
         {
 
             QuestPDF.Settings.License = LicenseType.Community;
@@ -422,12 +422,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                    .FontSize(30);
 
                });
-           }).GeneratePdf("Logs"); //RENAMING USING RANDOM WORDS
+           }).GeneratePdf(nameformat+"_"+Guid.NewGuid().ToString()+"_Logs.pdf"); //RENAMING USING RANDOM WORDS
 
             return RedirectToAction("Logs");
         }
         public IActionResult _ClearLogs()
         {
+            PrintLogs("Backup_");
             var result = _db.logsLists.ToList();
             _db.logsLists.RemoveRange(result);
             _db.SaveChanges();
@@ -633,6 +634,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             var result = _db.feesLists.SingleOrDefault(_ => _.IDFees == id);
             if (result != null)
             {
+
                 _db.feesLists.Remove(result);
                 _db.SaveChanges();
                 var userfeesstatus = _db.userFeesStatuses.Where(_d => _d.IDFees == id);
