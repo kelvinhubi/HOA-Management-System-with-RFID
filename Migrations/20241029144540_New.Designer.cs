@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241027085709_UpdateTitle")]
-    partial class UpdateTitle
+    [Migration("20241029144540_New")]
+    partial class New
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -65,6 +65,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("bgFilePath")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.HasKey("AnnouncementID");
 
                     b.ToTable("Announcements");
@@ -88,6 +92,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
+
+                    b.Property<string>("FeesName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -115,6 +123,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                         .HasMaxLength(8)
                         .HasColumnType("varchar(8)");
 
+                    b.Property<string>("FeesName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -135,6 +147,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -243,6 +258,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                         .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("varchar(8)");
+
+                    b.Property<string>("FeesName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<int>("IDFees")
                         .HasColumnType("int");

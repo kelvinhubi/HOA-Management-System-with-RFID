@@ -33,6 +33,26 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Announcements",
+                columns: table => new
+                {
+                    AnnouncementID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    AnnouncementTitle = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DatePosted = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    bgFilePath = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Announcements", x => x.AnnouncementID);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Due_Details",
                 columns: table => new
                 {
@@ -40,6 +60,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     AccountID = table.Column<int>(type: "int", nullable: false),
                     Amount = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    FeesName = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     TypeofDues = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -59,6 +81,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                 {
                     IDFees = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    FeesName = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     TypeOfFees = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Amount = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: false)
@@ -110,7 +134,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     BlkNO = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    LotNo = table.Column<string>(type: "longtext", nullable: false)
+                    Address = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RFID_number = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
@@ -118,6 +142,26 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Homeowner_Details", x => x.AccountID);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "logsLists",
+                columns: table => new
+                {
+                    LogID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    LogName = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    LogDescription = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    LogUserRole = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    LogDate = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_logsLists", x => x.LogID);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -146,7 +190,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                 {
                     UserFeeID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    IDFees = table.Column<int>(type: "int", nullable: false),
                     AccountID = table.Column<int>(type: "int", nullable: false),
+                    FeesName = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     TypeOfFees = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Amount = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: false)
@@ -194,6 +241,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                 name: "Admin_Accounts");
 
             migrationBuilder.DropTable(
+                name: "Announcements");
+
+            migrationBuilder.DropTable(
                 name: "Due_Details");
 
             migrationBuilder.DropTable(
@@ -204,6 +254,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
             migrationBuilder.DropTable(
                 name: "Homeowner_Details");
+
+            migrationBuilder.DropTable(
+                name: "logsLists");
 
             migrationBuilder.DropTable(
                 name: "User_Accounts");

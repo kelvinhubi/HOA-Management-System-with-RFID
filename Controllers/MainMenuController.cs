@@ -172,7 +172,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             model.CheckMe = _db.userFeesStatuses.Where(x => x.AccountID == ID).Select(vm => new CheckBoxItem()
             {
                 ID = vm.UserFeeID,
-                FeesName = vm.TypeOfFees,
+                FeesName = vm.FeesName,
+                TypeOfFees = vm.TypeOfFees,
                 IsChecked = vm.Status.Equals("Enabled") ? true : false
             }).ToList();
             if (useracc == null)
@@ -272,6 +273,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                                   FullName = homeacc.Firstname + " " + homeacc.Middlename + " " + homeacc.Surname,
                                   Amount = due.Amount,
                                   Date = due.Date,
+                                  FeesName = due.FeesName,
                                   TypeofDues = due.TypeofDues,
                                   Status = due.Status
                               });
@@ -542,6 +544,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     var data2 = new UserFeesStatus
                     {
                         AccountID = x.AccountID,
+                        FeesName = info.FeesName,
                         TypeOfFees = info.TypeOfFees,
                         IDFees = info.IDFees,
                         Amount = info.Amount,
@@ -591,6 +594,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     {
                         foreach (var x in feeid)
                         {
+                            x.FeesName = info.FeesName;
                             x.TypeOfFees = info.TypeOfFees;
                             x.Status = info.Status;
                             x.Amount = info.Amount;
@@ -664,16 +668,16 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
         //Json Result
         [HttpPost]
-        public JsonResult CheckAmount(string userdata)
+        public JsonResult CheckAmount(string userdata, string AccountID)
         {
             Console.WriteLine("Check aMOUNT:" + userdata);
             if (userdata != null)
             {
 
-                var SearchData = _db.userFeesStatuses.Where(x => x.UserFeeID == Convert.ToInt32(userdata)).SingleOrDefault();
+                var SearchData = _db.userFeesStatuses.Where(x => x.TypeOfFees.Equals(userdata) && x.Status.Equals("Enabled") && x.AccountID == Convert.ToInt32(AccountID));
                 if (SearchData != null)
                 {
-                    return Json(SearchData.Amount);
+                    return Json(SearchData.Sum(i=> Convert.ToInt32(i.Amount)));
                 }
                 else
                 {

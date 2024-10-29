@@ -78,11 +78,14 @@
                 }
             });
     }
+    
     function CheckAmount() {
+        var initialid = $("#Typeoffees").find($("select option:selected")).data('another2');;
         var id = $("#Typeoffees").find($("select option:selected")).data('another1');
         $.post("@Url.Action("CheckAmount", "MainMenu")",
             {
-                userdata: id
+                userdata: id,
+                AccountID: initialid
             },
             function (data) {
                 if (data == 0) {
@@ -109,9 +112,14 @@
                 else {
                     console.log("Check Fees:" + data[0].typeOfFees);
                     $("#Typeoffees").find('option').remove().end();
+                    var recentvar = "";
                     for (var j = 0; j < data.length; j++) {
                         console.log(data[j].userFeeID);
-                        $("#Typeoffees").append('<option value="' + data[j].typeOfFees + '" data-another1="' + data[j].userFeeID + '">' + data[j].typeOfFees + '</option>');
+                        if(recentvar != data[j].typeOfFees){
+                            recentvar = data[j].typeOfFees;
+                            $("#Typeoffees").append('<option value="' + data[j].typeOfFees + '" data-another1="' + data[j].typeOfFees + '" data-another2="' + data[j].accountID + '">' + data[j].typeOfFees + '</option>');
+                        }
+                        
                     }
                     $("#Typeoffees").val("");
                 }

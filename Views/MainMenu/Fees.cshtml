@@ -15,7 +15,8 @@
     <table id="mytable" class="table">
         <thead class="table-light">
             <tr>
-                <th>Fees Name</a></th>
+                <th>Fees Name</th>
+                <th>Type of Fee</th>
                 <th>Amount</th>
                 <th>Status</th>
                 <th></th>
@@ -25,6 +26,7 @@
             @foreach (var obj in Model)
             {
                 <tr>
+                    <td>@obj.FeesName</td>
                     <td>@obj.TypeOfFees</td>
                     <td>@obj.Amount</td>
                     <td>@obj.Status</td>

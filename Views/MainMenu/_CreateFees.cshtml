@@ -5,9 +5,14 @@
     <input asp-for=IDFees hidden/>
     <input asp-for=Status hidden />
     <div class="form-group">
-        
+
+        <label asp-for="FeesName" class="control-label"></label>
+        <input asp-for="FeesName" class="form-control" class="input" />
+        <span asp-validation-for="FeesName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
         <label asp-for="TypeOfFees" class="control-label"></label>
-        <input asp-for="TypeOfFees" class="form-control" class="input" />
+        <input asp-for="TypeOfFees" class="form-control" class="input"/>
         <span asp-validation-for="TypeOfFees" class="text-danger"></span>
     </div>
     <div class="form-group">
