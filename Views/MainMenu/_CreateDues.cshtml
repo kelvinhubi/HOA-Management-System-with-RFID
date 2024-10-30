@@ -5,6 +5,7 @@
     <p class="title">Add Dues</p>
     <input asp-for="@Model.dues.AccountID" name="AccountID" id="AccountID" class="form-control" hidden />
     <input asp-for="@Model.dues.Status" name="Status" class="form-control" hidden />
+    <input asp-for="@Model.dues.FeesName" name="FeesName" id="FeesName" hidden/>
     <div class="form-group">
         <label asp-for="@Model.dues.FullName" class="control-label">Select Homeowner</label>
         <select asp-for="@Model.dues.FullName" onclick="CheckName();CheckFees()" id="FullName" class="form-control">
@@ -96,14 +97,15 @@
                 }
             });
     }
+    var dataforfees;
     function CheckFees() {
-        
         var id = $("#FullName").find($("select option:selected")).data('another');
         $.post("@Url.Action("CheckFees", "MainMenu")",
             {
                 userdata: id
             },
             function (data) {
+                dataforfees = data;
                 if (data == 0) {
                     $("#Typeoffees").find('option').remove().end();
                     $("#Typeoffees").append('<option></option>');
@@ -117,15 +119,26 @@
                         console.log(data[j].userFeeID);
                         if(recentvar != data[j].typeOfFees){
                             recentvar = data[j].typeOfFees;
+                            
                             $("#Typeoffees").append('<option value="' + data[j].typeOfFees + '" data-another1="' + data[j].typeOfFees + '" data-another2="' + data[j].accountID + '">' + data[j].typeOfFees + '</option>');
                         }
                         
                     }
+                    
                     $("#Typeoffees").val("");
                 }
             });
     
     }
+    $("#Typeoffees").on('change', function () {
+        var FeesName = $("#FeesName");
+        var str = "";
+        var typeoffee = $("#Typeoffees").find($("select option:selected")).data('another1');
+        for (var j = 0; j < dataforfees.length; j++) {
+            if (dataforfees[j].typeOfFees == typeoffee) { str += dataforfees[j].feesName + ', '; }
+        }
+        FeesName.val(str);
+    })
     function Clear() { 
             
         $("#Amount").val("0");

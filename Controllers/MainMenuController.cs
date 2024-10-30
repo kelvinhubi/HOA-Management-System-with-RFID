@@ -11,6 +11,7 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using System.Text;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
@@ -277,11 +278,12 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                                   TypeofDues = due.TypeofDues,
                                   Status = due.Status
                               });
-                NewModel v = new NewModel();
-                v.Homeacc = _db.Homeowner_Details.ToList();
-                v.dues = new Dues();
-                v.ListDues = result.ToList();
-                return View(v);
+                NewModel model = new NewModel();
+                model.Homeacc = _db.Homeowner_Details.ToList();
+                model.Userfeestatuses = _db.userFeesStatuses.ToList();
+                model.dues = new Dues();
+                model.ListDues = result.ToList();
+                return View(model);
             }
             return RedirectToAction("AccessDenied", "Home");
 
@@ -291,13 +293,15 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return PartialView();
         }
         [HttpPost]
-        public async Task<IActionResult> _CreateDues(string AccountID, string Amount, string TypeofDues, DateOnly Date, string Status)
+        public async Task<IActionResult> _CreateDues(string AccountID, string Amount, string TypeofDues, DateOnly Date, string Status,string FeesName)
         {
 
             if (ModelState.IsValid)
             {
+                
                 _db.Due_Details.Add(new Dues
                 {
+                    FeesName = FeesName.Substring(0, FeesName.Length -2),
                     AccountID = Convert.ToInt32(AccountID),
                     Amount = Amount,
                     TypeofDues = TypeofDues,
@@ -424,7 +428,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                    .FontSize(30);
 
                });
-           }).GeneratePdf(nameformat+"_"+Guid.NewGuid().ToString()+"_Logs.pdf"); //RENAMING USING RANDOM WORDS
+           }).GeneratePdf(nameformat+"_"+Guid.NewGuid().ToString()+"_"+DateTime.Now.ToString("yyyy-MMM-dd")+"_Logs.pdf"); //RENAMING USING RANDOM WORDS
 
             return RedirectToAction("Logs");
         }
@@ -693,7 +697,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             if (userdata != null)
             {
 
-                var SearchData = _db.userFeesStatuses.Where(x => x.AccountID == Convert.ToInt32(userdata) && x.Status == "Enabled").ToList();
+                var SearchData = _db.userFeesStatuses.Where(x => x.AccountID == Convert.ToInt32(userdata) && x.Status == "Enabled").OrderBy(_=>_.FeesName).ToList();
                 if (SearchData != null)
                 {
                     return Json(SearchData);

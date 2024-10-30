@@ -6,7 +6,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
     public class Dues
     {
         [Key]
-        public int payID { get; set; }
+        public int DueID { get; set; }
         public int AccountID { get; set; }
         [Required(ErrorMessage = "Please not more than 8 digits"), MaxLength(8)]
         [RegularExpression(@"^[0-9]*$", ErrorMessage = "Error pls only enter numbers")]
