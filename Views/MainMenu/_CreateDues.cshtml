@@ -114,11 +114,9 @@
                     $("#Amount").val("");
                 }
                 else {
-                    console.log("Check Fees:" + data[0].typeOfFees);
                     $("#Typeoffees").find('option').remove().end();
                     var recentvar = "";
                     for (var j = 0; j < data.length; j++) {
-                        console.log(data);
                         if(recentvar != data[j].typeOfFees){
                             recentvar = data[j].typeOfFees;
                             $("#Typeoffees").append('<option value="' + data[j].typeOfFees + '" data-another1="' + data[j].typeOfFees + '" data-another2="' + data[j].accountID + '">' + data[j].typeOfFees + '</option>');

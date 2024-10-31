@@ -64,7 +64,6 @@
     new DataTable('#mytable');
     window.onload = function () { 
         var table = document.querySelectorAll("td");
-        console.log(table.length);
         for (let i = 0; i < table.length; i++) { 
             let col = table[i].innerHTML;
             if (col == "Unpaid") { 
@@ -85,14 +84,13 @@
             if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
                 table[i].classList.add('bx','bxs-error-alt','card-warning','bg-warning')
             }
-            else { console.log("false")}
+            else {}
             
         }
     }
     $(document).ready(function () {
         $(document,"dt-column-title").on('click change',function () {
             var table = document.querySelectorAll("td");
-            console.log(table.length);
             for (let i = 0; i < table.length; i++) {
                 let col = table[i].innerHTML;
                 if (col == "Unpaid") {
@@ -113,7 +111,7 @@
                 if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
                     table[i].classList.add('bx', 'bxs-error-alt', 'card-warning', 'bg-warning')
                 }
-                else { console.log("false") }
+                else { }
 
             }
         })

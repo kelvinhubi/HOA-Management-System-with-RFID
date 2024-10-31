@@ -67,7 +67,6 @@
     }
     $("#CreateBatch").on('click', function () {
         const selectedUserIds = getSelectedUserIds();
-        console.log(selectedUserIds);
         if (selectedUserIds.length === 0) {
             alert('Please select at least one user.');
             return;
@@ -102,7 +101,6 @@
                 else {
                     $("#populate").find('tr').remove().end();
                     for (var j = 0; j < data.length; j++) {
-                        console.log(data);
                         $("#populate").append('<tr><td><input type="checkbox" class="select-user" data-user-id="' + data[j].accountID + '"></td>' + '<td>' + data[j].fullName + '</td></tr>');
                     }
                 }

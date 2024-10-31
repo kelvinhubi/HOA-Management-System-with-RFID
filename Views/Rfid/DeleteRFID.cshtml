@@ -16,7 +16,6 @@
             function (data) {
                 if (data == 0) {
                     isValue = false;
-                    console.log("should change value");
                 }
                 else {
                     $("#RFIDnumber").val(data);
@@ -28,7 +27,6 @@
     async function Timer(time) {
         setTimeout(function () {
             if (isValue == false) {
-                console.log("Hello");
                 $("#RFIDnumber").val("N/A");
             }
 
