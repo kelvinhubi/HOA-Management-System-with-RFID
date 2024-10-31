@@ -281,12 +281,40 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 NewModel model = new NewModel();
                 model.Homeacc = _db.Homeowner_Details.ToList();
                 model.Userfeestatuses = _db.userFeesStatuses.ToList();
+                model.feesLists = _db.feesLists.OrderBy(_=>_.TypeOfFees).ToList();
                 model.dues = new Dues();
                 model.ListDues = result.ToList();
                 return View(model);
             }
             return RedirectToAction("AccessDenied", "Home");
 
+        }
+        [HttpPost]
+        public JsonResult FindHomeOwners(string userdata)
+        {
+            if (userdata == null)
+            {
+                return Json(new { success = false });
+            }
+            var result = (from homeacc in _db.Homeowner_Details
+                          join
+                          userfees in _db.userFeesStatuses on homeacc.AccountID equals userfees.AccountID where userfees.Status.Equals("Enabled") && userfees.TypeOfFees.Equals(userdata)
+                          select new Homeowner_details
+                          {
+                              Firstname = homeacc.Firstname,
+                              Surname = homeacc.Surname,
+                              Middlename = homeacc.Middlename,
+                              AccountID = homeacc.AccountID,
+                          }).ToList();
+            var recentval = "";
+            var anotherresult = new List<Homeowner_details>();
+            foreach (var obj in result.OrderBy(_=>_.FullName)) {
+                if (!obj.FullName.Equals(recentval)) { 
+                    recentval = obj.FullName;
+                    anotherresult.Add(obj);
+                }
+            }
+            return Json(anotherresult.ToList());
         }
         public IActionResult _CreateDues()
         {
@@ -319,6 +347,50 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return RedirectToAction("AssociationDues");
 
+        }
+        public IActionResult _CreateDuesMultiple() { 
+            return PartialView();
+        }
+        [HttpPost]
+        public JsonResult AddDuesToUsers(string[] userIds, string TypeofDues)
+        {
+            try
+            {
+                foreach (var userId in userIds)
+                {
+                    var getuser = _db.userFeesStatuses.Where(_=>_.AccountID == Convert.ToInt32(userId) && _.Status.Equals("Enabled") && _.TypeOfFees.Equals(TypeofDues)).ToList();
+                    if (getuser.Count() != 0) {
+                        string str = "";
+                        int Amount = 0;
+                        foreach (var x in getuser)
+                        {
+                            str += x.FeesName + ", ";
+                            Amount += Convert.ToInt32(x.Amount);
+                        }
+                        Dues info = new Dues
+                        {
+                            AccountID = Convert.ToInt32(userId),
+                            FeesName = str.Substring(0, str.Length - 2),
+                            TypeofDues = TypeofDues,
+                            Amount = Amount.ToString(),
+                            Status = "Unpaid",
+                        };
+
+                        _db.Due_Details.Add(info);
+                    }
+                    else {
+                        
+                    }
+                    // Example: _duesService.CreateDuesForUser(userId);
+                }
+                _db.SaveChanges();
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception if needed
+                return Json(new { success = false, message = ex.Message });
+            }
         }
         public IActionResult _ClearPaid()
         {
@@ -697,10 +769,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             if (userdata != null)
             {
 
-                var SearchData = _db.userFeesStatuses.Where(x => x.AccountID == Convert.ToInt32(userdata) && x.Status == "Enabled").OrderBy(_=>_.FeesName).ToList();
+                var SearchData = _db.userFeesStatuses.Where(x => x.AccountID == Convert.ToInt32(userdata) && x.Status == "Enabled").ToList();
                 if (SearchData != null)
                 {
-                    return Json(SearchData);
+                    return Json(SearchData.OrderBy(_ => _.TypeOfFees).ToList());
                 }
                 else
                 {

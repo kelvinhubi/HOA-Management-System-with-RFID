@@ -2,14 +2,15 @@
     display: none;
     flex-direction: column;
     gap:10px;
-    max-width: 350px;
+    width: 50%;
+    height:50%;
     background-color: #16a085;
     padding: 25px;
     border-radius: 20px;
     position: fixed;
     z-index: 1;
     overflow: auto;
-    left:50%;
+    left:30%;
     top:10%;
 }
 
@@ -19,7 +20,6 @@
     font-weight: 600;
     letter-spacing: -1px;
     position: relative;
-    display: flex;
     align-items: center;
     padding-left: 30px;
 }
@@ -64,7 +64,6 @@
         }
 
 .flex {
-    display: flex;
     width: 100%;
     gap: 6px;
 }

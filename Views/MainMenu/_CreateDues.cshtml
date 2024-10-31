@@ -39,12 +39,13 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
     var btn = document.getElementById("bution")
-    $(".form").css("display", "none");
+    $("#thisform").css("display", "none");
     btn.onclick = function () {
-        if ($(".form").css("display") == "block") {
-            $(".form").css("display", "none");
+        if ($("#thisform").css("display") == "block") {
+            $("#thisform").css("display", "none");
             $("#UserPartial").css("display", "block");
             $("#PaidDues").css("display", "block");
+            $(".CreateMultiple").css("display", "block");
             $("#bution").html('Create Dues'); 
             document.getElementById("bution").style.cssText = "display: block; position: inherit; background-color:#16a085; color: black";
             $("body").css("background", "rgba(0, 0, 0, 0)");
@@ -53,12 +54,13 @@
         }
         else {
             this.blur();
-            $(".form").css("display", "block");
+            $("#thisform").css("display", "block");
             CheckName();
             CheckFees();
             document.getElementById("bution").style.cssText = "position: fixed; background-color:#16a085;color:black;";
             $("#UserPartial").css("display", "none");
             $("#PaidDues").css("display", "none");
+            $(".CreateMultiple").css("display", "none");
             $("#bution").html('Hide');
             $("body").css("background", "rgba(0, 0, 0, 0.4)");
 
@@ -116,10 +118,9 @@
                     $("#Typeoffees").find('option').remove().end();
                     var recentvar = "";
                     for (var j = 0; j < data.length; j++) {
-                        console.log(data[j].userFeeID);
+                        console.log(data);
                         if(recentvar != data[j].typeOfFees){
                             recentvar = data[j].typeOfFees;
-                            
                             $("#Typeoffees").append('<option value="' + data[j].typeOfFees + '" data-another1="' + data[j].typeOfFees + '" data-another2="' + data[j].accountID + '">' + data[j].typeOfFees + '</option>');
                         }
                         

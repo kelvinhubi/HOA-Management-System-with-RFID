@@ -12,6 +12,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         public CheckBoxItem CheckM { get; set; }
         public IEnumerable<UserFeesStatus> Userfeestatuses { get; set; } = Enumerable.Empty<UserFeesStatus>();
         public UserFeesStatus Userfeestatus { get; set; }
+        public IEnumerable<FeesList> feesLists { get; set;} = Enumerable.Empty<FeesList>();
+        public FeesList feesList { get; set; }
         public Dues dues { get; set; }
         public string sortOrder { get; set; }
         public IEnumerable<Announcements> Announcements { get; set; }

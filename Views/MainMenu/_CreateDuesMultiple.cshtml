@@ -1,0 +1,125 @@
+﻿@model NewModel
+
+<Button runat="server" id="bution1" class="btn btn-success" style="position:sticky;">Add Multiple Dues</Button>
+<form method="post" class="form form2" id="thisform1">
+    <p class="title">Add Multiple Dues</p>
+    <input asp-for="@Model.dues.AccountID" name="AccountID" id="AccountID" class="form-control" hidden />
+    <input asp-for="@Model.dues.Status" name="Status" class="form-control" hidden />
+    <input asp-for="@Model.dues.FeesName" name="FeesName" id="FeesName" hidden />
+    <div class="form-group">
+        <label for="typeofdue" class="control-label">Select Homeowner</label>
+        <select name="TypeofDues" id="typeofdue" class="form-control">
+            @{
+                var recentvar = "";
+                foreach (var obj in Model.feesLists)
+                {
+                    if(!recentvar.Equals(obj.TypeOfFees)){
+                    recentvar = obj.TypeOfFees;
+                            <option value="@obj.TypeOfFees">@obj.TypeOfFees</option>
+                    }
+                }
+            }
+        </select>
+    </div>
+    <table class="table table-bordered" style="width:100%">
+        <thead class="table-light">
+            <tr>
+                <th><input type="checkbox" id="select-all"></th> <!-- Select All Checkbox -->
+                <th>Full Name</th>
+            </tr>
+        </thead>
+        <tbody id="populate">
+           
+        </tbody>
+    </table>
+    <div class="form-group">
+        <input  type="button" id="CreateBatch" value="Create" class="btn btn-success" />
+    </div>
+</form>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    var btn = document.getElementById("bution1")
+    $(".form2").css("display", "none");
+    btn.onclick = function () {
+        if ($(".form2").css("display") == "block") {
+            $(".form2").css("display", "none");
+            $("#UserPartial").css("display", "block");
+            $("#PaidDues").css("display", "block");
+            $(".CreateSingle").css("display", "block");
+            $("#bution1").html('Add Multiple Dues');
+            document.getElementById("bution1").style.cssText = "display: block; position: inherit; background-color:#16a085; color: black";
+            $("body").css("background", "rgba(0, 0, 0, 0)");
+            $('#forpass').val("")
+            $("#forpass").attr('disabled', 'disabled');
+        }
+        else {
+            this.blur();
+            checkdues();
+            $(".form2").css("display", "block");
+            document.getElementById("bution1").style.cssText = "position: fixed; background-color:#16a085;color:black;";
+            $("#UserPartial").css("display", "none");
+            $("#PaidDues").css("display", "none");
+            $(".CreateSingle").css("display", "none");
+            $("#bution1").html('Hide');
+            $("body").css("background", "rgba(0, 0, 0, 0.4)");
+
+        }
+    }
+    $("#CreateBatch").on('click', function () {
+        const selectedUserIds = getSelectedUserIds();
+        console.log(selectedUserIds);
+        if (selectedUserIds.length === 0) {
+            alert('Please select at least one user.');
+            return;
+        }
+        $.post('@Url.Action("AddDuesToUsers", "MainMenu")',
+            {
+                userIds: selectedUserIds,
+                TypeofDues: $("#typeofdue").val()
+            },
+            function (data) {
+                if (data == 0) {
+                    alert("Error Adding Batch process");
+                }
+                else {
+                    location.reload();
+                }
+            })
+    });
+    $("#typeofdue").on('change', function () {
+        checkdues();
+     });
+
+    function checkdues() { 
+        $.post('@Url.Action("FindHomeOwners", "MainMenu")',
+            {
+                userdata: $("#typeofdue").val()
+            },
+            function (data) {
+                if (data == 0) {
+                    alert("No Homeowners found in the specified dues");
+                }
+                else {
+                    $("#populate").find('tr').remove().end();
+                    for (var j = 0; j < data.length; j++) {
+                        console.log(data);
+                        $("#populate").append('<tr><td><input type="checkbox" class="select-user" data-user-id="' + data[j].accountID + '"></td>' + '<td>' + data[j].fullName + '</td></tr>');
+                    }
+                }
+            });
+    }
+    // Select All functionality
+    document.getElementById('select-all').addEventListener('change', function () {
+        const checkboxes = document.querySelectorAll('.select-user');
+        checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+    });
+
+    // Get all selected user IDs
+    function getSelectedUserIds() {
+        const selectedUsers = [];
+        document.querySelectorAll('.select-user:checked').forEach(checkbox => {
+            selectedUsers.push(checkbox.dataset.userId);
+        });
+        return selectedUsers;
+    }
+</script>

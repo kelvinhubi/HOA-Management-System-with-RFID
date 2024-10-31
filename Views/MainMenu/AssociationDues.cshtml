@@ -41,11 +41,19 @@
 
 </div>
 <div style="display:flex">
-    @{
-        <partial name="_CreateDues" model="Model" />
-    }
+    <div class="CreateSingle">
+        @{
+            <partial name="_CreateDues" model="Model" />
+        }
+    </div>
+    <div class="CreateMultiple">
+        @{
+            <partial name="_CreateDuesMultiple" model="Model" />
+        }
+    </div>
     <Button id="PaidDues" asp-action="_ClearPaid" class="btn btn-danger" style="margin-left:5px;">Clear Paid Dues</Button>
 </div>
+
 @section Scripts {
     @{
                                     <partial name="_ValidationScriptsPartial" />
