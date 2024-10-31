@@ -21,17 +21,22 @@
             }
         </select>
     </div>
-    <table class="table table-bordered" style="width:100%">
-        <thead class="table-light">
-            <tr>
-                <th><input type="checkbox" id="select-all"></th> <!-- Select All Checkbox -->
-                <th>Full Name</th>
-            </tr>
-        </thead>
-        <tbody id="populate">
-           
-        </tbody>
-    </table>
+    <div class="form-group">
+        <table class="table table-bordered" style="width:100%">
+            <thead class="table-light">
+                <tr>
+                    <th><input type="checkbox" id="select-all"></th> <!-- Select All Checkbox -->
+                    <th>Full Name</th>
+                </tr>
+            </thead>
+            <tbody id="populate">
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group">
+        <label class="control-label">Set Due Date</label>
+        <input type="date" name="date" id="dateinput" class="form-control input" />
+    </div>
     <div class="form-group">
         <input  type="button" id="CreateBatch" value="Create" class="btn btn-success" />
     </div>
@@ -74,7 +79,8 @@
         $.post('@Url.Action("AddDuesToUsers", "MainMenu")',
             {
                 userIds: selectedUserIds,
-                TypeofDues: $("#typeofdue").val()
+                TypeofDues: $("#typeofdue").val(),
+                date: $("#dateinput").val()
             },
             function (data) {
                 if (data == 0) {

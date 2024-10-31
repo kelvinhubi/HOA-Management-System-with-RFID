@@ -352,7 +352,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return PartialView();
         }
         [HttpPost]
-        public JsonResult AddDuesToUsers(string[] userIds, string TypeofDues)
+        public JsonResult AddDuesToUsers(string[] userIds, string TypeofDues,string date)
         {
             try
             {
@@ -374,6 +374,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                             TypeofDues = TypeofDues,
                             Amount = Amount.ToString(),
                             Status = "Unpaid",
+                            Date = DateOnly.Parse(date)
                         };
 
                         _db.Due_Details.Add(info);
