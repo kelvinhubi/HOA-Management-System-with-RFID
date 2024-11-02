@@ -4,6 +4,7 @@
     Homeowner_details details = Model.Homeowner;
     int Year = Convert.ToInt32(details.Birthdate.Year);
     int Age = Convert.ToInt32(DateTime.Today.Year) - Year;
+    string cars = Model.Vehicles.Count() == 0 ? "N/A":Model.Vehicles.Count().ToString();
 }
 <div id="UserPartial">
     <h2>User Details</h2>
@@ -13,9 +14,10 @@
                 <th>Full Name</th>
                 <th>Phone Number</th>
                 <td>Age</td>
-                <td>Block No</td>
-                <td>Lot No</td>
-                <td>RFID_number</td>
+                <th>Block No</th>
+                <th>Address</th>
+                <th>Cars</th>
+                <th>RFID_number</th>
             </tr>
         </thead>
         <tbody>
@@ -25,6 +27,7 @@
                     <td>@Age</td>
                 <td>@Html.DisplayFor(m => m.Homeowner.BlkNO)</td>
                 <td>@Html.DisplayFor(m => m.Homeowner.Address)</td>
+                <td>@cars</td>
                 <td>@Html.DisplayFor(m => m.Homeowner.RFID_number)</td>
                 </tr>
         </tbody>

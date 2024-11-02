@@ -153,5 +153,24 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         {
             return _db.Guard_Information.Any(e => e.ID == id);
         }
+
+        public bool CheckRole()
+        {
+            var usertype = HttpContext.Session.GetString("UserType");
+            Console.WriteLine(usertype);
+            if (usertype != null)
+            {
+                if (usertype == "Guard")
+                {
+                    return true;
+
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
     }
 }

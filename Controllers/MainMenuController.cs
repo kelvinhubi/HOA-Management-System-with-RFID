@@ -12,6 +12,7 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using System.Text;
 using Microsoft.CodeAnalysis.CSharp;
+using System.ComponentModel.DataAnnotations;
 
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
@@ -170,6 +171,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             var model = new NewModel();
             var useracc = _db.Homeowner_Details.AsNoTracking().FirstOrDefault(m => m.AccountID == ID);
+            var cars = _db.Vehicle_Information.AsNoTracking().Where(_ =>_.AccountID == ID);
             model.CheckMe = _db.userFeesStatuses.Where(x => x.AccountID == ID).Select(vm => new CheckBoxItem()
             {
                 ID = vm.UserFeeID,
@@ -181,6 +183,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             {
                 return RedirectToAction("Error", "MainMenu", ID);
             }
+            model.Vehicles = cars;
             model.Homeowner = useracc;
             return View(model);
         }
@@ -528,7 +531,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         {
             if (CheckRole())
             {
-                ViewData["NameSortParam"] = System.String.IsNullOrEmpty(sortOrder) ? "nameDesc" : "";
                 var result = (from vehicle in _db.Vehicle_Information
                               join
                               homeacc in _db.Homeowner_Details on vehicle.AccountID equals homeacc.AccountID
@@ -543,31 +545,22 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                                   RFID_number = vehicle.RFID_number
 
                               });
-                switch (sortOrder)
-                {
-                    case "nameDesc":
-                        result = result.OrderByDescending(r => r.FullName);
-                        break;
-                    default:
-                        result = result.OrderBy(r => r.FullName); break;
-                }
-                ViewData["ListOwners"] = _db.Homeowner_Details.ToList();
-                return View(result.AsNoTracking().ToList());
+                NewModel model = new NewModel();
+                model.Vehicle = new Vehicle_Information();
+                model.Vehicles = result.ToList();
+                model.Homeacc = _db.Homeowner_Details.ToList();
+                return View(model);
             }
             return RedirectToAction("AccessDenied", "Home");
         }
 
         public IActionResult _CreateVehicle() { return PartialView(); }
         [HttpPost]
-        public async Task<IActionResult> _CreateVehicle(Vehicle_Information info)
+        public async Task<IActionResult> _CreateVehicle(NewModel info)
         {
-            if (ModelState.IsValid)
-            {
-                _db.Vehicle_Information.Add(info);
+                _db.Vehicle_Information.Add(info.Vehicle);
                 await _db.SaveChangesAsync();
                 return RedirectToAction("VehicleManagement");
-            }
-            return RedirectToAction("VehicleManagement");
         }
 
         public IActionResult _DeleteVehicle(int ID)

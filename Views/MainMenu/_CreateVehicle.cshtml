@@ -1,42 +1,41 @@
-﻿@model Vehicle_Information
+﻿@model NewModel
 @{
-    string[] typeofdue = { "Facilities", "Amortization", };
-    IEnumerable<Homeowner_details>? ListOwners = ViewData["ListOwners"] as IEnumerable<Homeowner_details>;
+   
 }
 <Button runat="server" id="bution" class="btn btn-primary" style="position:sticky;background-color:#16a085;color:black;">Add Vehicle</Button>
 <form asp-action="View" class="form" id="thisform">
     <p class="title">Add Vehicle</p>
-    <input asp-for="AccountID" value="" id="AccountID" class="form-control" hidden />
+    <input asp-for="@Model.Vehicle.AccountID" value="" id="AccountID" class="form-control" hidden />
     <div class="form-group">
-        <label asp-for="FullName" class="control-label">Select Homeowner</label>
-        <select asp-for="FullName" onclick="CheckName()" class="form-control">
-            @foreach (Homeowner_details obj in ListOwners)
+        <label asp-for="@Model.Vehicle.FullName" class="control-label">Select Homeowner</label>
+        <select asp-for="@Model.Vehicle.FullName" onclick="CheckName()" class="form-control">
+            @foreach (Homeowner_details obj in Model.Homeacc)
             {
 
                 var fullname = obj.Firstname + " " + obj.Middlename + " " + obj.Surname;
                 <option id="FullName" value="@fullname">@fullname</option>
             }
         </select>
-        <span asp-validation-for="AccountID" class="text-danger"></span>
+        <span asp-validation-for="@Model.Vehicle.AccountID" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="PlateNo" class="control-label"></label>
-        <input asp-for="PlateNo" class="form-control input" />
-        <span asp-validation-for="PlateNo" class="text-danger"></span>
+        <label asp-for="@Model.Vehicle.PlateNo" class="control-label"></label>
+        <input asp-for="@Model.Vehicle.PlateNo" class="form-control input" />
+        <span asp-validation-for="@Model.Vehicle.PlateNo" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="VehicleModel" class="control-label"></label>
-        <input asp-for="VehicleModel" class="form-control input" />
-        <span asp-validation-for="VehicleModel" class="text-danger"></span>
+        <label asp-for="@Model.Vehicle.VehicleModel" class="control-label"></label>
+        <input asp-for="@Model.Vehicle.VehicleModel" class="form-control input" />
+        <span asp-validation-for="@Model.Vehicle.VehicleModel" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="VehicleType" class="control-label">Vehicle Type</label>
-        <input asp-for="VehicleType" class="form-control input" />
+        <label asp-for="@Model.Vehicle.VehicleType" class="control-label">Vehicle Type</label>
+        <input asp-for="@Model.Vehicle.VehicleType" class="form-control input" />
     </div>
     <div class="form-group">
-        <label asp-for="RFID_number" class="control-label">RFID Number</label>
-        <input asp-for="RFID_number" id="RFIDnumber" class="form-control input" readonly/>
-        <span asp-validation-for="RFID_number" class="text-danger"></span>
+        <label asp-for="@Model.Vehicle.RFID_number" class="control-label">RFID Number</label>
+        <input asp-for="@Model.Vehicle.RFID_number" id="RFIDnumber" class="form-control input" readonly />
+        <span asp-validation-for="@Model.Vehicle.RFID_number" class="text-danger"></span>
     </div>
     <div class="form-group">
         <input asp-controller="MainMenu" asp-action="_CreateVehicle" type="submit" id="button1" value="Create" class="btn btn-primary" style="background-color:#16a085;color:black;" />

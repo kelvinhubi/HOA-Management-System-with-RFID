@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Vehicle_Information>
+﻿@model NewModel
 @{
     Layout = "~/Views/Shared/_Layout1.cshtml";
 }
@@ -25,7 +25,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var obj in Model)
+            @foreach (var obj in Model.Vehicles)
             {
                 <tr>
                     <td>@obj.VehicleID</td>
@@ -46,8 +46,7 @@
     </table>
 </div>
 @{
-    Vehicle_Information vehicle = new Vehicle_Information();
-    <partial name="_CreateVehicle" model="vehicle" />
+    <partial name="_CreateVehicle" model="Model" />
 }
 @section Scripts {
     @{
