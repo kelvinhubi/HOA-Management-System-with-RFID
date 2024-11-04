@@ -1,5 +1,74 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model NewModel
+
+<Button runat="server" id="bution" class="btn btn-success" style="position:sticky;">Add Multiple Dues</Button>
+<form asp-action="_AddHomesList" asp-controller="MainMenu" class="form" id="thisform">
+    <p class="title">Add Home</p>
+    <input asp-for="@Model.Home.AccountID" id="AccountID" class="form-control" hidden />
+    <input asp-for="@Model.Home.HomeID" class="form-control" hidden />
+    <input asp-for="@Model.Home.CreatedAt" id="FeesName" hidden />
+    <div class="form-group">
+        <label asp-for="@Model.Home.FullName" class="control-label">Select Homeowner</label>
+        <select asp-for="@Model.Home.FullName" onclick="CheckName()" id="FullName" class="form-control">
+            @foreach (var obj in Model.Homeacc)
+            {
+                <option value="@obj.FullName" data-another="@obj.AccountID">@obj.FullName</option>
+            }
+        </select>
+        <span asp-validation-for="@Model.Home.AccountID" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="@Model.Home.HomeName" class="control-label">Address</label>
+        <input asp-for="@Model.Home.HomeName" class="form-control input" />
+        <span asp-validation-for="@Model.Home.HomeName"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="@Model.Home.Address" class="control-label">Address</label>
+        <input asp-for="@Model.Home.Address" class="form-control input" />
+        <span asp-validation-for="@Model.Home.Address"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="@Model.Home.BlkNO" class="control-label">BlkNo</label>
+        <input asp-for="@Model.Home.BlkNO" class="form-control input" />
+        <span asp-validation-for="@Model.Home.BlkNO"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit"  value="Create" class="btn btn-success" />
+    </div>
+</form>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    var btn = document.getElementById("bution")
+    $("#thisform").css("display", "none");
+    btn.onclick = function () {
+        if ($("#thisform").css("display") == "block") {
+            $("#thisform").css("display", "none");
+            $("#UserPartial").css("display", "block");
+            $("#bution").html('Add Home');
+            document.getElementById("bution").style.cssText = "display: block; position: inherit; background-color:#16a085; color: black";
+            $("body").css("background", "rgba(0, 0, 0, 0)");
+        }
+        else {
+            this.blur();
+            $("#thisform").css("display", "block");
+            document.getElementById("bution").style.cssText = "position: fixed; background-color:#16a085;color:black;";
+            $("#UserPartial").css("display", "none");
+            $("#bution").html('Hide');
+            $("body").css("background", "rgba(0, 0, 0, 0.4)");
+
+        }
+    }
+    function CheckName() {
+        $.post("@Url.Action("CheckName", "MainMenu")",
+            {
+                userdata: $("#FullName").val()
+            },
+            function (data) {
+                if (data == 0) {
+                }
+                else {
+
+                    $("#AccountID").val(data);
+                }
+            });
+    }
+</script>

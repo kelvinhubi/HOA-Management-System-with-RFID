@@ -11,7 +11,7 @@
     <link rel=“stylesheet” href=“https://use.fontawesome.com/releases/v5.5.0/css/all.css” integrity=“sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU” crossorigin=“anonymous”>
 </head>
 <div id="UserPartial">
-    <h2>Association Dues </h2>
+    <h2>List Of Fees</h2>
     <table id="mytable" class="table">
         <thead class="table-light">
             <tr>
@@ -31,7 +31,7 @@
                     <td>@obj.Amount</td>
                     <td>@obj.Status</td>
                     <td style="white-space:nowrap;">
-                        <a class="btn btn-success btn-sm" asp-action="_EditFees" asp-route-id="@obj.IDFees">Edit<i class='bx bxs-edit-alt'></i></a>
+                        <a asp-action="_EditFees" asp-route-id="@obj.IDFees" class="btn btn-success btn-sm">Edit<i class='bx bxs-edit-alt'></i></a>
                         <a asp-action="_DeleteFees" asp-route-id="@obj.IDFees" class="btn btn-danger btn-sm">Delete<i class='bx bxs-trash'></i></a>
                     </td>
                 </tr>

@@ -4,8 +4,9 @@
         .expandTextArea {
             display: inline-block;
             border: solid 1px #000;
-            min-height: 200px;
-            width: 300px;
+            border-radius:5px;
+            min-height: 150px;
+            width: 450px;
             background-color: white;
         }
     </style>
@@ -25,7 +26,7 @@
         <textarea class="form-control-plaintext expandTextArea" asp-for="Description" class="form-control-plaintext input"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
-    <div class="form-group">
+    <div class="form-group" style="margin-bottom:10px;">
         <label asp-for="backgroundFile" class="control-label">Upload Image</label>
         <input asp-for="backgroundFile" class="form-control" accept="image/*" />
     </div>

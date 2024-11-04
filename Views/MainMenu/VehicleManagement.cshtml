@@ -36,8 +36,8 @@
                     <td>@obj.RFID_number</td>
                     <td>@obj.RFID_status</td>
                     <td>
-                        <a asp-action="_EditVehicle" class="btn btn-warning"  asp-route-ID="@obj.VehicleID">Edit</a>
-                        <a asp-action="_DeleteVehicle" class="btn btn-danger" asp-route-ID="@obj.VehicleID">Delete</a>
+                        <a asp-action="_EditVehicle" asp-route-ID="@obj.VehicleID" class="btn btn-success btn-sm">Edit<i class='bx bxs-edit-alt'></i></a>
+                        <a asp-action="_DeleteVehicle" asp-route-ID="@obj.VehicleID" class="btn btn-danger btn-sm">Delete<i class='bx bxs-trash'></i></a>
                     </td>
                 </tr>
             }

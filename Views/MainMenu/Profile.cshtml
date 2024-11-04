@@ -77,7 +77,7 @@
 
 	</style>
 </head>
-<form>
+<form id="thisform">
 	<div class="container">
 		<div class="row gutters">
 
@@ -89,23 +89,27 @@
 								<h6 class="mb-2 text-primary">Account Settings</h6>
 							</div>
 							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+								<input asp-for="AccountID" name="AccountID" hidden/>
 								<div class="form-group">
 									<label asp-for="Username"></label>
-									<input type="text" class="form-control" asp-for="Username" />
+									<input type="text" class="form-control" asp-for="Username" name="Username" />
+									<span asp-validation-for="Username"></span>
 								</div>
 							</div>
 							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
 								<div class="form-group">
 									<label asp-for="Password">Password</label>
-									<input type="password" id="Pass" class="form-control" asp-for="Password" placeholder="********" />
+									<input type="password" id="Pass" class="form-control" asp-for="Password" name="Password" autocomplete="on" placeholder="********" />
+									<span asp-validation-for="Password"></span>
 								</div>
 							</div>
 						</div>
 						<div class="row gutters">
 							<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
 								<div class="text-right">
-									<button type="button" id="submit" name="submit" class="btn btn-secondary">Cancel</button>
-									<button type="button" id="submit" name="submit" class="btn btn-primary">Update</button>
+									<button type="button" name="Edit" id="Edit" class="btn btn-warning">Edit</button>
+									<button type="button" id="Cancel" name="cancel" class="btn btn-secondary" hidden>Cancel</button>
+									<button type="button" id="SubmitForm" name="submit" class="btn btn-primary" hidden>Update</button>
 								</div>
 							</div>
 						</div>
@@ -115,6 +119,11 @@
 		</div>
 	</div>
 </form>
+@section Scripts {
+	@{
+			<partial name="_ValidationScriptsPartial" />
+	}
+}
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
 	$("#Pass").on('focus', function () {	
@@ -123,4 +132,35 @@
     $("#Pass").on('focusout', function () {
 		$(this).attr("placeholder", "********")
     });
+	console.log("Password is:" + $("Pass").val());
+	$("#SubmitForm").on('click', function () {
+		let formdat = new FormData(document.getElementById('thisform'));
+		$.ajax({
+			url: '@Url.Action("UpdateProfile","MainMenu")', // Replace with your controller and action
+			type: 'POST',
+			data: formdat,
+			contentType: false, // Important for FormData
+			processData: false, // Important for FormData
+			success: function (response) {
+				alert("Profile Updated Successfully");
+			},
+			error: function (xhr, status, error) {
+				alert("Profile Update Fail");
+			}
+		});
+		$("#thisform").trigger("reset");
+		$("#Cancel").attr("hidden", true);
+		$("#SubmitForm").attr("hidden", true);
+		$("#Edit").removeAttr("hidden");
+	});
+	$("#Edit").on('click', function () {
+		$("#Cancel").removeAttr("hidden");
+		$("#SubmitForm").removeAttr("hidden");
+		$("#Edit").attr("hidden",true);
+	});
+	$("#Cancel").on('click', function () {
+		$("#Cancel").attr("hidden", true);
+		$("#SubmitForm").attr("hidden", true);
+		$("#Edit").removeAttr("hidden");
+	});
 </script>

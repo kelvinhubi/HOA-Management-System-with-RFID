@@ -20,5 +20,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         public string sortOrder { get; set; }
         public IEnumerable<Announcements> Announcements { get; set; }
         public Announcements Announcement { get; set; }
+        public IEnumerable<HomesList> Homes { get; set;} = Enumerable.Empty<HomesList>();
+        public HomesList Home { get; set; }
     }
 }

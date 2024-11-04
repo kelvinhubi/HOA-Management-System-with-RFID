@@ -1,12 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
     public class UserMenuController : Controller
     {
         private readonly ILogger<UserMenuController> _logger;
-        public UserMenuController(ILogger<UserMenuController> logger) {
+        private readonly AppDbContext _db;
+        public UserMenuController(ILogger<UserMenuController> logger, AppDbContext db) {
             _logger = logger;
+            _db = db;
         }
         public IActionResult Dashboard()
         {
@@ -19,7 +23,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return RedirectToAction("AccessDenied", "Home");
         }
 
-
+        public IActionResult Announcements() { 
+            return View(_db.Announcements.ToList());
+        }
         public IActionResult Logs()
         {
             if (CheckRole()) { return View(); }
