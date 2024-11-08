@@ -6,23 +6,35 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
     public class RfidController : Controller
     {
         private readonly AppDbContext _db;
-
+        public static SerialPort? _port;
         public RfidController(AppDbContext db)
         {
-            _db = db;
-        }
+            _db = db;;
+		}
 
         [HttpGet]
         public JsonResult ReadRFID()
         {
-
-            string[] ports = SerialPort.GetPortNames();
-            foreach (string port in ports)
-            {
-                Console.WriteLine(port);
+            if (_port != null) {
+                try {
+                    if (_port.IsOpen == true) { _port.Close(); }
+                    if (_port.IsOpen == false)
+                    {
+                        _port.Open();
+                        string value = _port.ReadLine();
+                        if (value != null)
+                        {
+                            Console.WriteLine(value);
+                            _port.Close();
+                            return Json(value);
+                        }
+                    }
+                } catch (Exception ) { 
+                
+                }
             }
-            return Json(0);
-        }
+            return Json("0");
+		}
 
         public IActionResult ShowRFID()
         {

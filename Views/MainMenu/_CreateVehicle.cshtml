@@ -72,7 +72,7 @@
                 userdata: $("#FullName").val()
             },
             function (data) {
-                if (data == 0) {
+                if (data == "0") {
                 }
                 else {
 
@@ -89,7 +89,6 @@
         $.get("@Url.Action("ReadRFID", "Rfid")", function (data) {
             if (data == 0) {
                 isValue = false;
-                console.log("should change value");
             }
             else {
                 $("#RFIDnumber").val(data);
@@ -100,8 +99,7 @@
     });
     async function Timer(time) {
         setTimeout(function () {
-            if (isValue == false) {
-                console.log("Hello");
+            if (isValue == false || $("#RFIDnumber").val() == "Listening...") {
                 $("#RFIDnumber").val("N/A");
             }
         }, time);
