@@ -737,17 +737,38 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             var result = _db.Admin_Accounts.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
             return View(result);
         }
-        [HttpPost]
-        public JsonResult UpdateProfile(int AccountID, string Password, string Username) {
-            if (ModelState.IsValid) { 
-                _db.Admin_Accounts.Update(new Admin_Account { AccountID = Convert.ToInt32(AccountID), Password = Encryption.Encrpyt(Password, _env.EncryptionKey,_env.IVKey) , Username = Username});
-                _db.SaveChanges();
-                return Json(new { success = true});
-            }
-            return Json(new { success = false });
-        }
-        //HomesList
-        public IActionResult HomesList() {
+		[HttpPost]
+		public JsonResult UpdateProfile(int AccountID, string Password, string Username)
+		{
+			if (ModelState.IsValid)
+			{
+				var result = _db.Admin_Accounts.Where(_ => _.AccountID == AccountID).ToList().FirstOrDefault();
+				if (result != null)
+				{
+					try
+					{
+						if (Encryption.Decrypt(Password, _env.EncryptionKey, _env.IVKey).ToString().Equals(Encryption.Decrypt(result.Password, _env.EncryptionKey, _env.IVKey).ToString()))
+
+						{
+							result.Password = Encryption.Encrpyt(Encryption.Decrypt(Password, _env.EncryptionKey, _env.IVKey), _env.EncryptionKey, _env.IVKey);
+						}
+					}
+					catch (Exception)
+					{
+						result.Password = Encryption.Encrpyt(Password, _env.EncryptionKey, _env.IVKey);
+
+					}
+					result.Username = Username;
+					_db.Admin_Accounts.Update(result);
+					_db.SaveChanges();
+					return Json(new { success = true });
+				}
+
+			}
+			return Json(new { success = false });
+		}
+		//HomesList
+		public IActionResult HomesList() {
             if (CheckRole()) {
                 NewModel model = new NewModel();
                 model.Homes = _db.homesLists.ToList();
