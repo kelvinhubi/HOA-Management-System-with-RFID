@@ -102,8 +102,6 @@ public class GuardMenuController : Controller
                             PlateNo = vehicle.PlateNo,
                             FullName = vehicle.FullName,
                       }).ToList();
-        foreach (var res in result) {
-        }
         return Json(result);
     }
     [HttpGet]

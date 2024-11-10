@@ -1,0 +1,48 @@
+﻿@model NewModel
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<div class="card direct-chat direct-chat-primary mb-4">
+
+    <div class="card-header">
+        <h3 class="card-title">Chat</h3>
+    </div> <!-- /.card-header -->
+    <div class="card-body">
+        <input id="Nameval"value=""/>
+        <!-- Conversations are loaded here -->
+        <div class="direct-chat-messages" id="pops">
+            
+            
+        </div> <!-- /.direct-chat-messages--> <!-- Contacts are loaded here -->
+    </div> <!-- /.card-body -->
+    <div class="card-footer">
+        <form action="#" method="post">
+            <div class="input-group">
+                <input type="text" name="message" id="message" placeholder="Type Message ..." class="form-control"> <span class="input-group-append">
+                    <button type="button" id="sendmessage" class="btn btn-primary">
+                        Send
+                    </button>
+                </span>
+            </div>
+        </form>
+    </div> <!-- /.card-footer-->
+</div>
+<!--<div class="container">
+    <div class="form-group">
+        <label class="form-label">Message
+        </label>
+        <input type="text" id="message" class="form-control input"/>
+    </div>
+    <div class="mt-5">
+        <input type="button" id="sendmessage" value="Send" />
+    </div>
+</div>-->
+<script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script>
+<script src="~/js/Hub.js"></script>
+<script>
+    window.onload = function () { 
+        $.get('@Url.Action("GetSessionName","Login")', function (data) {
+            $('#Nameval').val(data);
+        });
+    }
+</script>

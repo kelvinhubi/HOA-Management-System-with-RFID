@@ -519,6 +519,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return RedirectToAction("Logs");
 
         }
+        //Chat
+        public IActionResult Chat() {
+            return View();
+        }
         //Guards Controller
         public IActionResult Guards()
         {

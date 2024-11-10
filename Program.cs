@@ -1,11 +1,10 @@
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
 using Microsoft.EntityFrameworkCore;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
-using System;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Net.Mail;
-using System.Net;
+
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Hubs;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers;
 using System.IO.Ports;
@@ -61,7 +60,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.MapHub<MyHub>("/Chat");
+app.MapHub<MyHub>("/chat");
 app.UseAuthorization();
 app.UseAuthentication();
 app.MapRazorPages();

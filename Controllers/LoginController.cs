@@ -117,6 +117,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     }
                     else
                     {
+                        HttpContext.Session.SetString("SessionUsername", _account.Username);
                         HttpContext.Session.SetString("SessionID", Convert.ToString(SearchData.AccountID));
                         HttpContext.Session.SetString("UserType", "User");//JsonConvert.SerializeObject
                         Console.WriteLine("Logged In");
@@ -238,7 +239,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 }
             return View();
             }
-
+        [HttpGet]
+        public JsonResult GetSessionName() {
+            return Json(HttpContext.Session.GetString("SessionUsername"));
+        }
 
 
         public IActionResult ForgotPassword(){

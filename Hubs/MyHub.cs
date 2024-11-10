@@ -5,13 +5,16 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Hubs
 {
     public class MyHub : Hub
     {
-        public async Task JoinRF(Homeowner_details conn) {
-            await Clients.All.SendAsync("RecieveMessage", "Admin",$"{conn.FullName} has joined");
+        public async Task JoinRF(string user,string conn) {
+              await Clients.All.SendAsync("RecieveMessage",user, conn,DateTime.Now.ToString("MMMM dd, yyyy h:mm tt"));
         }
 
-        public async Task ChatRoom(Homeowner_details conn) {
-            await Groups.AddToGroupAsync(Context.ConnectionId, conn.FullName);
-            await Clients.Group(conn.FullName).SendAsync("RecieveMessage", "Admin", $"{conn.FullName} has joined");
+        public async Task ChatRoom(string conn) {
+            await Groups.AddToGroupAsync(Context.ConnectionId, conn);
+            await Clients.Group(conn).SendAsync("RecieveMessage", "Admin", $"{conn} has joined");
+        }
+        public async Task Notification(string User, string message) { 
+            await Clients.All.SendAsync("RecieveMessage",User, message, DateTime.Now.ToString("MMMM dd, yyyy h:mm tt"));
         }
     }
 }

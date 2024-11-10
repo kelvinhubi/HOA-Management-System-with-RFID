@@ -24,5 +24,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         public HomesList Home { get; set; }
         public IEnumerable<AccessLog> accessLogs { get; set; } = Enumerable.Empty<AccessLog>();
         public AccessLog AccessLog { get; set; }
+        public IEnumerable<Admin_Account> admin_Accounts { get; set; } = Enumerable.Empty<Admin_Account>();
+        public Admin_Account AdminAccount { get; set; }
+        public IEnumerable<Guard_Information> guards { get; set; }
+        public Guard_Information Guard { get; set; }
     }
 }
