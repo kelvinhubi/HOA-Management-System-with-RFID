@@ -45,6 +45,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Arduino_Serivce
         public void Dispose()
         {
             _serialPort?.Close();
+            _serialPort?.Dispose();
         }
     }
 }

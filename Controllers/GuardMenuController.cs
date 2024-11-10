@@ -17,7 +17,6 @@ public class GuardMenuController : Controller
          _db = context;
         _arduinoLog = service;
         _asyncdb = db2;
-        
         Task.Run(EntryLogging);
     }
     public async Task EntryLogging()
@@ -27,13 +26,14 @@ public class GuardMenuController : Controller
         while (true)
         {
             string data = await _arduinoLog.ReadLineAsync();
+            _arduinoLog.Dispose();
 
             if (data != string.Empty )
             {
                 using (var context = _asyncdb.CreateDbContext())
                 {
-                    var result = context.Vehicle_Information.Where(_ => _.RFID_number == data).ToList().SingleOrDefault();
-                    var result2 = context.accessLogs.Where(_ => _.RFID_number == data).OrderByDescending(p => p.Time).ToList().FirstOrDefault();
+                    var result = context.Vehicle_Information.Where(_ => _.RFID_number == data).FirstOrDefault();
+                    var result2 = context.accessLogs.OrderByDescending(p =>p.Time).Where(_ => _.RFID_number == data).FirstOrDefault();
                     if (result != null)
                     {
                         if (result2 != null)
@@ -50,17 +50,18 @@ public class GuardMenuController : Controller
                                 context.accessLogs.Add(info);
                                 await context.SaveChangesAsync();
                             }
-                            else
-                            {
-                                var info = new AccessLog
+                            if (result2.LogType == "Entry") {
                                 {
-                                    GuardID = SessionID,
-                                    AccountID = result2.AccountID,
-                                    RFID_number = result.RFID_number,
-                                    LogType = "Exit",
-                                };
-                                context.accessLogs.Add(info);
-                                await context.SaveChangesAsync();
+                                    var info = new AccessLog
+                                    {
+                                        GuardID = SessionID,
+                                        AccountID = result2.AccountID,
+                                        RFID_number = result.RFID_number,
+                                        LogType = "Exit",
+                                    };
+                                    context.accessLogs.Add(info);
+                                    await context.SaveChangesAsync();
+                                }
                             }
 
                         }
@@ -78,17 +79,14 @@ public class GuardMenuController : Controller
                     }
                 }
             }
-           await Task.Delay(1000);
+           await Task.Delay(2000);
         }
     }
     public IActionResult Dashboard() {
         return View();
     }
     public IActionResult EntryandExitLogs() {
-        /*SessionID = Convert.ToInt32(HttpContext.Session.GetString("SessionID"));
-        NewModel model = new NewModel();
-        model.accessLogs = _db.accessLogs.ToList();
-        model.Vehicles = _db.Vehicle_Information.ToList();*/
+        SessionID = Convert.ToInt32(HttpContext.Session.GetString("SessionID"));
         return View();
     }
     [HttpGet]
@@ -98,17 +96,19 @@ public class GuardMenuController : Controller
                       select new { 
                             LogID = access.AccessLogID,
                             GuardID = access.GuardID,
-                            Time = access.Time,
+                            Time = access.Time.ToString("MMMM dd, yyyy h:mm tt"),
                             LogType = access.LogType,
                             RFID_number = vehicle.RFID_number,
                             PlateNo = vehicle.PlateNo,
                             FullName = vehicle.FullName,
-                      }).OrderByDescending(_=>_.Time).ToList();
+                      }).ToList();
+        foreach (var res in result) {
+        }
         return Json(result);
     }
     [HttpGet]
     public JsonResult getCount() {
-        var result = _db.accessLogs.Count();
+        var result =  _db.accessLogs.Count();
         return Json(result);
     }
 }
