@@ -1,4 +1,5 @@
 ﻿using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
+using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.IO.Ports;
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
@@ -9,9 +10,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public static SerialPort? _port;
         public RfidController(AppDbContext db)
         {
-            _db = db;;
+            _db = db;
 		}
-
+        
         [HttpGet]
         public JsonResult ReadRFID()
         {

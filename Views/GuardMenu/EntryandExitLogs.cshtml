@@ -1,0 +1,61 @@
+﻿@model NewModel
+@{
+    Layout = "~/Views/Shared/_Layout3.cshtml";
+
+}
+<head>
+    <title>
+        @{
+            ViewData["Title"] = "User Management";
+        }
+    </title>
+</head>
+@Html.AntiForgeryToken();
+<div id="UserPartial">
+    <h2>Entry and Exit Logs</h2>
+    <table id="mytable" class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Log ID</th>
+                <th>Guard ID</th>
+                <th>Time</th>
+                <th>Log Type</th>
+                <th>RFID No.</th>
+                <th>Plate No.</th>
+                <th>Full Name</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+<script>
+    window.onload = function () { 
+        populate();
+        Timer();
+    }
+    async function Timer() { 
+        setInterval(function () {
+            console.log("PR");
+            $.get('@Url.Action("getCount", "GuardMenu")', function (data) {
+                if (updatedvalue < data) {
+                    populate();
+                }
+            });
+        }, 200);
+    }
+    let updatedvalue = 0;
+   async function populate() { 
+        if ($.fn.DataTable.isDataTable('#mytable')) {
+            $('#mytable').DataTable().destroy();
+        }
+        $('#mytable tbody').empty();
+        $.get('@Url.Action("GetEntryLogs","GuardMenu")', 
+        function (data1) {
+            console.log(data1);
+            updatedvalue = data1.length;
+            var table = $('#mytable').DataTable({
+                    data: data1,
+                    columns: [{data: 'logID'}, { data: 'guardID' }, { data: 'time' }, { data: 'logType' }, { data: 'rfiD_number' }, { data: 'plateNo' }, { data: 'fullName' }]
+            });
+        });
+    }
+</script>

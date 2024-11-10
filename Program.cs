@@ -9,6 +9,7 @@ using System.Net;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Hubs;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers;
 using System.IO.Ports;
+using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Arduino_Serivce;
 RfidController._port = new SerialPort();
 RfidController._port.PortName = "COM4";
 RfidController._port.BaudRate = 115200;
@@ -17,9 +18,11 @@ var connectionString = builder.Configuration.GetConnectionString("AppDbConnectio
 var serverVersion = new MySqlServerVersion(ServerVersion.AutoDetect(connectionString));
 var EnvModel = builder.Configuration.GetSection("Env");
 builder.Services.Configure<EnvironmentModel>(EnvModel);
+builder.Services.AddScoped<ArduinoLog>(provider => { return new ArduinoLog("COM4", 115200); });
 //For Entity Framework
 builder.Services.AddSignalR();
-builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connectionString, serverVersion));
+//builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connectionString, serverVersion));
+builder.Services.AddDbContextFactory<AppDbContext>(options => options.UseMySql(connectionString, serverVersion));
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AppDbContext>();
 //For Identity
 //Adding Authentication

@@ -1,176 +1,114 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿
+using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Arduino_Serivce;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Eventing.Reader;
 
-namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
+public class GuardMenuController : Controller
 {
-    public class GuardMenuController : Controller
+    private readonly AppDbContext _db;
+    private readonly ArduinoLog _arduinoLog;
+    private readonly IDbContextFactory<AppDbContext> _asyncdb;
+    public int SessionID;
+    public GuardMenuController(AppDbContext context, ArduinoLog service,IDbContextFactory<AppDbContext> db2)
     {
-        private readonly AppDbContext _db;
-
-        public GuardMenuController(AppDbContext context)
+         _db = context;
+        _arduinoLog = service;
+        _asyncdb = db2;
+        
+        Task.Run(EntryLogging);
+    }
+    public async Task EntryLogging()
+    {
+        await _arduinoLog.InitializeAsync();
+        
+        while (true)
         {
-            _db = context;
-        }
+            string data = await _arduinoLog.ReadLineAsync();
 
-        // GET: Guard_Information
-        public async Task<IActionResult> Index()
-        {
-            return View(await _db.Guard_Information.ToListAsync());
-        }
-
-        // GET: Guard_Information/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
+            if (data != string.Empty )
             {
-                return NotFound();
-            }
-
-            var guard_Information = await _db.Guard_Information
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (guard_Information == null)
-            {
-                return NotFound();
-            }
-
-            return View(guard_Information);
-        }
-
-        // GET: Guard_Information/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Guard_Information/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Username,Password,Name")] Guard_Information guard_Information)
-        {
-            if (ModelState.IsValid)
-            {
-                _db.Add(guard_Information);
-                await _db.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(guard_Information);
-        }
-
-        // GET: Guard_Information/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var guard_Information = await _db.Guard_Information.FindAsync(id);
-            if (guard_Information == null)
-            {
-                return NotFound();
-            }
-            return View(guard_Information);
-        }
-
-        // POST: Guard_Information/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Username,Password,Name")] Guard_Information guard_Information)
-        {
-            if (id != guard_Information.ID)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                using (var context = _asyncdb.CreateDbContext())
                 {
-                    _db.Update(guard_Information);
-                    await _db.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!Guard_InformationExists(guard_Information.ID))
+                    var result = context.Vehicle_Information.Where(_ => _.RFID_number == data).ToList().SingleOrDefault();
+                    var result2 = context.accessLogs.Where(_ => _.RFID_number == data).OrderByDescending(p => p.Time).ToList().FirstOrDefault();
+                    if (result != null)
                     {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
+                        if (result2 != null)
+                        {
+                            if (result2.LogType == "Exit")
+                            {
+                                var info = new AccessLog
+                                {
+                                    GuardID = SessionID,
+                                    AccountID = result.AccountID,
+                                    RFID_number = result.RFID_number,
+                                    LogType = "Entry",
+                                };
+                                context.accessLogs.Add(info);
+                                await context.SaveChangesAsync();
+                            }
+                            else
+                            {
+                                var info = new AccessLog
+                                {
+                                    GuardID = SessionID,
+                                    AccountID = result2.AccountID,
+                                    RFID_number = result.RFID_number,
+                                    LogType = "Exit",
+                                };
+                                context.accessLogs.Add(info);
+                                await context.SaveChangesAsync();
+                            }
+
+                        }
+                        else {
+                            var info = new AccessLog
+                            {
+                                GuardID = SessionID,
+                                AccountID = result.AccountID,
+                                RFID_number = result.RFID_number,
+                                LogType = "Entry",
+                            };
+                            context.accessLogs.Add(info);
+                            await context.SaveChangesAsync();
+                        }
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(guard_Information);
+           await Task.Delay(1000);
         }
-
-        // GET: Guard_Information/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var guard_Information = await _db.Guard_Information
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (guard_Information == null)
-            {
-                return NotFound();
-            }
-
-            return View(guard_Information);
-        }
-
-        // POST: Guard_Information/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var guard_Information = await _db.Guard_Information.FindAsync(id);
-            if (guard_Information != null)
-            {
-                _db.Guard_Information.Remove(guard_Information);
-            }
-
-            await _db.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool Guard_InformationExists(int id)
-        {
-            return _db.Guard_Information.Any(e => e.ID == id);
-        }
-
-        public bool CheckRole()
-        {
-            var usertype = HttpContext.Session.GetString("UserType");
-            Console.WriteLine(usertype);
-            if (usertype != null)
-            {
-                if (usertype == "Guard")
-                {
-                    return true;
-
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            return false;
-        }
+    }
+    public IActionResult Dashboard() {
+        return View();
+    }
+    public IActionResult EntryandExitLogs() {
+        /*SessionID = Convert.ToInt32(HttpContext.Session.GetString("SessionID"));
+        NewModel model = new NewModel();
+        model.accessLogs = _db.accessLogs.ToList();
+        model.Vehicles = _db.Vehicle_Information.ToList();*/
+        return View();
+    }
+    [HttpGet]
+    public JsonResult GetEntryLogs() {
+        var result = (from access in _db.accessLogs join
+                      vehicle in _db.Vehicle_Information on access.RFID_number equals vehicle.RFID_number
+                      select new { 
+                            LogID = access.AccessLogID,
+                            GuardID = access.GuardID,
+                            Time = access.Time,
+                            LogType = access.LogType,
+                            RFID_number = vehicle.RFID_number,
+                            PlateNo = vehicle.PlateNo,
+                            FullName = vehicle.FullName,
+                      }).OrderByDescending(_=>_.Time).ToList();
+        return Json(result);
+    }
+    [HttpGet]
+    public JsonResult getCount() {
+        var result = _db.accessLogs.Count();
+        return Json(result);
     }
 }

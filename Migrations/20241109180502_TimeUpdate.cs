@@ -1,0 +1,37 @@
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
+{
+    /// <inheritdoc />
+    public partial class TimeUpdate : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AlterColumn<string>(
+                name: "Time",
+                table: "accessLogs",
+                type: "longtext",
+                nullable: false,
+                oldClrType: typeof(DateTime),
+                oldType: "datetime(6)")
+                .Annotation("MySql:CharSet", "utf8mb4");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AlterColumn<DateTime>(
+                name: "Time",
+                table: "accessLogs",
+                type: "datetime(6)",
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "longtext")
+                .OldAnnotation("MySql:CharSet", "utf8mb4");
+        }
+    }
+}

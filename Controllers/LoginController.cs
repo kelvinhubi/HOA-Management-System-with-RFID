@@ -159,6 +159,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     }
                     else
                     {
+                        HttpContext.Session.SetString("SessionID",_account.AccountID.ToString());
                         HttpContext.Session.SetString("SessionUsername", info.Username);
                         isLoggedIn = true;
                     }
@@ -172,7 +173,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 {
                     
                  HttpContext.Session.SetString("UserType", "Guard");//JsonConvert.SerializeObject
-                 return RedirectToAction("Create", "GuardMenu");
+                 return RedirectToAction("EntryandExitLogs", "GuardMenu");
                 }
                 catch (Exception ex) { Console.WriteLine(ex.Message); }
 
@@ -207,8 +208,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         {
             if (ModelState.IsValid)
             {
-              
-                    Console.WriteLine("This works" + _account.Username);
                     _db.Homeowner_Details.Add(new Homeowner_details
                     {
                         AccountID = _account.AccountID,
@@ -218,7 +217,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                         Middlename = info.Middlename,
                         Birthdate = info.Birthdate,
                         PhoneNo = info.PhoneNo,
-                        RFID_number = info.RFID_number,
                     });
                 _db.SaveChanges();
                 var data1 = _db.feesLists.ToList();
