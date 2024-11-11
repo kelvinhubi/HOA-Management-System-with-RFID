@@ -39,6 +39,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public async Task<JsonResult> Payout(string Amount, string Invoice) {
             var options = new RestClientOptions("https://api.paymongo.com/v1/links");
             var client = new RestClient(options);
+            Amount = Amount+"00";
             string jsonstring = "{\"data\":{\"attributes\":{\"amount\":" + Amount + ",\"description\":" + '\"' + Invoice + '\"' + "}}}";
             var request = new RestRequest("");
             request.AddHeader("accept", "application/json");
