@@ -35,6 +35,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\Htmls\index.html" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Update="Views\Login\GuardLoginForm.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

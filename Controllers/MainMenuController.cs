@@ -279,6 +279,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                                   FullName = homeacc.Firstname + " " + homeacc.Middlename + " " + homeacc.Surname,
                                   Amount = due.Amount,
                                   Date = due.Date,
+                                  Invoice = due.Invoice,
                                   FeesName = due.FeesName,
                                   TypeofDues = due.TypeofDues,
                                   Status = due.Status
@@ -331,11 +332,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
             if (ModelState.IsValid)
             {
-
                 _db.Due_Details.Add(new Dues
                 {
                     FeesName = FeesName.Substring(0, FeesName.Length - 2),
                     AccountID = Convert.ToInt32(AccountID),
+                    Invoice = GenerateText(6),
                     Amount = Amount,
                     TypeofDues = TypeofDues,
                     Date = Date,
@@ -376,6 +377,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                         {
                             AccountID = Convert.ToInt32(userId),
                             FeesName = str.Substring(0, str.Length - 2),
+                            Invoice = GenerateText(6),
                             TypeofDues = TypeofDues,
                             Amount = Amount.ToString(),
                             Status = "Unpaid",
@@ -397,6 +399,20 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 // Log the exception if needed
                 return Json(new { success = false, message = ex.Message });
             }
+            
+        }
+        public string GenerateText(int length)
+        {
+            const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+            StringBuilder res = new StringBuilder();
+            Random rnd = new Random();
+            int i = 0;
+            while (i <= length)
+            {
+                res.Append(valid[rnd.Next(valid.Length)]);
+                i++;
+            }
+            return res.ToString();
         }
         public IActionResult _ClearPaid()
         {
@@ -855,7 +871,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
         private string CreateMailBody(string Username, string Password)
         {
-            string? dir = System.IO.Path.GetFullPath("Views\\Home\\index.html");
+            string? dir = System.IO.Path.GetFullPath("wwwroot\\Htmls\\index.html");
             string body = string.Empty;
             using (StreamReader reader = new StreamReader(dir))
             {

@@ -3,6 +3,7 @@
 <Button runat="server" id="bution1" class="btn btn-success" style="position:sticky;">Add Multiple Dues</Button>
 <form method="post" class="form form2" id="thisform1">
     <p class="title">Add Multiple Dues</p>
+
     <input asp-for="@Model.dues.AccountID" name="AccountID" id="AccountID" class="form-control" hidden />
     <input asp-for="@Model.dues.Status" name="Status" class="form-control" hidden />
     <input asp-for="@Model.dues.FeesName" name="FeesName" id="FeesName" hidden />

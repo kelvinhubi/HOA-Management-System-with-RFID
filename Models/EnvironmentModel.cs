@@ -6,7 +6,8 @@
         public string? Email { get; set; }
         public string? Password { get; set; }
         public string? Port { get; set; }
-        public string EncryptionKey { get; set; } = String.Empty;
+        public string EncryptionKey { get; set; } = string.Empty;
         public string IVKey { get; set; } = string.Empty;
+        public string Paymongo { get; set; } = string.Empty;
 	}
 }

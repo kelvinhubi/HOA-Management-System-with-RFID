@@ -28,7 +28,7 @@
                 <div class="small-box text-bg-primary">
                     <div class="inner">
                         <h3>@UserRegisterdCount</h3>
-                        <p>User Registrations</p>
+                        <p>User</p>
                     </div>  <a asp-action="UserManagement" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
                         More info <i class="bi bi-link-45deg"></i>
                     </a>
@@ -39,7 +39,7 @@
                 <div class="small-box text-bg-warning">
                     <div class="inner">
                         <h3>@PendingPaymentsCount</h3>
-                        <p>Pending Payments</p>
+                        <p>Total Pending Amount</p>
                     </div>  <a asp-action="AssociationDues" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
                         More info <i class="bi bi-link-45deg"></i>
                     </a>
@@ -47,10 +47,10 @@
             </div> <!--end::Col-->
             <div class="col-lg-3 col-6">
                 <!--begin::Small Box Widget 2-->
-                <div class="small-box text-bg-info">
+                <div class="small-box text-bg-Danger">
                     <div class="inner">
                         <h3>@RFIDRegisterdCount</h3>
-                        <p>User With RFID Tag</p>
+                        <p>Overdue Payments</p>
                     </div>  <a asp-action="AssociationDues" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
                         More info <i class="bi bi-link-45deg"></i>
                     </a>
@@ -59,7 +59,5 @@
         </div> <!--end::Row--> <!--begin::Row-->
     </div>
 </div>
-<!-- asp:button runat="server" asp-controller="RFID" onclick="CheckButton()" class="btn btn-primary" >Click ME</asp:button> -->
-<script>
 
-</script>
+<!-- asp:button runat="server" asp-controller="RFID" onclick="CheckButton()" class="btn btn-primary" >Click ME</asp:button> -->

@@ -5,7 +5,9 @@ using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-
+using Newtonsoft.Json;
+using NuGet.Protocol;
+using RestSharp;
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
     public class UserMenuController : Controller
@@ -25,10 +27,31 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
         public IActionResult AssociationDues()
         {
-            if (CheckRole()) { return View(); }
+            if (CheckRole()) { 
+                NewModel model = new NewModel();
+                model.ListDues = _db.Due_Details.Where(_=>_.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID"))).ToList();
+                return View(model); 
+            }
+
             return RedirectToAction("AccessDenied", "Home");
         }
-
+        [HttpPost]
+        public async Task<JsonResult> Payout(string Amount, string Invoice) {
+            var options = new RestClientOptions("https://api.paymongo.com/v1/links");
+            var client = new RestClient(options);
+            string jsonstring = "{\"data\":{\"attributes\":{\"amount\":" + Amount + ",\"description\":" + '\"' + Invoice + '\"' + "}}}";
+            var request = new RestRequest("");
+            request.AddHeader("accept", "application/json");
+            request.AddHeader("authorization", "Basic c2tfdGVzdF9DRlRlTTRDUkdXSGVLdE1TSzFrVkw5VnE6");
+            request.AddJsonBody(jsonstring, false);
+  
+            var response = await client.PostAsync(request);
+            Console.WriteLine("{0}", response.Content);
+            string str = response.Content;
+            PayoutDetails paydetails = JsonConvert.DeserializeObject<PayoutDetails>(str);
+            return Json(paydetails);
+            
+        }
         public IActionResult Announcements() { 
             return View(_db.Announcements.ToList());
         }
