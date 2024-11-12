@@ -22,7 +22,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
         public IActionResult Dashboard()
         {
-            if (CheckRole()) { return View(); }
+           
+            if (CheckRole()) {
+                NewModel model = new NewModel();
+                model.ListDues = _db.Due_Details.Where(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID"))).ToList(); 
+                return View(model); }
             return RedirectToAction("AccessDenied", "Home");
         }
         public IActionResult AssociationDues()
@@ -56,7 +60,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
         [HttpPost]
         public async Task<JsonResult> CheckPayment(string id){
-            
+            await Task.Delay(5000);
             var options = new RestClientOptions("https://api.paymongo.com/v1/links/"+id);
             var client = new RestClient(options);
             var request = new RestRequest("");
