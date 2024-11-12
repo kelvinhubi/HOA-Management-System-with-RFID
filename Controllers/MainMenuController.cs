@@ -414,53 +414,12 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return res.ToString();
         }
-        public IActionResult _ClearPaid()
+        public IActionResult ClearPaid()
         {
             var result = _db.Due_Details.Where(_ => _.Status.Equals("Paid"));
             _db.Due_Details.RemoveRange(result);
             _db.SaveChanges();
             return RedirectToAction("AssociationDues");
-        }
-        [HttpPost]
-        public JsonResult CheckName(string userdata)
-        {
-            if (userdata != null)
-            {
-                Console.WriteLine(userdata);
-                char[] trimchars = { ' ', '!' };
-                string[] trimmedArray = userdata.Split(trimchars, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
-
-                if (trimmedArray.Count() == 4)
-                {
-                    var SearchData = _db.Homeowner_Details.Where(x => x.Firstname == trimmedArray[0] + " " + trimmedArray[1]).SingleOrDefault();
-                    if (SearchData != null)
-                    {
-
-                        return Json(SearchData.AccountID);
-
-                    }
-                    else
-                    {
-                        return Json(0);
-                    }
-                }
-                else
-                {
-
-                    var SearchData = _db.Homeowner_Details.Where(x => x.Firstname == trimmedArray[0]).SingleOrDefault();
-
-                    if (SearchData != null)
-                    {
-                        return Json(SearchData.AccountID);
-                    }
-                    else
-                    {
-                        return Json(0);
-                    }
-
-                }
-            }
-            return Json(0);
         }
 
         //Logs Controller

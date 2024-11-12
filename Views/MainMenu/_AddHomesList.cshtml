@@ -3,7 +3,7 @@
 <Button runat="server" id="bution" class="btn btn-success" style="position:sticky;">Add Multiple Dues</Button>
 <form asp-action="_AddHomesList" asp-controller="MainMenu" class="form" id="thisform">
     <p class="title">Add Home</p>
-    <input asp-for="@Model.Home.AccountID" id="AccountID" class="form-control" hidden />
+    <input asp-for="@Model.Home.AccountID" id="AccountID" class="form-control" />
     <input asp-for="@Model.Home.HomeID" class="form-control" hidden />
     <input asp-for="@Model.Home.CreatedAt" id="FeesName" hidden />
     <div class="form-group">
@@ -58,17 +58,8 @@
         }
     }
     function CheckName() {
-        $.post("@Url.Action("CheckName", "MainMenu")",
-            {
-                userdata: $("#FullName").val()
-            },
-            function (data) {
-                if (data == 0) {
-                }
-                else {
-
-                    $("#AccountID").val(data);
-                }
-            });
+        var initialid = $("#FullName").find($("select option:selected")).data('another');
+        console.log(initialid);
+        $("#AccountID").val(initialid);
     }
 </script>

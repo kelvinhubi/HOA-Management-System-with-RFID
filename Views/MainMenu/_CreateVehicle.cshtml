@@ -13,7 +13,7 @@
             {
 
                 var fullname = obj.Firstname + " " + obj.Middlename + " " + obj.Surname;
-                <option value="@obj.Firstname">@fullname</option>
+                <option value="@obj.FullName" data-another="@obj.AccountID">@fullname</option>
             }
         </select>
         <span asp-validation-for="@Model.Vehicle.AccountID" class="text-danger"></span>
@@ -66,19 +66,9 @@
         }
     }
     function CheckName() {
-        $.post("@Url.Action("CheckName", "MainMenu")",
-            {
-                userdata: $("#FullName").val()
-            },
-            function (data) {
-                if (data == "0") {
-                }
-                else {
-
-                    $("#AccountID").val(data);
-
-                }
-            });
+        var initialid = $("#FullName").find($("select option:selected")).data('another');
+        console.log(initialid);
+        $("#AccountID").val(initialid);
     }
     var isValue = false
     $("#RFIDnumber").on('click', function () {
