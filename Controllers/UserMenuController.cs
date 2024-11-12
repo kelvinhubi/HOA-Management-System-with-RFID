@@ -15,7 +15,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         private readonly ILogger<UserMenuController> _logger;
         private readonly AppDbContext _db;
         private readonly EnvironmentModel _env;
-        public UserMenuController(ILogger<UserMenuController> logger, AppDbContext db,IOptions<EnvironmentModel> env) {
+        public UserMenuController(ILogger<UserMenuController> logger, AppDbContext db, IOptions<EnvironmentModel> env) {
             _logger = logger;
             _db = db;
             _env = env.Value;
@@ -27,10 +27,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
         public IActionResult AssociationDues()
         {
-            if (CheckRole()) { 
+            if (CheckRole()) {
                 NewModel model = new NewModel();
-                model.ListDues = _db.Due_Details.Where(_=>_.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID"))).ToList();
-                return View(model); 
+                model.ListDues = _db.Due_Details.Where(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID"))).ToList();
+                return View(model);
             }
 
             return RedirectToAction("AccessDenied", "Home");
@@ -39,19 +39,41 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public async Task<JsonResult> Payout(string Amount, string Invoice) {
             var options = new RestClientOptions("https://api.paymongo.com/v1/links");
             var client = new RestClient(options);
-            Amount = Amount+"00";
-            string jsonstring = "{\"data\":{\"attributes\":{\"amount\":" + Amount + ",\"description\":" + '\"' + Invoice + '\"' + "}}}";
+            Amount = Amount + "00";
+            string jsonstring = "{\"data\":{\"attributes\":{\"amount\":" + Amount + ",\"description\":\"" + Invoice + "\"}}}";
             var request = new RestRequest("");
             request.AddHeader("accept", "application/json");
             request.AddHeader("authorization", "Basic c2tfdGVzdF9DRlRlTTRDUkdXSGVLdE1TSzFrVkw5VnE6");
             request.AddJsonBody(jsonstring, false);
-  
+
             var response = await client.PostAsync(request);
             Console.WriteLine("{0}", response.Content);
             string str = response.Content;
             PayoutDetails paydetails = JsonConvert.DeserializeObject<PayoutDetails>(str);
+            var pay = paydetails.Data.Attributes.Checkout_url;
             return Json(paydetails);
+
+        }
+        [HttpPost]
+        public async Task<JsonResult> CheckPayment(string id){
             
+            var options = new RestClientOptions("https://api.paymongo.com/v1/links/"+id);
+            var client = new RestClient(options);
+            var request = new RestRequest("");
+            request.AddHeader("accept", "application/json");
+            request.AddHeader("authorization", "Basic c2tfdGVzdF9DRlRlTTRDUkdXSGVLdE1TSzFrVkw5VnE6");
+            var response = await client.GetAsync(request);
+            PayoutDetails paydetails = JsonConvert.DeserializeObject<PayoutDetails>(response.Content);
+            if (paydetails.Data.Attributes.Status != "unpaid") {
+                var result = _db.Due_Details.Where(_ => _.Invoice.Equals(paydetails.Data.Attributes.Description)).ToList().FirstOrDefault();
+                if (result != null) {
+                    result.Status = "Paid";
+                    await _db.SaveChangesAsync();
+                }
+            }
+
+            return Json(new { success = true });
+
         }
         public IActionResult Announcements() { 
             return View(_db.Announcements.ToList());

@@ -89,7 +89,7 @@
 </div>
 @section Scripts {
     @{
-                                    <partial name="_ValidationScriptsPartial" />
+                                                            <partial name="_ValidationScriptsPartial" />
     }
 }
 <script>
@@ -98,15 +98,32 @@
     const btn = document.getElementById("open-modal");
     const span = document.getElementsByClassName("close")[0];
     const div = document.getElementById("UserPartial");
+    var id_link = "";
     span.onclick = function () {
         modal.style.display = "none";
         div.style.display = "block";
+        modal.style.display = "none";
+        div.style.display = "block";
+        $.post('@Url.Action("CheckPayment", "UserMenu")', {
+            id: id_link
+        }, function (data) {
+            if (data.success) {
+                alert("Payment Succesfull");
+            }
+        });
     }
 
     window.onclick = function (event) {
         if (event.target == modal) {
             modal.style.display = "none";
             div.style.display = "block";
+            $.post('@Url.Action("CheckPayment", "UserMenu")', {
+                id: id_link
+            }, function (data) {
+                if (data.success) { 
+                    alert("Payment Succesfull");
+                }
+            });
         }
     }
     $(".btn-sm").on('click', function () {
@@ -121,6 +138,7 @@
             if (json != null) {
                     modal.style.display = "block";
                     div.style.display = "none";
+                id_link = json.data.id;
                 $("#frameload").attr("src", json.data.attributes.checkout_url);
             }
                 
