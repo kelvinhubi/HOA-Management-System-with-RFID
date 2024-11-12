@@ -15,7 +15,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         public string FeesName { get; set; } = string.Empty;
         public string TypeOfFee { get; set; } = string.Empty;
         public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
-
         public string Status { get; set; } = "Unpaid";
         [NotMapped]
         public string FullName { get; set; } = string.Empty;

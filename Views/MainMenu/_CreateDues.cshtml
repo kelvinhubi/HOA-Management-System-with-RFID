@@ -1,5 +1,8 @@
 ﻿@model NewModel
-
+@{
+var setmin = DateTime.Now.ToString("yyyy-MM-dd");;
+    var setmax = DateTime.MaxValue.ToString("yyyy-MM-dd");
+}
 <Button runat="server" id="bution" class="btn btn-success" style="position:sticky;">Create Dues</Button>
 <form method="post" class="form" id="thisform">
     <p class="title">Add Dues</p>
@@ -29,7 +32,7 @@
     </div>
     <div class="form-group">
         <label asp-for="@Model.dues.Date"  class="control-label">Set Due Date</label>
-        <input asp-for="@Model.dues.Date" type="date" name="Date" class="form-control input" />
+        <input asp-for="@Model.dues.Date" type="date" min="@setmin" max="@setmax" name="Date" class="form-control input" />
         <span asp-validation-for="@Model.dues.Date" class="text-danger"></span>
     </div>
     <div class="form-group">
