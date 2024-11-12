@@ -8,12 +8,12 @@
     <input asp-for="@Model.Vehicle.AccountID" value="" id="AccountID" class="form-control" hidden />
     <div class="form-group">
         <label asp-for="@Model.Vehicle.FullName" class="control-label">Select Homeowner</label>
-        <select asp-for="@Model.Vehicle.FullName" onclick="CheckName()" class="form-control">
+        <select asp-for="@Model.Vehicle.FullName" onclick="CheckName()" id="FullName" class="form-control">
             @foreach (Homeowner_details obj in Model.Homeacc)
             {
 
                 var fullname = obj.Firstname + " " + obj.Middlename + " " + obj.Surname;
-                <option id="FullName" value="@fullname">@fullname</option>
+                <option value="@obj.Firstname">@fullname</option>
             }
         </select>
         <span asp-validation-for="@Model.Vehicle.AccountID" class="text-danger"></span>
@@ -65,7 +65,6 @@
 
         }
     }
-
     function CheckName() {
         $.post("@Url.Action("CheckName", "MainMenu")",
             {
