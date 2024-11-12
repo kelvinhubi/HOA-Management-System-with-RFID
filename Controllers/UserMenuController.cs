@@ -69,10 +69,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 if (result != null) {
                     result.Status = "Paid";
                     await _db.SaveChangesAsync();
+                    return Json(new { success = true });
                 }
             }
 
-            return Json(new { success = true });
+            return Json(new { success = false });
 
         }
         public IActionResult Announcements() { 
