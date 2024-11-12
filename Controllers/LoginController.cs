@@ -282,5 +282,19 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 return Json(0);
             }
         }
+        [HttpPost]
+        public JsonResult CheckGuard(string userdata)
+        {
+            System.Threading.Thread.Sleep(200);
+            var SearchData = _db.Guard_Information.Where(x => x.Username == userdata).SingleOrDefault();
+            if (SearchData != null)
+            {
+                return Json(1);
+            }
+            else
+            {
+                return Json(0);
+            }
+        }
     }
 }

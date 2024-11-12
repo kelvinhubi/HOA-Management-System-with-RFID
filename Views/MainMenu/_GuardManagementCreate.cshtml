@@ -1,0 +1,95 @@
+﻿@model Guard_Information
+<Button runat="server" id="bution" class="btn btn-success">Create User Account</Button>
+<form method="post" asp-action="GuardCreate" class="form" id="thisform">
+    <p class="title">Add Homeowner User Account</p>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for="ID" class="form-control" class="input" hidden />
+    <div class="form-group">
+        <label asp-for="FirstName" class="control-label"></label>
+        <input asp-for="FirstName" class="form-control" class="input"/>
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="LastName" class="control-label"></label>
+        <input asp-for="LastName" class="form-control" class="input" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Username" class="control-label"></label>
+        <input asp-for="Username" class="form-control" class="input" oninput="UserCheck();" />
+        <p id="Status" />
+        <span asp-validation-for="Username" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email" class="control-label"></label>
+        <input asp-for="Email" class="form-control" class="input" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PhoneNumber" class="control-label"></label>
+        <input asp-for="PhoneNumber" class="form-control" class="input" />
+        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Password" class="control-label"></label>
+        <input id="forpass" asp-for="Password" type="password" class="form-control" class="input" readonly />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <Button onclick="GeneratePass();" type="button" class="btn btn-secondary" style="margin-top:5px;margin-bottom:5px;">Generate Password</Button>
+    </div>
+    <div class="form-group">
+        <input type="submit" id="button1" value="Create" class="btn btn-primary" />
+    </div>
+</form>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    var btn = document.getElementById("bution")
+    var text;
+    $(".form").css("display", "none");
+    btn.onclick = function () {
+        if ($(".form").css("display") == "block") {
+            $(".form").css("display", "none");
+            $("#UserPartial").css("display", "block");
+
+            $("#bution").html('Create User Account');
+            $("body").css("background", "rgba(0, 0, 0, 0)");
+            $('#forpass').val("")
+        }
+        else {
+            this.blur();
+            $(".form").css("display", "block");
+            $("#UserPartial").css("display", "none");
+            $("#bution").html('Hide');
+            $("body").css("background", "rgba(0, 0, 0, 0.4)");
+
+        }
+    }
+
+    function GeneratePass() {
+        $.post("@Url.Action("GeneratePass", "MainMenu")", { userdata: $("#Username").val() },
+            function (data) {
+                $('#forpass').val(data)
+            });
+    }
+    function UserCheck() {
+        $("#Status").html("Checking...");
+        $.post("@Url.Action("CheckGuard", "Login")",
+            {
+                userdata: $("#Username").val()
+            },
+            function (data) {
+                if (data == 0) {
+                    $("#Status").html('<font color = "Green"> Username Available!.</font>');
+                    $("#Username").css("border-color", "Green");
+                    $("#button1").removeAttr('disabled');
+                }
+                else {
+                    $("#Status").html('<font color = "Red"> Username already Taken!.</font>');
+                    $("#Username").css("border-color", "Green");
+                    $("#button1").attr('disabled', 'disabled');
+                }
+            });
+    }
+
+</script>

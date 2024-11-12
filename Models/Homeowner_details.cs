@@ -9,11 +9,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         [Key]
         public int AccountID { get; set; }
         public string Username { get; set; } = string.Empty;
-        [Required(ErrorMessage = "Please enter your Surname"), MaxLength(15)]
+        [Required(ErrorMessage = "Please enter your Surname"), MaxLength(20)]
         public string Surname { get; set; } = string.Empty;
         [Required(ErrorMessage = "Please enter your Firstname"), MaxLength(20)]
         public string Firstname { get; set; } = string.Empty;
-        [Required(ErrorMessage = "Please enter your Middlename"), MaxLength(15)]
+        [Required(ErrorMessage = "Please enter your Middlename"), MaxLength(20)]
         public string Middlename { get; set; } = string.Empty;
         [Required]
         public DateOnly Birthdate { get; set; }

@@ -24,10 +24,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 _db.Admin_Accounts.Add(new Admin_Account { Username="ADMIN", Password = Encryption.Encrpyt("ADMIN1234", _env.EncryptionKey, _env.IVKey) });
                 _db.SaveChanges();
             }
-            if (CheckGuard == 0) {
-                _db.Guard_Information.Add(new Guard_Information { Username = "Guard", Password = Encryption.Encrpyt("Guard1234", _env.EncryptionKey, _env.IVKey) });
-                _db.SaveChanges();
-            }
         }
         public IActionResult Announcements() {
             var result = _db.Announcements.OrderByDescending(_=>_.DatePosted);

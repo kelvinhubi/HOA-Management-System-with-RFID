@@ -33,5 +33,14 @@
         </tbody>
     </table>
 </div>
-<a asp-action="PrintLogs" class="btn - btn-success" padding:5px;">PrintLogs</a>
-<a asp-action="_ClearLogs" class="btn - btn-danger" padding:5px;">Clear Logs</a>
+<div style="display:flex">
+    @using (Html.BeginForm("ExportExcel", "MainMenu", FormMethod.Post))
+    {
+        <input type="submit" class="btn - btn-success" style="padding:5px; margin-right:5px;" value="Export as Excel" />
+    }
+    <a asp-action="PrintLogs" id="Print" class="btn - btn-success" style="padding:5px;margin-right:5px;">Export as Pdf</a>
+    <a asp-action="_ClearLogs" class="btn - btn-danger" style="padding:5px;margin-right:5px;">Clear Logs</a>
+</div>
+<script>
+    new DataTable('#mytable');
+</script>

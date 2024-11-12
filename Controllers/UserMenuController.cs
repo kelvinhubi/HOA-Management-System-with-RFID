@@ -49,7 +49,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             request.AddHeader("accept", "application/json");
             request.AddHeader("authorization", "Basic c2tfdGVzdF9DRlRlTTRDUkdXSGVLdE1TSzFrVkw5VnE6");
             request.AddJsonBody(jsonstring, false);
-
             var response = await client.PostAsync(request);
             Console.WriteLine("{0}", response.Content);
             string str = response.Content;

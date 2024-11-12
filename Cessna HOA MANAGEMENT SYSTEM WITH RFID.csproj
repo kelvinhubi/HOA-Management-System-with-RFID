@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Controllers\MainMenuController.cs~RF125be9b.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.104.1" />
     <PackageReference Include="MailKit" Version="4.8.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
@@ -32,6 +37,7 @@
     <Folder Include="Data\" />
     <Folder Include="Images\" />
     <Folder Include="Migrations\" />
+    <Folder Include="wwwroot\ExportedFiles\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,55 @@
+﻿@model IEnumerable<Guard_Information>
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+
+}
+<head>
+    <title>
+        @{
+            ViewData["Title"] = "Guard Management";
+        }
+    </title>
+</head>
+@Html.AntiForgeryToken();
+<div id="UserPartial">
+    <h2>Accounts</h2>
+    <table id="mytable" class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Full Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Contact No.</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model)
+            {
+                <tr>
+                    @{string fullname = obj.FirstName + " " + obj.LastName;}
+                    <td>@fullname</td>
+                    <td>@obj.Username</td>
+                    <td>@obj.Email</td>
+                    <th>@obj.PhoneNumber</th>
+                    <td>
+                        <a asp-action="_GuardManagementDelete" class="btn btn-danger btn-sm" asp-route-id="@obj.ID">Delete<i class='bx bxs-trash'></i></a>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@{
+    Guard_Information user = new Guard_Information();
+    <partial name="_GuardManagementCreate" model="user" />
+}
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
+<script>
+    new DataTable('#mytable');
+</script>

@@ -65,15 +65,27 @@
             {
                 <tr>
                     
-                    <td>@obj.TypeofDues</td>
+                    <td>@obj.TypeOfFee</td>
                     <td>@obj.FeesName</td>
                     <td>@obj.Invoice</td>
                     <td>@obj.Amount</td>
-                    <td>@obj.Date</td>
+                    <td id="duedate">@obj.Date</td>
                     <td>@obj.Status</td>
-                    <td>
-                        <button class="btn-sm btn-success">Pay<i class='bx bxs-user-detail'></i></button>
-                    </td>
+                    @{
+                        if (obj.Status.Equals("Paid"))
+
+                        {
+                            <td>
+                                <a class="btn-sm btn-success details">Details<i class='bx bxs-user-detail'></i></a>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                <button type="button" class="btn-sm btn-success pay">Pay<i class='bx bxs-user-detail'></i></button>
+                            </td>
+                        }
+                    }
 
                 </tr>
             }
@@ -89,7 +101,7 @@
 </div>
 @section Scripts {
     @{
-                                                                    <partial name="_ValidationScriptsPartial" />
+                                                                        <partial name="_ValidationScriptsPartial" />
     }
 }
 <script>
@@ -115,12 +127,9 @@
             }
         });
     }
-    $(document).on('click','.btn-sm', function () {
+    $(document).on('click','.pay', function () {
         var invoice = $(this).closest("tr").find('td:eq(2)').text();
         var amount = $(this).closest("tr").find('td:eq(3)').text();
-        var value = table.row(12).data();
-
-        console.log(value);
         $.post('@Url.Action("Payout", "UserMenu")', {
             Amount: amount,
             Invoice: invoice
@@ -134,5 +143,31 @@
             }
                 
         });
+    });
+    window.onload = function () {
+            var table = document.querySelectorAll("#duedate");
+            for (let i = 0; i < table.length; i++) {
+                let col = table[i].innerHTML
+                var due = new Date(col)
+                var date = new Date()
+                if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
+                    table[i].classList.add('bx', 'bxs-error-alt', 'card-warning', 'bg-warning');
+                }
+
+            }
+    }
+    $(document).ready(function () {
+        $(document, "dt-column-title").on('click change', function () {
+            var table = document.querySelectorAll("#duedate");
+            for (let i = 0; i < table.length; i++) {
+                let col = table[i].innerHTML
+                var due = new Date(col)
+                var date = new Date()
+                if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
+                    table[i].classList.add('bx', 'bxs-error-alt', 'card-warning', 'bg-warning')
+                }
+
+            }
+        })
     });
 </script>

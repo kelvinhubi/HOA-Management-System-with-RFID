@@ -13,6 +13,9 @@ using QuestPDF.Infrastructure;
 using System.Text;
 using Microsoft.CodeAnalysis.CSharp;
 using System.ComponentModel.DataAnnotations;
+using ClosedXML.Excel;
+using System.Data;
+using DocumentFormat.OpenXml.EMMA;
 
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
@@ -281,7 +284,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                                   Date = due.Date,
                                   Invoice = due.Invoice,
                                   FeesName = due.FeesName,
-                                  TypeofDues = due.TypeofDues,
+                                  TypeOfFee = due.TypeOfFee,
                                   Status = due.Status
                               });
                 NewModel model = new NewModel();
@@ -338,7 +341,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     AccountID = Convert.ToInt32(AccountID),
                     Invoice = GenerateText(6),
                     Amount = Amount,
-                    TypeofDues = TypeofDues,
+                    TypeOfFee = TypeofDues,
                     Date = Date,
                     Status = Status,
                 });
@@ -358,7 +361,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return PartialView();
         }
         [HttpPost]
-        public JsonResult AddDuesToUsers(string[] userIds, string TypeofDues, string date)
+        public JsonResult AddDuesToUsers(string[] userIds, string TypeofDues, DateOnly date)
         {
             try
             {
@@ -378,18 +381,24 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                             AccountID = Convert.ToInt32(userId),
                             FeesName = str.Substring(0, str.Length - 2),
                             Invoice = GenerateText(6),
-                            TypeofDues = TypeofDues,
+                            TypeOfFee = TypeofDues,
                             Amount = Amount.ToString(),
                             Status = "Unpaid",
-                            Date = DateOnly.Parse(date)
+                            Date = date
                         };
-
+                        _db.logsLists.Add(new LogsList
+                        {
+                            LogName = "Add Dues to Multiple Users",
+                            LogDescription = "Dues Added: " + info.TypeOfFee + "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                            LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+                        });
                         _db.Due_Details.Add(info);
                     }
                     else {
 
                     }
                     // Example: _duesService.CreateDuesForUser(userId);
+                    
                 }
                 _db.SaveChanges();
                 return Json(new { success = true });
@@ -434,7 +443,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
         public IActionResult PrintLogs(string? nameformat)
         {
-
+            if (nameformat == null) {
+                nameformat = "ExportPdf";
+            }
+            string filepath = "wwwroot\\ExportedFiles\\" + nameformat + "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_Logs.pdf";
             QuestPDF.Settings.License = LicenseType.Community;
             void ComposeTable(IContainer container)
             {
@@ -481,16 +493,48 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                    .FontSize(30);
 
                });
-           }).GeneratePdf(nameformat + "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_Logs.pdf"); //RENAMING USING RANDOM WORDS
+           }).GeneratePdf(filepath); //RENAMING USING RANDOM WORDS
 
-            return RedirectToAction("Logs");
+           return File(System.IO.File.ReadAllBytes(filepath), "application/pdf", nameformat + "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_Logs.pdf");
+        }
+        [HttpPost]
+        public IActionResult ExportExcel() {
+            DataTable dt = new DataTable("Student");
+            dt.Columns.AddRange(new DataColumn[4] { 
+                                            new DataColumn("Log Name"),
+                                            new DataColumn("Description"),
+                                            new DataColumn("User Role"),
+                                            new DataColumn("Date")});
+
+            var Logs = _db.logsLists.ToList();
+
+            foreach (var loglists in Logs)
+            {
+                dt.Rows.Add(loglists.LogName, loglists.LogDescription, loglists.LogUserRole, loglists.LogDate);
+            }
+
+            using (XLWorkbook wb = new XLWorkbook())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_Logs.xlsx");
+                }
+            }
         }
         public IActionResult _ClearLogs()
         {
-            PrintLogs("Backup_");
+            //PrintLogs("Backup_");
             var result = _db.logsLists.ToList();
             _db.logsLists.RemoveRange(result);
             _db.SaveChanges();
+            _db.logsLists.Add(new LogsList
+            {
+                LogName = "Logs Cleared",
+                LogDescription ="Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+            });
             return RedirectToAction("Logs");
 
         }
@@ -501,10 +545,92 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         //Guards Controller
         public IActionResult Guards()
         {
-            if (CheckRole()) { return View(); }
+            if (CheckRole()) { return View(_db.Guard_Information.ToList()); }
             return RedirectToAction("AccessDenied", "Home");
         }
+        public IActionResult _GuardManagementCreate() {
+            return PartialView();
+        }
+        [HttpPost]
+        public IActionResult GuardCreate(Guard_Information info)
+        {
+            if (ModelState.IsValid)
+            {
+                var mailMessage = new MimeMessage();
+                var Username = info.Username;
+                var Password = info.Password;
+                var bodybuild = new BodyBuilder();
 
+                bodybuild.HtmlBody = CreateMailBody(Username, Password);
+                mailMessage.From.Add(new MailboxAddress("Cessna", _env.Email));
+                mailMessage.To.Add(new MailboxAddress(info.Username, info.Email));
+                mailMessage.Subject = "Guard Username and Password";
+                mailMessage.Body = bodybuild.ToMessageBody();
+                using (var smtpclient = new SmtpClient())
+                {
+                    smtpclient.Connect(_env.Host, Convert.ToInt32(_env.Port), SecureSocketOptions.StartTls);
+                    smtpclient.Authenticate(_env.Email, _env.Password);
+                    smtpclient.Send(mailMessage);
+                    smtpclient.Disconnect(true);
+                }
+                info = new Guard_Information
+                {
+                    FirstName = info.FirstName,
+                    LastName = info.LastName,
+                    Username = info.Username,
+                    Password = Encryption.Encrpyt(info.Password, _env.EncryptionKey, _env.IVKey),
+                    PhoneNumber = info.PhoneNumber,
+                    Email = info.Email,
+                    ID = info.ID
+                };
+                _db.Guard_Information.Add(info);
+                _db.logsLists.Add(new LogsList
+                {
+                    LogName = "Create Guard Account",
+                    LogDescription = "Logged In Username:" + HttpContext.Session.GetString("SessionUsername"),
+                    LogUserRole =""+ HttpContext.Session.GetString("UserType"),
+                });
+                _db.SaveChanges();
+
+                return RedirectToAction("Guards");
+            }
+            return View();
+        }
+        public IActionResult _GuardManagementDelete(int? ID)
+        {
+            if (ID == null)
+            {
+                return RedirectToAction("Error", "MainMenu", ID);
+            }
+
+            var useracc = _db.Guard_Information.FirstOrDefault(m => m.ID == ID);
+            if (useracc == null)
+            {
+                return RedirectToAction("Error", "MainMenu", ID);
+            }
+
+            return PartialView(useracc);
+        }
+        [HttpPost]
+        public async Task<IActionResult> GuardDelete(Guard_Information obj)
+        {
+            try
+            {
+
+                _db.Guard_Information.Remove(obj);
+                _db.SaveChanges();
+                _db.logsLists.Add(new LogsList
+                {
+                    LogName = "Delete Guard Account",
+                    LogDescription = "Logged In Username:" + HttpContext.Session.GetString("SessionUsername"),
+                    LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+                });
+                await _db.SaveChangesAsync();
+                return RedirectToAction("Guards");
+            }
+            catch (Exception) { return RedirectToAction("Guards"); }
+
+        }
         //Vehicle List
 
         //Vehicle Management Controller
@@ -540,6 +666,12 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public async Task<IActionResult> _CreateVehicle(NewModel info)
         {
             _db.Vehicle_Information.Add(info.Vehicle);
+            _db.logsLists.Add(new LogsList
+            {
+                LogName = "Add Vehicle",
+                LogDescription = "Vehicle Owner" + info.Vehicle.FullName + "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+            });
             await _db.SaveChangesAsync();
             return RedirectToAction("VehicleManagement");
         }
@@ -556,6 +688,12 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             if (ModelState.IsValid)
             {
                 _db.Vehicle_Information.Remove(info);
+                _db.logsLists.Add(new LogsList
+                {
+                    LogName = "Delete Vehicle",
+                    LogDescription = "Vehicle Owner: " + info.FullName + "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                    LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+                });
                 _db.SaveChanges();
             }
             return RedirectToAction("VehicleManagement");
@@ -572,6 +710,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             if (ModelState.IsValid)
             {
                 _db.Vehicle_Information.Update(info);
+                _db.SaveChanges();
+                _db.logsLists.Add(new LogsList
+                {
+                    LogName = "Edit Vehicle",
+                    LogDescription = "Vehicle Owner: "+info.FullName+"Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                    LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+                });
                 _db.SaveChanges();
             }
             return RedirectToAction("VehicleManagement");

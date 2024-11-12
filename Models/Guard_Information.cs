@@ -7,11 +7,17 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         public int ID { get; set; }
 
         [Required]
-        public String? Username { get; set; }
-
+        public string Username { get; set; } = string.Empty;
         [Required]
-        public String? Password { get; set; }
-
-        public String? Name { get; set; }
+        public string Email { get; set; } = string.Empty;
+        [Required]
+        public string Password { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Please enter your Name"), MaxLength(15)]
+        public string FirstName { get; set; } = string.Empty;
+        [Required]
+        public string LastName { get; set; } = string.Empty;
+        [Required]
+        [RegularExpression(@"^(09|\+639)\d{9}$", ErrorMessage = "Not a valid phone number")]
+        public string PhoneNumber { get; set; } = string.Empty;
     }
 }

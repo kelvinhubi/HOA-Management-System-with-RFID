@@ -1,0 +1,34 @@
+﻿@model Guard_Information
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<form asp-action="GuardDelete" class="form" id="thisform" style="bottom:29rem; display:block">
+    <p class="title">Delete Homeowner User Account?</p>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="ID" />
+    <div class="form-group">
+        <label asp-for="FirstName" class="control-label"></label>
+        <input asp-for="FirstName" class="form-control" class="input"  />
+        <p id="Status" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="LastName" class="control-label"></label>
+        <input asp-for="LastName" class="form-control" class="input" />
+        <p id="Status" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Username" class="control-label"></label>
+        <input asp-for="Username" class="form-control" class="input"/>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email" class="control-label"></label>
+        <input asp-for="Email" class="form-control" class="input" readonly />
+    </div>
+    <div class="form-group">
+        <input type="submit" id="button1" value="Delete" class="btn btn-danger" style="margin-top:10px;" />
+    </div>
+</form>
+<a asp-controller="MainMenu" asp-action="UserManagement" class="btn btn-success" style="padding:5px;">Back to List</a>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>

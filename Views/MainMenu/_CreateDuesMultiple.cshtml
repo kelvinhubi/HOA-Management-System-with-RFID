@@ -44,6 +44,7 @@
 </form>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
+
     var btn = document.getElementById("bution1")
     $(".form2").css("display", "none");
     btn.onclick = function () {
@@ -70,11 +71,18 @@
         }
     }
     $("#CreateBatch").on('click', function () {
+        var date = document.getElementById('dateinput').value;
         const selectedUserIds = getSelectedUserIds();
         if (selectedUserIds.length === 0) {
             alert('Please select at least one user.');
             return;
         }
+        if(!date){
+            alert('Please select date');
+            return;
+        }
+
+        console.log($("#dateinput").val);
         $.post('@Url.Action("AddDuesToUsers", "MainMenu")',
             {
                 userIds: selectedUserIds,
