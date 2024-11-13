@@ -5,6 +5,7 @@ using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using NuGet.Protocol;
 using RestSharp;
@@ -22,10 +23,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
         public IActionResult Dashboard()
         {
-           
             if (CheckRole()) {
                 NewModel model = new NewModel();
-                model.ListDues = _db.Due_Details.Where(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID"))).ToList(); 
+                model.ListDues = _db.Due_Details.Where(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID"))).ToList();
                 return View(model); }
             return RedirectToAction("AccessDenied", "Home");
         }
@@ -58,9 +58,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
         }
         [HttpPost]
-        public async Task<JsonResult> CheckPayment(string id){
+        public async Task<JsonResult> CheckPayment(string id) {
             await Task.Delay(5000);
-            var options = new RestClientOptions("https://api.paymongo.com/v1/links/"+id);
+            var options = new RestClientOptions("https://api.paymongo.com/v1/links/" + id);
             var client = new RestClient(options);
             var request = new RestRequest("");
             request.AddHeader("accept", "application/json");
@@ -79,33 +79,44 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return Json(new { success = false });
 
         }
-        public IActionResult Announcements() { 
-            return View(_db.Announcements.ToList());
-        }
-        public IActionResult Logs()
-        {
-            if (CheckRole()) { return View(); }
-            return RedirectToAction("AccessDenied", "Home");
-        }
+        public IActionResult Announcements() {
+            if (CheckRole()) {
 
-
-        public IActionResult VisitorsList()
-        {
-            if (CheckRole()) { return View(); }
-            return RedirectToAction("AccessDenied", "Home");
+                var result = _db.Announcements.ToList();
+                if (result != null)
+                {
+                    return View(result);
+                }
+                return View();
+            }
+            return RedirectToAction("AccessDenied", "UserMenu");
         }
 
 
         public IActionResult VehiclesList()
         {
-            if (CheckRole()) { return View(); }
+            if (CheckRole()) {
+                var result = _db.Vehicle_Information.Where(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+                if (result != null)
+                {
+                    return View(result);
+                }
+                return View();
+            }
             return RedirectToAction("AccessDenied", "Home");
         }
 
 
         public IActionResult HomeList()
         {
-            if (CheckRole()) { return View(); }
+            if (CheckRole()) {
+                var result = _db.homesLists.Where(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+                if (result != null)
+                {
+                    return View(result);
+                }
+                return View();
+            }
             return RedirectToAction("AccessDenied", "Home");
         }
 
@@ -126,11 +137,25 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return false;
         }
-		public IActionResult _ChangeUserPass()
-		{
-			var result = _db.User_Accounts.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
-			return View(result);
-		}
+        public IActionResult _ChangeUserPass()
+        {
+            var result = _db.User_Accounts.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+            return View(result);
+        }
+        public IActionResult _ChangeDetails()
+        {
+            var result = _db.Homeowner_Details.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+            return View(result);
+        }
+        [HttpPost]
+        public JsonResult UpdateDetails(Homeowner_details info) {
+			if (ModelState.IsValid) { 
+                    _db.Homeowner_Details.Update(info);
+                    _db.SaveChanges();
+                    return Json(new { success = true });
+			}
+            return Json(new { success = false});
+        }
 		[HttpPost]
 		public JsonResult UpdateProfile(int AccountID, string Password, string Username)
 		{

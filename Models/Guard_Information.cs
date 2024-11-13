@@ -5,16 +5,18 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
     {
         [Key]
         public int ID { get; set; }
-
         [Required]
         public string Username { get; set; } = string.Empty;
-        [Required]
+        [EmailAddress]
+        [Required(ErrorMessage = "Email is required")]
         public string Email { get; set; } = string.Empty;
         [Required]
         public string Password { get; set; } = string.Empty;
-        [Required(ErrorMessage = "Please enter your Name"), MaxLength(15)]
+        [Required(ErrorMessage = "Please enter your FirstName"), MaxLength(15)]
         public string FirstName { get; set; } = string.Empty;
-        [Required]
+		[Required(ErrorMessage = "Please enter your MiddleName"), MaxLength(15)]
+		public string MiddleName { get; set; } = string.Empty;
+		[Required(ErrorMessage = "Please enter your LastName"), MaxLength(15)]
         public string LastName { get; set; } = string.Empty;
         [Required]
         [RegularExpression(@"^(09|\+639)\d{9}$", ErrorMessage = "Not a valid phone number")]

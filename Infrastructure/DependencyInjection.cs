@@ -19,7 +19,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Infrastructure
                 var result = _db.Homeowner_Details.ToList();
                 foreach (var user in result)
                 {
-                    var dues = _db.Due_Details.Where(_ => _.AccountID == user.AccountID && _.Status.Equals("Unpaid") && DateOnly.FromDateTime(DateTime.Now) >= _.Date).Count();
+                    var dues = _db.Due_Details.Where(_ => _.AccountID == user.AccountID && _.Status.Equals("Unpaid") && DateOnly.FromDateTime(DateTime.Now) > _.Date).Count();
                     if (dues == 0)
                     {
                         var update = _db.Vehicle_Information.Where(_ => _.AccountID == user.AccountID).ToList();
@@ -41,8 +41,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Infrastructure
                         }
                     }
                 }
-
-                
             }
             catch (Exception) { }
             return Task.CompletedTask;

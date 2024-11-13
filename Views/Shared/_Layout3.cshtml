@@ -31,7 +31,7 @@
             background-color: #f0f0f0;
             border: 1px solid #ccc;
             padding: 10px;
-            position: absolute;
+            position: fixed;
             border-radius: 5px;
             z-index: 2;
         }</style>
@@ -47,31 +47,27 @@
                 <a href="#" class="nav_logo" style="text-decoration:none;"> <i class='bx bx-home nav_logo-icon'></i> <span class="nav_logo-name" style="text-decoration:none; font-size:13px">C.S.H.A HOA System</span> </a>
                     <div class="nav_list">
 
-                    @{ url = Url.Action("Dashboard", "GuardMenu");}
+                    @{ url = Url.Action("EntryandExitLogs", "GuardMenu");}
                     <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url" > <i class='bx bx-grid-alt nav_icon'></i> <span class="nav_name">Dashboard</span></a>
-                    @{
-                        url = Url.Action("Dashboard", "GuardMenu");
-                    }
-                    <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-grid-alt nav_icon'></i> <span class="nav_name">Dashboard</span></a>
-                    @{
-                        url = Url.Action("Dashboard", "GuardMenu");
-                    }
-                    <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-grid-alt nav_icon'></i> <span class="nav_name">Dashboard</span></a>
 
-                        <a  class="nav_link dropdown-toggle" data-bs-toggle="dropdown">
+                    <a  class="nav_link dropdown-toggle" data-bs-toggle="dropdown">
                             <i class='bx bx-user-circle nav_icon'></i><span class="nav_name">Profile</span>
                         </a>
                         <ul class="dropdown-menu" style="font-size:10px;">
                             <li>
                             @{
-                                url = Url.Action("_ChangeUserPass", "UserMenu");
+                                url = Url.Action("_ChangeUserPass", "GuardMenu");
                             }
                             <a class="dropdown-item @(Context.Request.Path == url ? "active" : null)" href="@url">Change Account Username and Password</a>
                             </li>
-                        <li><a class="dropdown-item" href="#">Edit Personal Details</a></li>
+                        <li>
+                            @{
+                                url = Url.Action("_ChangeDetails", "GuardMenu");
+                            }<a class="dropdown-item @(Context.Request.Path == url ? "active" : null)" href="@url">Edit Personal Details</a>
+                        </li>
                         </ul>
                 </div>
-                </div> <a href="#" class="nav_link"> <i class='bx bx-log-out nav_icon'></i> <span class="nav_name">SignOut</span> </a>
+                <a asp-action="Index" asp-controller="Home" class="nav_link"> <i class='bx bx-log-out nav_icon'></i> <span class="nav_name">SignOut</span> </a>
             </nav>
         </div>
         <!--Container Main start-->

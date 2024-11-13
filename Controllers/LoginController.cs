@@ -1,9 +1,13 @@
 ﻿using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.InfoSec;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
+using DocumentFormat.OpenXml.EMMA;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using MimeKit;
 using MySqlConnector;
 using Newtonsoft.Json;
 using System.Reflection.PortableExecutable;
@@ -18,8 +22,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         const string connstr = "server=localhost;user=root;password=Kelvinfo14;database=hoa_sys";
         public static User _account = new User();
         private readonly AppDbContext _db;
-		private readonly EnvironmentModel _env;
-		private readonly ILogger _logger;
+        private readonly EnvironmentModel _env;
+        private readonly ILogger _logger;
         MySqlConnection conn = new MySqlConnection(connstr);
         public LoginController(AppDbContext db, ILogger<LoginController> logger, IOptions<EnvironmentModel> Accessor)
         {
@@ -47,14 +51,14 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     string password = Encryption.Decrypt(reader["Password"].ToString(), _env.EncryptionKey, _env.IVKey);
                     if (!password.Equals(info.Password))
                     {
-                        
+
                         ModelState.AddModelError("PasswordError", "Password failed!");
                     }
                     else
                     {
                         HttpContext.Session.SetString("SessionUsername", info.Username);
                         var result = _db.Admin_Accounts.Where(_ => _.Username == info.Username && _.Password == Encryption.Encrpyt(info.Password, _env.EncryptionKey, _env.IVKey)).Select(_ => _.AccountID).FirstOrDefault();
-					    HttpContext.Session.SetString("SessionID", Convert.ToString(result));
+                        HttpContext.Session.SetString("SessionID", Convert.ToString(result));
                         HttpContext.Session.SetString("UserType", "Admin");
                         _db.logsLists.Add(new LogsList
                         {
@@ -81,7 +85,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public IActionResult LoginForm(User info)
         {
             var pass = info.Password;
-			_account.Username = info.Username;
+            _account.Username = info.Username;
             _account.AccountID = _db.User_Accounts.Where(x => x.Username == info.Username).Select(x => x.AccountID).FirstOrDefault();
             MySqlCommand mySqlCommand = new MySqlCommand("Select Username,Password From user_accounts", conn);
             conn.Open();
@@ -94,7 +98,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     string password = Encryption.Decrypt(reader["Password"].ToString(), _env.EncryptionKey, _env.IVKey);
                     if (!password.Equals(info.Password))
                     {
-                        
+
                         ModelState.AddModelError("PasswordError", "Password failed!");
                     }
                     else {
@@ -112,7 +116,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     var SearchData = _db.Homeowner_Details.FirstOrDefault(x => x.Username == info.Username);
                     if (SearchData == null)
                     {
-                        Console.WriteLine("Logged In"+ _account.Username);
+                        Console.WriteLine("Logged In" + _account.Username);
                         return RedirectToAction("Sign_Up2");
                     }
                     else
@@ -125,7 +129,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     }
                 }
                 catch (Exception ex) { Console.WriteLine(ex.Message); }
-                
+
             }
 
             ModelState.AddModelError("UsernameError", "Username Not Found");
@@ -160,7 +164,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     }
                     else
                     {
-                        HttpContext.Session.SetString("SessionID",_account.AccountID.ToString());
+                        HttpContext.Session.SetString("SessionID", _account.AccountID.ToString());
                         HttpContext.Session.SetString("SessionUsername", info.Username);
                         isLoggedIn = true;
                     }
@@ -172,9 +176,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             {
                 try
                 {
-                    
-                 HttpContext.Session.SetString("UserType", "Guard");//JsonConvert.SerializeObject
-                 return RedirectToAction("EntryandExitLogs", "GuardMenu");
+
+                    HttpContext.Session.SetString("UserType", "Guard");//JsonConvert.SerializeObject
+                    return RedirectToAction("EntryandExitLogs", "GuardMenu");
                 }
                 catch (Exception ex) { Console.WriteLine(ex.Message); }
 
@@ -184,41 +188,22 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return View();
         }
 
-
-
-
-        public IActionResult Sign_Up() { return View(); }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Sign_Up(User_Account info)//Create User
-        {
-            if (ModelState.IsValid)
-            {
-                _db.User_Accounts.Add(info);
-                await _db.SaveChangesAsync();
-                return RedirectToAction("Sign_Up2");
-            }
-            return View();
-        }
-        public IActionResult Sign_Up2(string Username) { return View(); }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Sign_Up2(Homeowner_details info)
         {
             if (ModelState.IsValid)
             {
-                    _db.Homeowner_Details.Add(new Homeowner_details
-                    {
-                        AccountID = _account.AccountID,
-                        Username = _account.Username.ToString(),
-                        Surname = info.Surname,
-                        Firstname = info.Firstname,
-                        Middlename = info.Middlename,
-                        Birthdate = info.Birthdate,
-                        PhoneNo = info.PhoneNo,
-                    });
+                _db.Homeowner_Details.Add(new Homeowner_details
+                {
+                    AccountID = _account.AccountID,
+                    Username = _account.Username.ToString(),
+                    Surname = info.Surname,
+                    Firstname = info.Firstname,
+                    Middlename = info.Middlename,
+                    Birthdate = info.Birthdate,
+                    PhoneNo = info.PhoneNo,
+                });
                 _db.SaveChanges();
                 var data1 = _db.feesLists.ToList();
                 foreach (var x in data1)
@@ -235,19 +220,42 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     _db.userFeesStatuses.Add(data2);
                 }
                 await _db.SaveChangesAsync();
-                    return RedirectToAction("Index", "Home");
-                }
-            return View();
+                return RedirectToAction("Index", "Home");
             }
+            return View();
+        }
         [HttpGet]
         public JsonResult GetSessionName() {
             return Json(HttpContext.Session.GetString("SessionUsername"));
         }
-
-
-        public IActionResult ForgotPassword(){
+        public IActionResult UserForgotPassword() {
             return View();
         }
+        [HttpPost]   
+        public IActionResult UserForgotPassword(string email){
+            var result = _db.User_Accounts.Where(_ => _.Email == email).FirstOrDefault();
+            if (result != null) {
+				var mailMessage = new MimeMessage();
+                var Username = result.Username;
+				var Password = Encryption.Decrypt(result.Password,_env.EncryptionKey,_env.IVKey);
+				var bodybuild = new BodyBuilder();
+				bodybuild.HtmlBody = MainMenuController.CreateMailBody(Username, Password);
+				mailMessage.From.Add(new MailboxAddress("Cessna", _env.Email));
+				mailMessage.To.Add(new MailboxAddress(result.Username, result.Email));
+				mailMessage.Subject = "User Forgot Username and Password";
+				mailMessage.Body = bodybuild.ToMessageBody();
+				using (var smtpclient = new SmtpClient())
+				{
+					smtpclient.Connect(_env.Host, Convert.ToInt32(_env.Port), SecureSocketOptions.StartTls);
+					smtpclient.Authenticate(_env.Email, _env.Password);
+					smtpclient.Send(mailMessage);
+					smtpclient.Disconnect(true);
+				}
+			}
+            return RedirectToAction("LoginForm");
+        }
+
+
         public IActionResult ResetPassword() {
             return View();
         }

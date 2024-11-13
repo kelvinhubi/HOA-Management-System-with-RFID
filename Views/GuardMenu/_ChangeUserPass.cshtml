@@ -1,7 +1,7 @@
-﻿@model User_Account
+﻿@model Guard_Information
 @using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.InfoSec;
 @{
-	Layout = "~/Views/Shared/_Layout2.cshtml";
+	Layout = "~/Views/Shared/_Layout3.cshtml";
 }
 <head>
 	<style>
@@ -90,7 +90,7 @@
 								<h6 class="mb-2 text-primary">Change Username And Password</h6>
 							</div>
 							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-								<input asp-for="AccountID" name="AccountID" hidden />
+								<input asp-for="ID" name="AccountID" hidden />
 								<div class="form-group">
 									<label asp-for="Username"></label>
 									<input type="text" class="form-control" asp-for="Username" name="Username" />
@@ -102,13 +102,6 @@
 									<label asp-for="Password">Password</label>
 									<input type="password" id="Pass" class="form-control" asp-for="Password" value="@Model.Password" name="Password"/>
 									<span asp-validation-for="Password"></span>
-								</div>
-							</div>
-							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-								<div class="form-group">
-									<label asp-for="Email">Email</label>
-									<input type="email" id="Pass" class="form-control" asp-for="Email" name="Email" />
-									<span asp-validation-for="Email"></span>
 								</div>
 							</div>
 						</div>
@@ -137,7 +130,7 @@
 	$("#SubmitForm").on('click', function () {
 		let formdat = new FormData(document.getElementById('thisform'));
 		$.ajax({
-			url: '@Url.Action("UpdateProfile", "UserMenu")', // Replace with your controller and action
+			url: '@Url.Action("UpdateProfile", "GuardMenu")', // Replace with your controller and action
 			type: 'POST',
 			data: formdat,
 			contentType: false, // Important for FormData

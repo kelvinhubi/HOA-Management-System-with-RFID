@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\Htmls\VerificationCode.html" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Controllers\MainMenuController.cs~RF125be9b.TMP" />
   </ItemGroup>
 
@@ -42,6 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\Htmls\VerificationCode.html" />
     <None Include="wwwroot\Htmls\index.html" />
   </ItemGroup>
 

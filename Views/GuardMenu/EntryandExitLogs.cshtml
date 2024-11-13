@@ -1,4 +1,4 @@
-﻿@model NewModel
+﻿
 @{
     Layout = "~/Views/Shared/_Layout3.cshtml";
 
@@ -27,6 +27,14 @@
         </thead>
     </table>
 </div>
+<div style="display:flex">
+    @using (Html.BeginForm("ExportExcel", "GuardMenu", FormMethod.Post))
+    {
+        <input type="submit" class="btn - btn-success" style="padding:5px; margin-right:5px;" value="Export as Excel" />
+    }
+    <a asp-action="PrintLogs" asp-controller="GuardMenu" id="Print" class="btn - btn-success" style="padding:5px;margin-right:5px;">Export as Pdf</a>
+    <a asp-action="_ClearLogs" asp-controller="GuardMenu" class="btn - btn-danger" style="padding:5px;margin-right:5px;">Clear Logs</a>
+</div>
     <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script>
 <script>
     window.onload = function(){
@@ -50,7 +58,6 @@
         $('#mytable tbody').empty();
         $.get('@Url.Action("GetEntryLogs","GuardMenu")', 
         function (data1) {
-            console.log(data1);
             updatedvalue = data1.length;
             var table = $('#mytable').DataTable({
                     data: data1,
@@ -62,13 +69,24 @@
     connection2.start().catch(function (err) {
     return console.error(err.toString());
 });
-    connection2.on("GetGuardLog", function (Message) {
+    connection2.on("GetGuardLogSuccess", function (Message) {
     const notification = document.getElementById('notifications');
     notification.classList.remove('notification');
     notification.textContent = "";
     notification.classList.add('notification');
     notification.textContent = Message;
-    console.log(Message);
+    setTimeout(() => {
+        notification.classList.remove('notification');
+        notification.textContent = "";
+    }, 5000);
+});
+connection2.on("GetGuardLogFail", function (Message) {
+    const notification = document.getElementById('notifications');
+    notification.classList.remove('notification');
+    notification.textContent = "";
+    notification.classList.add('notification');
+    notification.textContent = Message;
+    
     setTimeout(() => {
         notification.classList.remove('notification');
         notification.textContent = "";

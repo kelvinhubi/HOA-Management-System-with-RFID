@@ -1,5 +1,4 @@
-﻿@model User_Account
-@using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.InfoSec;
+﻿@model Homeowner_details
 @{
 	Layout = "~/Views/Shared/_Layout2.cshtml";
 }
@@ -89,26 +88,41 @@
 							<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
 								<h6 class="mb-2 text-primary">Change Username And Password</h6>
 							</div>
-							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
 								<input asp-for="AccountID" name="AccountID" hidden />
+								<input asp-for="Username" name="Username" hidden />
+							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
 								<div class="form-group">
-									<label asp-for="Username"></label>
-									<input type="text" class="form-control" asp-for="Username" name="Username" />
-									<span asp-validation-for="Username"></span>
+									<label asp-for="Firstname">First Name</label>
+									<input type="text" class="form-control" asp-for="Firstname" readonly />
+									<span asp-validation-for="Firstname"></span>
 								</div>
 							</div>
 							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
 								<div class="form-group">
-									<label asp-for="Password">Password</label>
-									<input type="password" id="Pass" class="form-control" asp-for="Password" value="@Model.Password" name="Password"/>
-									<span asp-validation-for="Password"></span>
+									<label asp-for="Middlename">Middle Name</label>
+									<input type="text" class="form-control" asp-for="Middlename" readonly />
+									<span asp-validation-for="Middlename"></span>
 								</div>
 							</div>
 							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
 								<div class="form-group">
-									<label asp-for="Email">Email</label>
-									<input type="email" id="Pass" class="form-control" asp-for="Email" name="Email" />
-									<span asp-validation-for="Email"></span>
+									<label asp-for="Surname">Surname</label>
+									<input type="text" class="form-control" asp-for="Surname" readonly />
+									<span asp-validation-for="Surname"></span>
+								</div>
+							</div>
+							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+								<div class="form-group">
+									<label asp-for="Birthdate">First Name</label>
+									<input type="date" class="form-control" asp-for="Birthdate" readonly />
+									<span asp-validation-for="Birthdate"></span>
+								</div>
+							</div>
+							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+								<div class="form-group">
+									<label asp-for="PhoneNo">Phone No.</label>
+									<input type="text" class="form-control" asp-for="PhoneNo"/>
+									<span asp-validation-for="PhoneNo"></span>
 								</div>
 							</div>
 						</div>
@@ -129,7 +143,7 @@
 </form>
 @section Scripts {
 	@{
-							<partial name="_ValidationScriptsPartial" />
+		<partial name="_ValidationScriptsPartial" />
 	}
 }
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -137,7 +151,7 @@
 	$("#SubmitForm").on('click', function () {
 		let formdat = new FormData(document.getElementById('thisform'));
 		$.ajax({
-			url: '@Url.Action("UpdateProfile", "UserMenu")', // Replace with your controller and action
+			url: '@Url.Action("UpdateDetails", "UserMenu")', // Replace with your controller and action
 			type: 'POST',
 			data: formdat,
 			contentType: false, // Important for FormData

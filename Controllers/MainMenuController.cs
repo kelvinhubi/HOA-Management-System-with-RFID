@@ -77,13 +77,12 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         {
 
             if (ModelState.IsValid) {
-                if (info.backgroundFile != null) {
+                /*if (info.backgroundFile != null) {
                     string folder = "Images\\";
                     folder += Guid.NewGuid().ToString() + info.backgroundFile.FileName;
                     string serverFolder = Path.Combine(_webenv.ContentRootPath, folder);
                     info.backgroundFile.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
-                }
-
+                }*/
                 _db.Announcements.Add(info);
                 _db.SaveChanges();
             }
@@ -428,6 +427,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             var result = _db.Due_Details.Where(_ => _.Status.Equals("Paid"));
             _db.Due_Details.RemoveRange(result);
             _db.SaveChanges();
+            _db.logsLists.Add(new LogsList
+            {
+                LogName = "Clear Paid Dues",
+                LogDescription = "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+            });
+            _db.SaveChanges();
             return RedirectToAction("AssociationDues");
         }
 
@@ -494,8 +500,14 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
                });
            }).GeneratePdf(filepath); //RENAMING USING RANDOM WORDS
-
-           return File(System.IO.File.ReadAllBytes(filepath), "application/pdf", nameformat + "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_Logs.pdf");
+            _db.logsLists.Add(new LogsList
+            {
+                LogName = "Export Logs",
+                LogDescription = "Export FileType: PDF " +"Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+            });
+            _db.SaveChanges();
+            return File(System.IO.File.ReadAllBytes(filepath), "application/pdf", nameformat + "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_Logs.pdf");
         }
         [HttpPost]
         public IActionResult ExportExcel() {
@@ -519,6 +531,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 using (MemoryStream stream = new MemoryStream())
                 {
                     wb.SaveAs(stream);
+                    _db.logsLists.Add(new LogsList
+                    {
+                        LogName = "Export Logs",
+                        LogDescription = "Export FileType: Excel " + "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                        LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+                    });
+                    _db.SaveChanges();
                     return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_Logs.xlsx");
                 }
             }
@@ -800,7 +819,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     }
                     _db.logsLists.Add(new LogsList
                     {
-                        LogName = "Create Fees",
+                        LogName = "Edit Fees",
                         LogDescription = "Fees Name:" + info.TypeOfFees + "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
                         LogUserRole = "" + HttpContext.Session.GetString("UserType"),
                     });
@@ -886,7 +905,14 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 					result.Username = Username;
 					_db.Admin_Accounts.Update(result);
 					_db.SaveChanges();
-					return Json(new { success = true });
+                    _db.logsLists.Add(new LogsList
+                    {
+                        LogName = "Update Profile",
+                        LogDescription = "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                        LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+                    });
+                    _db.SaveChanges();
+                    return Json(new { success = true });
 				}
 
 			}
@@ -907,6 +933,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public IActionResult _AddHomesList(NewModel info){
             if (info.Home != null) { 
                 _db.homesLists.Add(info.Home);
+                _db.SaveChanges();
+                _db.logsLists.Add(new LogsList
+                {
+                    LogName = "Add Homes List",
+                    LogDescription = "Added Home"+info.Home.HomeName+"Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                    LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+                });
                 _db.SaveChanges();
             }
             return RedirectToAction("HomesList");
@@ -974,7 +1007,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return false;
         }
-        private string CreateMailBody(string Username, string Password)
+        public static string CreateMailBody(string Username, string Password)
         {
             string? dir = System.IO.Path.GetFullPath("wwwroot\\Htmls\\index.html");
             string body = string.Empty;
