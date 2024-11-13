@@ -11,6 +11,7 @@ using System.IO.Ports;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Arduino_Serivce;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Infrastructure;
 using Quartz;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 RfidController._port = new SerialPort();
 RfidController._port.PortName = "COM4";
 RfidController._port.BaudRate = 115200;
@@ -57,8 +58,8 @@ builder.Services.AddSession(options =>
 builder.Services.AddControllersWithViews();
 
 
-    
-    var app = builder.Build();
+
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -70,7 +71,6 @@ if (!app.Environment.IsDevelopment())
 else {
     app.UseExceptionHandler("/Home/Error");
 }
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
