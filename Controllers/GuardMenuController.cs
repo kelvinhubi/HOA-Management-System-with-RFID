@@ -5,17 +5,20 @@ using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.Eventing.Reader;
-
+using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Hubs;
+using Microsoft.AspNetCore.SignalR;
 public class GuardMenuController : Controller
 {
     private readonly AppDbContext _db;
     private readonly ArduinoLog _arduinoLog;
     private readonly IDbContextFactory<AppDbContext> _asyncdb;
+    private readonly IHubContext<MyHub> _hub;
     public int SessionID;
-    public GuardMenuController(AppDbContext context, ArduinoLog service,IDbContextFactory<AppDbContext> db2)
+    public GuardMenuController(AppDbContext context, ArduinoLog service,IDbContextFactory<AppDbContext> db2,IHubContext<MyHub> hubContext)
     {
          _db = context;
         _arduinoLog = service;
+        _hub = hubContext;
         _asyncdb = db2;
         Task.Run(EntryLogging);
     }
@@ -26,7 +29,6 @@ public class GuardMenuController : Controller
         while (true)
         {
             string data = await _arduinoLog.ReadLineAsync();
-            _arduinoLog.Dispose();
 
             if (data != string.Empty)
             {
@@ -50,7 +52,8 @@ public class GuardMenuController : Controller
                                 context.accessLogs.Add(info);
                                 await context.SaveChangesAsync();
                             }
-                            if (result2.LogType == "Entry") {
+                            if (result2.LogType == "Entry")
+                            {
                                 {
                                     var info = new AccessLog
                                     {
@@ -65,7 +68,8 @@ public class GuardMenuController : Controller
                             }
 
                         }
-                        else {
+                        else
+                        {
                             var info = new AccessLog
                             {
                                 GuardID = SessionID,
@@ -76,6 +80,9 @@ public class GuardMenuController : Controller
                             context.accessLogs.Add(info);
                             await context.SaveChangesAsync();
                         }
+                    }
+                    else {
+                        await _hub.Clients.All.SendAsync("GetGuardLog", "Unkown RFID Due to Homeowner have pending payments or RFID not Registered");
                     }
                 }
             }

@@ -20,12 +20,13 @@ var connectionString = builder.Configuration.GetConnectionString("AppDbConnectio
 var serverVersion = new MySqlServerVersion(ServerVersion.AutoDetect(connectionString));
 var EnvModel = builder.Configuration.GetSection("Env");
 builder.Services.Configure<EnvironmentModel>(EnvModel);
-builder.Services.AddScoped<ArduinoLog>(provider => { return new ArduinoLog("COM4", 115200); });
+
 //For Entity Framework
 builder.Services.AddSignalR();
 //builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connectionString, serverVersion));
 builder.Services.AddDbContextFactory<AppDbContext>(options => options.UseMySql(connectionString, serverVersion));
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AppDbContext>();
+builder.Services.AddScoped<ArduinoLog>(provider => { return new ArduinoLog("COM4", 115200); });
 //For Background Task
 builder.Services.AddQuartz(options => {
     var jobkey = JobKey.Create("CheckDuesJob");

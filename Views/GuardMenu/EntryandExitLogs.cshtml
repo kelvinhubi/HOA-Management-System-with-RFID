@@ -27,8 +27,11 @@
         </thead>
     </table>
 </div>
+    <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script>
 <script>
-    
+    window.onload = function(){
+        Timer();
+    }
     async function Timer() { 
         setInterval(function () {
             console.log("PR");
@@ -55,4 +58,20 @@
             });
         });
     }
+    var connection2 = new signalR.HubConnectionBuilder().withUrl("/chat").build();
+    connection2.start().catch(function (err) {
+    return console.error(err.toString());
+});
+    connection2.on("GetGuardLog", function (Message) {
+    const notification = document.getElementById('notifications');
+    notification.classList.remove('notification');
+    notification.textContent = "";
+    notification.classList.add('notification');
+    notification.textContent = Message;
+    console.log(Message);
+    setTimeout(() => {
+        notification.classList.remove('notification');
+        notification.textContent = "";
+    }, 5000);
+});
 </script>
