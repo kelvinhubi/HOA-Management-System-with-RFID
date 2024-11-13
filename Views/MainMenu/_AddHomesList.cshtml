@@ -1,9 +1,9 @@
 ﻿@model NewModel
 
-<Button runat="server" id="bution" class="btn btn-success" style="position:sticky;">Add Multiple Dues</Button>
+<Button runat="server" id="bution" class="btn btn-success" style="position:sticky;">Add Home</Button>
 <form asp-action="_AddHomesList" asp-controller="MainMenu" class="form" id="thisform">
     <p class="title">Add Home</p>
-    <input asp-for="@Model.Home.AccountID" id="AccountID" class="form-control" />
+    <input asp-for="@Model.Home.AccountID" id="AccountID" class="form-control" hidden />
     <input asp-for="@Model.Home.HomeID" class="form-control" hidden />
     <input asp-for="@Model.Home.CreatedAt" id="FeesName" hidden />
     <div class="form-group">
@@ -44,13 +44,13 @@
             $("#thisform").css("display", "none");
             $("#UserPartial").css("display", "block");
             $("#bution").html('Add Home');
-            document.getElementById("bution").style.cssText = "display: block; position: inherit; background-color:#16a085; color: black";
+            document.getElementById("bution").style.cssText = "display: block; position: inherit;";
             $("body").css("background", "rgba(0, 0, 0, 0)");
         }
         else {
             this.blur();
             $("#thisform").css("display", "block");
-            document.getElementById("bution").style.cssText = "position: fixed; background-color:#16a085;color:black;";
+            document.getElementById("bution").style.cssText = "position: fixed;";
             $("#UserPartial").css("display", "none");
             $("#bution").html('Hide');
             $("body").css("background", "rgba(0, 0, 0, 0.4)");
