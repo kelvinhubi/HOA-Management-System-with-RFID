@@ -47,7 +47,7 @@
 </head>
 @Html.AntiForgeryToken()
 <div id="UserPartial">
-    <h2>Accounts</h2>
+    <h2>My Dues</h2>
     <table id="mytable" class="table table-bordered">
         <thead class="table-light">
             <tr>
@@ -69,8 +69,8 @@
                     <td>@obj.FeesName</td>
                     <td>@obj.Invoice</td>
                     <td>@obj.Amount</td>
-                    <td id="duedate">@obj.Date</td>
-                    <td>@obj.Status</td>
+                    <td><div id="duedate">@obj.Date</div></td>
+                    <td><div id="status">@obj.Status</div></td>
                     @{
                         if (obj.Status.Equals("Paid"))
 
@@ -86,7 +86,6 @@
                             </td>
                         }
                     }
-
                 </tr>
             }
         </tbody>
@@ -101,7 +100,7 @@
 </div>
 @section Scripts {
     @{
-                                                                        <partial name="_ValidationScriptsPartial" />
+                                                                            <partial name="_ValidationScriptsPartial" />
     }
 }
 <script>
@@ -145,16 +144,16 @@
         });
     });
     window.onload = function () {
-        var table = document.querySelectorAll("td");
+        var table = document.querySelectorAll("#status");
         for (let i = 0; i < table.length; i++) {
             let col = table[i].innerHTML;
             if (col == "Unpaid") {
                 table[i].classList.add('bx', 'bxs-user-x', 'card-danger', 'bg-danger')
-                table[i].style.cssText = "font-size:15px;"
+                table[i].style.cssText = "width:100%; padding:15px;";
             }
             if (col == "Paid") {
                 table[i].classList.add('bx', 'bxs-user-x', 'card-success', 'bg-success')
-                table[i].style.cssText = "font-size:14px;"
+                table[i].style.cssText = "width:100%; padding:15px;";
             }
         }
             var table = document.querySelectorAll("#duedate");
@@ -164,6 +163,7 @@
                 var date = new Date()
                 if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
                     table[i].classList.add('bx', 'bxs-error-alt', 'card-warning', 'bg-warning');
+                    table[i].style.cssText = "width:100%; padding:15px;";
                 }
 
             }
@@ -175,11 +175,11 @@
                 let col = table[i].innerHTML;
                 if (col == "Unpaid") {
                     table[i].classList.add('bx', 'bxs-user-x', 'card-danger', 'bg-danger')
-                    table[i].style.cssText = "font-size:15px;"
+                    table[i].style.cssText = "width:100%; padding:15px;";
                 }
                 if (col == "Paid") {
                     table[i].classList.add('bx', 'bxs-user-x', 'card-success', 'bg-success')
-                    table[i].style.cssText = "font-size:14px;"
+                    table[i].style.cssText = "width:100%; padding:15px;";
                 }
             }
             var table = document.querySelectorAll("#duedate");
@@ -188,7 +188,9 @@
                 var due = new Date(col)
                 var date = new Date()
                 if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
-                    table[i].classList.add('bx', 'bxs-error-alt', 'card-warning', 'bg-warning')
+                    table[i].classList.add('bx', 'bxs-error-alt', 'card-warning', 'bg-warning');
+                    table[i].style.cssText = "width:100%; padding:15px;";
+
                 }
 
             }

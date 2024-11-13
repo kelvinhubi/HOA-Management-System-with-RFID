@@ -12,7 +12,7 @@
 
 </head>
 <div id="UserPartial">
-    <h2>Association Dues </h2>
+    <h2>Association Dues</h2>
     <button type="button" id="notify" class="btn-sm btn-primary">Notify</button>
     <table id="mytable" class="table table-bordered" style="width:100%">
         <thead class="table-light">
@@ -30,13 +30,13 @@
             @foreach (Dues obj in Model.ListDues)
             {
                 <tr>
-                    <td>@obj.FullName</td>
-                    <td>@obj.Amount</td>
-                    <td>@obj.Invoice</td>
-                    <td>@obj.FeesName</td>
-                    <td id="duedate">@obj.Date</td>
                     <td>@obj.TypeOfFee</td>
-                    <td>@obj.Status</td>
+                    <td>@obj.FeesName</td>
+                    <td>@obj.Invoice</td>
+                    <td>@obj.Amount</td>
+                    <td><div id="duedate">@obj.Date</div></td>
+                    <td>@obj.TypeOfFee</td>
+                    <td><div id="status">@obj.Status</div></td>
                 </tr>
             }
 
@@ -68,55 +68,55 @@
 <script>
     new DataTable('#mytable');
     window.onload = function () { 
-        var table = document.querySelectorAll("td");
-        for (let i = 0; i < table.length; i++) { 
-            let col = table[i].innerHTML;
-            if (col == "Unpaid") { 
-                table[i].classList.add('bx', 'bxs-user-x', 'card-danger','bg-danger')
-                table[i].style.cssText = "font-size:15px;"
-            }
-            if (col == "Paid") { 
-                table[i].classList.add('bx', 'bxs-user-x', 'card-success', 'bg-success')
-                table[i].style.cssText = "font-size:14px;"
-            }
-        }
-
-        var table = document.querySelectorAll("#duedate");
-        for (let i = 0; i < table.length; i++) {
-            let col = table[i].innerHTML
-            var due = new Date(col)
-            var date = new Date()
-            if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
-                table[i].classList.add('bx','bxs-error-alt','card-warning','bg-warning')
-            }
-            else {}
-            
-        }
-    }
-    $(document).ready(function () {
-        $(document,"dt-column-title").on('click change',function () {
-            var table = document.querySelectorAll("td");
+        var table = document.querySelectorAll("#status");
             for (let i = 0; i < table.length; i++) {
                 let col = table[i].innerHTML;
                 if (col == "Unpaid") {
                     table[i].classList.add('bx', 'bxs-user-x', 'card-danger', 'bg-danger')
-                    table[i].style.cssText = "font-size:15px;"
+                    table[i].style.cssText = "width:100%; padding:15px;";
                 }
                 if (col == "Paid") {
                     table[i].classList.add('bx', 'bxs-user-x', 'card-success', 'bg-success')
-                    table[i].style.cssText = "font-size:14px;"
+                    table[i].style.cssText = "width:100%; padding:15px;";
                 }
             }
-
             var table = document.querySelectorAll("#duedate");
             for (let i = 0; i < table.length; i++) {
                 let col = table[i].innerHTML
                 var due = new Date(col)
                 var date = new Date()
                 if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
-                    table[i].classList.add('bx', 'bxs-error-alt', 'card-warning', 'bg-warning')
+                    table[i].classList.add('bx', 'bxs-error-alt', 'card-warning', 'bg-warning');
+                    table[i].style.cssText = "width:100%; padding:15px;";
+
                 }
-                else { }
+
+            }
+    }
+    $(document).ready(function () {
+        $(document,"dt-column-title").on('click change',function () {
+            var table = document.querySelectorAll("#status");
+            for (let i = 0; i < table.length; i++) {
+                let col = table[i].innerHTML;
+                if (col == "Unpaid") {
+                    table[i].classList.add('bx', 'bxs-user-x', 'card-danger', 'bg-danger')
+                    table[i].style.cssText = "width:100%; padding:15px;";
+                }
+                if (col == "Paid") {
+                    table[i].classList.add('bx', 'bxs-user-x', 'card-success', 'bg-success')
+                    table[i].style.cssText = "width:100%; padding:15px;";
+                }
+            }
+            var table = document.querySelectorAll("#duedate");
+            for (let i = 0; i < table.length; i++) {
+                let col = table[i].innerHTML
+                var due = new Date(col)
+                var date = new Date()
+                if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
+                    table[i].classList.add('bx', 'bxs-error-alt', 'card-warning', 'bg-warning');
+                    table[i].style.cssText = "width:100%; padding:15px;";
+
+                }
 
             }
         })
