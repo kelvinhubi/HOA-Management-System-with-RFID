@@ -28,6 +28,7 @@
             @foreach (var obj in Model.Vehicles)
             {
                 <tr>
+                    @{var rfid = obj.RFID_number != string.Empty ? obj.RFID_number : "N/A";}
                     <td>@obj.VehicleID</td>
                     <td>@obj.FullName</td>
                     <td>@obj.PlateNo</td>

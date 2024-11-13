@@ -14,8 +14,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         public string VehicleModel { get; set; } = string.Empty;
         [Required]
         public string VehicleType { get; set; } = string.Empty;
-        public string RFID_number { get; set; } = "N/A";
-        public string RFID_status { get; set; } = "Disabled";
+        public string RFID_number { get; set; } = string.Empty;
+        public string RFID_status { get; set; } = string.Empty;
 
     }
 }

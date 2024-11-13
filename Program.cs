@@ -9,6 +9,8 @@ using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Hubs;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers;
 using System.IO.Ports;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Arduino_Serivce;
+using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Infrastructure;
+using Quartz;
 RfidController._port = new SerialPort();
 RfidController._port.PortName = "COM4";
 RfidController._port.BaudRate = 115200;
@@ -23,6 +25,15 @@ builder.Services.AddSignalR();
 //builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connectionString, serverVersion));
 builder.Services.AddDbContextFactory<AppDbContext>(options => options.UseMySql(connectionString, serverVersion));
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AppDbContext>();
+//For Background Task
+builder.Services.AddQuartz(options => {
+    var jobkey = JobKey.Create("CheckDuesJob");
+    options.AddJob<DependencyInjection>(jobkey)
+    .AddTrigger(Trigger=> Trigger.ForJob(jobkey).WithSimpleSchedule(s=>s.WithIntervalInSeconds(60).RepeatForever()));
+});
+builder.Services.AddQuartzHostedService(options => {
+    options.WaitForJobsToComplete = true;
+});
 //For Identity
 //Adding Authentication
 builder.Services.AddAuthentication(options =>

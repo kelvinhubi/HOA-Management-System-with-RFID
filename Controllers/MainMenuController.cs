@@ -649,7 +649,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                                   PlateNo = vehicle.PlateNo,
                                   VehicleModel = vehicle.VehicleModel,
                                   VehicleType = vehicle.VehicleType,
-                                  RFID_number = vehicle.RFID_number
+                                  RFID_number = vehicle.RFID_number,
+                                  RFID_status = vehicle.RFID_status
 
                               });
                 NewModel model = new NewModel();

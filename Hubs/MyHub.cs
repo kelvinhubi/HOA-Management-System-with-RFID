@@ -13,8 +13,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, conn);
             await Clients.Group(conn).SendAsync("RecieveMessage", "Admin", $"{conn} has joined");
         }
-        public async Task Notification(string User, string message) { 
-            await Clients.All.SendAsync("RecieveMessage",User, message, DateTime.Now.ToString("MMMM dd, yyyy h:mm tt"));
+        public async Task Notification(string message) { 
+            await Clients.All.SendAsync("RecieveNotification", message);
         }
     }
 }

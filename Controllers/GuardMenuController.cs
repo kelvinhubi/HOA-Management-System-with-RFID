@@ -28,11 +28,11 @@ public class GuardMenuController : Controller
             string data = await _arduinoLog.ReadLineAsync();
             _arduinoLog.Dispose();
 
-            if (data != string.Empty )
+            if (data != string.Empty)
             {
                 using (var context = _asyncdb.CreateDbContext())
                 {
-                    var result = context.Vehicle_Information.Where(_ => _.RFID_number == data).FirstOrDefault();
+                    var result = context.Vehicle_Information.Where(_ => _.RFID_number == data && _.RFID_status.Equals("Enabled")).FirstOrDefault();
                     var result2 = context.accessLogs.OrderByDescending(p =>p.Time).Where(_ => _.RFID_number == data).FirstOrDefault();
                     if (result != null)
                     {
