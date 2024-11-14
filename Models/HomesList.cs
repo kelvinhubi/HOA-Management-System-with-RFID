@@ -12,8 +12,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         public string HomeName { get; set; } = string.Empty;
         public string FullName { get; set; } = string.Empty;
         [Required]
-        [RegularExpression(@"^[0-9]*$", ErrorMessage = "Error pls only enter numbers")]
+        [RegularExpression(@"^[0-9]*$", ErrorMessage = "Error pls only enter numbers"), MaxLength(10)]
         public string BlkNO { get; set; } = string.Empty;
+        [Required]
+        [RegularExpression(@"^[0-9]*$", ErrorMessage = "Error pls only enter numbers"),MaxLength(10)]
+        public string LotNo { get; set; } = string.Empty;
         [Required]
         public string Address { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.Now;

@@ -14,20 +14,24 @@ using Microsoft.Extensions.Options;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using QuestPDF.Fluent;
+using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Infrastructure;
+using Microsoft.AspNetCore.Http.HttpResults;
 public class GuardMenuController : Controller
 {
     private readonly AppDbContext _db;
     private readonly ArduinoLog _arduinoLog;
     private readonly IDbContextFactory<AppDbContext> _asyncdb;
+    private readonly IDbContextFactory<OfflineAppDbContext> _asyncdb2;
     private readonly IHubContext<MyHub> _hub;
     private readonly EnvironmentModel _env;
     public int SessionID;
-    public GuardMenuController(AppDbContext context, ArduinoLog service,IDbContextFactory<AppDbContext> db2,IHubContext<MyHub> hubContext, IOptions<EnvironmentModel> env)
+    public GuardMenuController(AppDbContext context, ArduinoLog service,IDbContextFactory<AppDbContext> db2, IDbContextFactory<OfflineAppDbContext> db3, IHubContext<MyHub> hubContext, IOptions<EnvironmentModel> env)
     {
          _db = context;
         _arduinoLog = service;
         _hub = hubContext;
         _asyncdb = db2;
+        _asyncdb2 = db3;
         _env = env.Value;
         Task.Run(EntryLogging);
     }
@@ -38,18 +42,50 @@ public class GuardMenuController : Controller
         while (true)
         {
             string data = await _arduinoLog.ReadLineAsync();
-
+            bool online = await ConnectivityChecker.IsOnline();
             if (data != string.Empty)
             {
-                using (var context = _asyncdb.CreateDbContext())
+                if (online)
                 {
-                    var result = context.Vehicle_Information.Where(_ => _.RFID_number == data && _.RFID_status.Equals("Enabled")).FirstOrDefault();
-                    var result2 = context.accessLogs.OrderByDescending(p =>p.Time).Where(_ => _.RFID_number == data).FirstOrDefault();
-                    if (result != null)
+                    using (var context = _asyncdb.CreateDbContext())
                     {
-                        if (result2 != null)
+                        var result = context.Vehicle_Information.Where(_ => _.RFID_number == data && _.RFID_status.Equals("Enabled")).FirstOrDefault();
+                        var result2 = context.accessLogs.OrderByDescending(p => p.Time).Where(_ => _.RFID_number == data).FirstOrDefault();
+                        if (result != null)
                         {
-                            if (result2.LogType == "Exit")
+                            if (result2 != null)
+                            {
+                                if (result2.LogType == "Exit")
+                                {
+                                    var info = new AccessLog
+                                    {
+                                        GuardID = SessionID,
+                                        AccountID = result.AccountID,
+                                        RFID_number = result.RFID_number,
+                                        LogType = "Entry",
+                                    };
+                                    context.accessLogs.Add(info);
+                                    await context.SaveChangesAsync();
+                                    await _hub.Clients.All.SendAsync("GetGuardLogSuccess", "RFID Scanned Successfully");
+                                }
+                                if (result2.LogType == "Entry")
+                                {
+                                    {
+                                        var info = new AccessLog
+                                        {
+                                            GuardID = SessionID,
+                                            AccountID = result2.AccountID,
+                                            RFID_number = result.RFID_number,
+                                            LogType = "Exit",
+                                        };
+                                        context.accessLogs.Add(info);
+                                        await context.SaveChangesAsync();
+                                        await _hub.Clients.All.SendAsync("GetGuardLogSuccess", "RFID Scanned Successfully");
+                                    }
+                                }
+
+                            }
+                            else
                             {
                                 var info = new AccessLog
                                 {
@@ -59,43 +95,78 @@ public class GuardMenuController : Controller
                                     LogType = "Entry",
                                 };
                                 context.accessLogs.Add(info);
+
                                 await context.SaveChangesAsync();
                                 await _hub.Clients.All.SendAsync("GetGuardLogSuccess", "RFID Scanned Successfully");
                             }
-                            if (result2.LogType == "Entry")
+                        }
+                        else
+                        {
+                            await _hub.Clients.All.SendAsync("GetGuardLogFail", "Unkown RFID Due to Homeowner have pending payments or RFID not Registered");
+                        }
+                    }
+                }
+                else {
+                    using (var context = _asyncdb2.CreateDbContext())
+                    {
+                        var result = context.Vehicle_Information.Where(_ => _.RFID_number == data && _.RFID_status.Equals("Enabled")).FirstOrDefault();
+                        var result2 = context.accessLogs.OrderByDescending(p => p.Time).Where(_ => _.RFID_number == data).FirstOrDefault();
+                        if (result != null)
+                        {
+                            if (result2 != null)
                             {
+                                if (result2.LogType == "Exit")
                                 {
                                     var info = new AccessLog
                                     {
                                         GuardID = SessionID,
-                                        AccountID = result2.AccountID,
+                                        AccountID = result.AccountID,
                                         RFID_number = result.RFID_number,
-                                        LogType = "Exit",
+                                        LogType = "Entry",
                                     };
                                     context.accessLogs.Add(info);
                                     await context.SaveChangesAsync();
                                     await _hub.Clients.All.SendAsync("GetGuardLogSuccess", "RFID Scanned Successfully");
                                 }
-                            }
+                                if (result2.LogType == "Entry")
+                                {
+                                    {
+                                        var info = new AccessLog
+                                        {
+                                            GuardID = SessionID,
+                                            AccountID = result2.AccountID,
+                                            RFID_number = result.RFID_number,
+                                            LogType = "Exit",
+                                        };
+                                        context.accessLogs.Add(info);
+                                        await context.SaveChangesAsync();
+                                        await _hub.Clients.All.SendAsync("GetGuardLogSuccess", "RFID Scanned Successfully");
+                                    }
+                                }
 
+                            }
+                            else
+                            {
+                                var info = new AccessLog
+                                {
+                                    GuardID = SessionID,
+                                    AccountID = result.AccountID,
+                                    RFID_number = result.RFID_number,
+                                    LogType = "Entry",
+                                };
+                                context.accessLogs.Add(info);
+
+                                await context.SaveChangesAsync();
+                                await _hub.Clients.All.SendAsync("GetGuardLogSuccess", "RFID Scanned Successfully");
+                            }
+                        }
+                        else if (result == null) {
+                            await _hub.Clients.All.SendAsync("GetGuardLogFail", "Scan Fail! RFID not Registered");
                         }
                         else
                         {
-                            var info = new AccessLog
-                            {
-                                GuardID = SessionID,
-                                AccountID = result.AccountID,
-                                RFID_number = result.RFID_number,
-                                LogType = "Entry",
-                            };
-                            context.accessLogs.Add(info);
-
-                            await context.SaveChangesAsync();
-                            await _hub.Clients.All.SendAsync("GetGuardLogSuccess", "RFID Scanned Successfully");
+                            await _hub.Clients.All.SendAsync("GetGuardLogFail", "Scan Fail! Due to Homeowner have pending payments");
                         }
-                    }
-                    else {
-                        await _hub.Clients.All.SendAsync("GetGuardLogFail", "Unkown RFID Due to Homeowner have pending payments or RFID not Registered");
                     }
                 }
             }
@@ -106,100 +177,112 @@ public class GuardMenuController : Controller
         SessionID = Convert.ToInt32(HttpContext.Session.GetString("SessionID"));
         return View();
     }
-    public IActionResult PrintLogs(string? nameformat)
+    public async Task<IActionResult> PrintLogs(string? nameformat)
     {
-        if (nameformat == null)
-        {
-            nameformat = "ExportPdf";
-        }
-        string filepath = "wwwroot\\ExportedFiles\\" + nameformat + "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_EntryExitLogs.pdf";
-        QuestPDF.Settings.License = LicenseType.Community;
-        void ComposeTable(IContainer container)
-        {
-            container.Border(1).Table(table =>
+        bool online = await ConnectivityChecker.IsOnline();
+        if (online) {
+            if (nameformat == null)
             {
-                table.ColumnsDefinition(columns =>
+                nameformat = "ExportPdf";
+            }
+            string filepath = "wwwroot\\ExportedFiles\\" + nameformat + "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_EntryExitLogs.pdf";
+            QuestPDF.Settings.License = LicenseType.Community;
+            void ComposeTable(IContainer container)
+            {
+                container.Border(1).Table(table =>
                 {
-                    columns.ConstantColumn(100);
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
-                });
-
-                table.Header(header =>
-                {
-                    header.Cell().Text("Guard ID");
-                    header.Cell().Text("Time");
-                    header.Cell().Text("Log Type");
-                    header.Cell().Text("RFID_Number");
-                    header.Cell().Text("Plate No.");
-                    header.Cell().Text("Owner Name");
-                });
-                var result = (from access in _db.accessLogs
-                              join
-                                vehicle in _db.Vehicle_Information on access.RFID_number equals vehicle.RFID_number
-                              select new
-                              {
-                                  LogID = access.AccessLogID,
-                                  GuardID = access.GuardID,
-                                  Time = access.Time.ToString("MMMM dd, yyyy h:mm tt"),
-                                  LogType = access.LogType,
-                                  RFID_number = vehicle.RFID_number,
-                                  PlateNo = vehicle.PlateNo,
-                                  FullName = vehicle.FullName,
-                              }).ToList();
-                if (result != null)
-                {
-                    foreach (var item in result)
+                    table.ColumnsDefinition(columns =>
                     {
-                        table.Cell().Text(item.GuardID.ToString());
-                        table.Cell().Text(item.Time.ToString());
-                        table.Cell().Text(item.LogType.ToString());
-                        table.Cell().Text(item.RFID_number.ToString());
-                        table.Cell().Text(item.PlateNo.ToString());
-                        table.Cell().Text(item.FullName.ToString());
+                        columns.ConstantColumn(100);
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                    });
+
+                    table.Header(header =>
+                    {
+                        header.Cell().Text("Guard ID");
+                        header.Cell().Text("Time");
+                        header.Cell().Text("Log Type");
+                        header.Cell().Text("RFID_Number");
+                        header.Cell().Text("Plate No.");
+                        header.Cell().Text("Owner Name");
+                    });
+                    var result = (from access in _db.accessLogs
+                                  join
+                                    vehicle in _db.Vehicle_Information on access.RFID_number equals vehicle.RFID_number
+                                  select new
+                                  {
+                                      LogID = access.AccessLogID,
+                                      GuardID = access.GuardID,
+                                      Time = access.Time.ToString("MMMM dd, yyyy h:mm tt"),
+                                      LogType = access.LogType,
+                                      RFID_number = vehicle.RFID_number,
+                                      PlateNo = vehicle.PlateNo,
+                                      FullName = vehicle.FullName,
+                                  }).ToList();
+                    if (result != null)
+                    {
+                        foreach (var item in result)
+                        {
+                            table.Cell().Text(item.GuardID.ToString());
+                            table.Cell().Text(item.Time.ToString());
+                            table.Cell().Text(item.LogType.ToString());
+                            table.Cell().Text(item.RFID_number.ToString());
+                            table.Cell().Text(item.PlateNo.ToString());
+                            table.Cell().Text(item.FullName.ToString());
+                        }
                     }
-                }
-            });
-        }
-        Document.Create(Print =>
-        {
-            Print.Page(page =>
+                });
+            }
+            Document.Create(Print =>
             {
-                page.Content()
-                .Column(c => ComposeTable(c.Item()));
-                page.Size(PageSizes.A4);
-                page.Header()
-                .Text("Logs")
-                .SemiBold()
-                .FontSize(30);
+                Print.Page(page =>
+                {
+                    page.Content()
+                    .Column(c => ComposeTable(c.Item()));
+                    page.Size(PageSizes.A4);
+                    page.Header()
+                    .Text("Logs")
+                    .SemiBold()
+                    .FontSize(30);
 
-            });
-        }).GeneratePdf(filepath); //RENAMING USING RANDOM WORDS
+                });
+            }).GeneratePdf(filepath); //RENAMING USING RANDOM WORDS
 
-        return File(System.IO.File.ReadAllBytes(filepath), "application/pdf", nameformat + "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_EntryExitLogs.pdf");
+            return File(System.IO.File.ReadAllBytes(filepath), "application/pdf", nameformat + "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_EntryExitLogs.pdf");
+        }
+        await _hub.Clients.All.SendAsync("GetGuardLogFail", "Unable to print while in offine");
+        return NoContent();
     }
-    public IActionResult _ClearLogs()
+    public async Task<IActionResult> _ClearLogs()
     {
-        //PrintLogs("Backup_");
-        var result = _db.accessLogs.ToList();
-        _db.accessLogs.RemoveRange(result);
-        _db.SaveChanges();
-        _db.logsLists.Add(new LogsList
-        {
-            LogName = "EntryandExit Logs Cleared",
-            LogDescription = "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
-            LogUserRole = "" + HttpContext.Session.GetString("UserType"),
-        });
-        return RedirectToAction("EntryandExitLogs");
+        bool online = await ConnectivityChecker.IsOnline();
+        if (online) {
+            //PrintLogs("Backup_");
+            var result = _db.accessLogs.ToList();
+            _db.accessLogs.RemoveRange(result);
+            _db.SaveChanges();
+            _db.logsLists.Add(new LogsList
+            {
+                LogName = "EntryandExit Logs Cleared",
+                LogDescription = "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+            });
+            return RedirectToAction("EntryandExitLogs");
+        }
+        await _hub.Clients.All.SendAsync("GetGuardLogFail", "Unable to Clear Logs while in Offline");
+        return NoContent();
     }
     [HttpPost]
-    public IActionResult ExportExcel()
+    public async Task<IActionResult> ExportExcel()
     {
-        DataTable dt = new DataTable("Student");
-        dt.Columns.AddRange(new DataColumn[6] {
+        bool online = await ConnectivityChecker.IsOnline();
+        if (online) {
+            DataTable dt = new DataTable("Student");
+            dt.Columns.AddRange(new DataColumn[6] {
                                             new DataColumn("Guard ID"),
                                             new DataColumn("Time"),
                                             new DataColumn("Log Type"),
@@ -208,34 +291,38 @@ public class GuardMenuController : Controller
                                             new DataColumn("Owner Name")
         });
 
-        var Logs = (from access in _db.accessLogs
-                    join
-                      vehicle in _db.Vehicle_Information on access.RFID_number equals vehicle.RFID_number
-                    select new
-                    {
-                        LogID = access.AccessLogID,
-                        GuardID = access.GuardID,
-                        Time = access.Time.ToString("MMMM dd, yyyy h:mm tt"),
-                        LogType = access.LogType,
-                        RFID_number = vehicle.RFID_number,
-                        PlateNo = vehicle.PlateNo,
-                        FullName = vehicle.FullName,
-                    }).ToList();
+            var Logs = (from access in _db.accessLogs
+                        join
+                          vehicle in _db.Vehicle_Information on access.RFID_number equals vehicle.RFID_number
+                        select new
+                        {
+                            LogID = access.AccessLogID,
+                            GuardID = access.GuardID,
+                            Time = access.Time.ToString("MMMM dd, yyyy h:mm tt"),
+                            LogType = access.LogType,
+                            RFID_number = vehicle.RFID_number,
+                            PlateNo = vehicle.PlateNo,
+                            FullName = vehicle.FullName,
+                        }).ToList();
 
-        foreach (var loglists in Logs)
-        {
-            dt.Rows.Add(loglists.GuardID, loglists.Time, loglists.LogType, loglists.RFID_number,loglists.PlateNo, loglists.FullName);
-        }
-
-        using (XLWorkbook wb = new XLWorkbook())
-        {
-            wb.Worksheets.Add(dt);
-            using (MemoryStream stream = new MemoryStream())
+            foreach (var loglists in Logs)
             {
-                wb.SaveAs(stream);
-                return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_Logs.xlsx");
+                dt.Rows.Add(loglists.GuardID, loglists.Time, loglists.LogType, loglists.RFID_number, loglists.PlateNo, loglists.FullName);
             }
+
+            using (XLWorkbook wb = new XLWorkbook())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_Logs.xlsx");
+                }
+            }
+            
         }
+        await _hub.Clients.All.SendAsync("GetGuardLogFail", "Unable to Export while Offline");
+        return NoContent();
     }
     [HttpGet]
     public JsonResult GetEntryLogs() {

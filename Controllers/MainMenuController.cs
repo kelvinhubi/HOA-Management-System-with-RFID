@@ -204,6 +204,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 x[i].Status = y[i].IsChecked == true ? "Enabled" : "Disabled";
             }
             await _db.SaveChangesAsync();
+            _db.logsLists.Add(new LogsList
+            {
+                LogName = "Edit UserFees",
+                LogDescription = "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+            });
+            _db.SaveChanges();
             return RedirectToAction("UserManagement");
         }
 

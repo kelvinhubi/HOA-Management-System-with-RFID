@@ -187,7 +187,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             ModelState.AddModelError("UsernameError", "Username Not Found");
             return View();
         }
-
+        public IActionResult Sign_Up2 (){ return View(); }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Sign_Up2(Homeowner_details info)

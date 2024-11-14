@@ -11,27 +11,33 @@ using System.IO.Ports;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Arduino_Serivce;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Infrastructure;
 using Quartz;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 RfidController._port = new SerialPort();
 RfidController._port.PortName = "COM4";
 RfidController._port.BaudRate = 115200;
+bool online = await ConnectivityChecker.IsOnline();
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("AppDbConnectionString") ?? throw new InvalidOperationException("Connection string 'AppDbConnectionString' not found.");
-var serverVersion = new MySqlServerVersion(ServerVersion.AutoDetect(connectionString));
+var connectionString1 = builder.Configuration.GetConnectionString("OnlineAppDbConnectionString");
+var connectionString2 = builder.Configuration.GetConnectionString("OfflineAppDbConnectionString");
+//throw new InvalidOperationException("Connection string 'AppDbConnectionString' not found.");
+var serverVersion1 = new MySqlServerVersion(ServerVersion.AutoDetect(connectionString1));
+var serverVersion2 = new MySqlServerVersion(ServerVersion.AutoDetect(connectionString2));
 var EnvModel = builder.Configuration.GetSection("Env");
 builder.Services.Configure<EnvironmentModel>(EnvModel);
-
 //For Entity Framework
 builder.Services.AddSignalR();
 //builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connectionString, serverVersion));
-builder.Services.AddDbContextFactory<AppDbContext>(options => options.UseMySql(connectionString, serverVersion));
+builder.Services.AddDbContextFactory<AppDbContext>(options => options.UseMySql(connectionString1, serverVersion1));
+builder.Services.AddDbContextFactory<OfflineAppDbContext>(options => options.UseMySql(connectionString2, serverVersion2));
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddScoped<ArduinoLog>(provider => { return new ArduinoLog("COM4", 115200); });
 //For Background Task
 builder.Services.AddQuartz(options => {
     var jobkey = JobKey.Create("CheckDuesJob");
+    var jobkey2 = JobKey.Create("OnlineChecker");
     options.AddJob<DependencyInjection>(jobkey)
-    .AddTrigger(Trigger=> Trigger.ForJob(jobkey).WithSimpleSchedule(s=>s.WithIntervalInSeconds(60).RepeatForever()));
+    .AddTrigger(Trigger=> Trigger.ForJob(jobkey).WithSimpleSchedule(s=>s.WithIntervalInHours(5).RepeatForever()));
+options.AddJob<SyncEntryExitLogs>(jobkey2).
+AddTrigger(Trigger => Trigger.ForJob(jobkey2).WithSimpleSchedule(s => s.WithIntervalInSeconds(60).RepeatForever()));
 });
 builder.Services.AddQuartzHostedService(options => {
     options.WaitForJobsToComplete = true;

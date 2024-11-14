@@ -17,7 +17,7 @@
         <span asp-validation-for="@Model.Home.AccountID" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="@Model.Home.HomeName" class="control-label">Address</label>
+        <label asp-for="@Model.Home.HomeName" class="control-label">Home Type</label>
         <input asp-for="@Model.Home.HomeName" class="form-control input" />
         <span asp-validation-for="@Model.Home.HomeName"></span>
     </div>
@@ -32,7 +32,12 @@
         <span asp-validation-for="@Model.Home.BlkNO"></span>
     </div>
     <div class="form-group">
-        <input type="submit"  value="Create" class="btn btn-success" />
+        <label asp-for="@Model.Home.LotNo" class="control-label">Lot No</label>
+        <input asp-for="@Model.Home.LotNo" class="form-control input" />
+        <span asp-validation-for="@Model.Home.LotNo"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-success" />
     </div>
 </form>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
