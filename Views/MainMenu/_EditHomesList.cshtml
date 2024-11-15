@@ -1,5 +1,56 @@
-﻿@*
-    
-*@
+﻿@model HomesList
+
 @{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+    ViewData["Title"] = "Edit HomesList";
+}
+
+<h1>Edit</h1>
+
+<h4>Fees List</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="_EditHomesList">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="HomeID" hidden/>
+            <input asp-for="AccountID" hidden/>
+            <input asp-for="FullName" hidden/>
+            <input type="date" asp-for="CreatedAt" hidden/>
+            <div class="form-group">
+                <label asp-for="HomeName" class="control-label"></label>
+                <input asp-for="HomeName" class="form-control" class="House Type" />
+                <span asp-validation-for="HomeName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BlkNO" class="control-label">BlkNO</label>
+                <input asp-for="BlkNO" class="form-control" />
+                <span asp-validation-for="BlkNO" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LotNo" class="control-label">LotNo</label>
+                <input asp-for="LotNo" class="form-control" />
+                <span asp-validation-for="LotNo" class="text-danger"></span>
+
+            </div>
+            <div class="form-group">
+                <label asp-for="Address" class="control-label">Address</label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="HomesList">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

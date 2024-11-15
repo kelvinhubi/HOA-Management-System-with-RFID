@@ -20,6 +20,7 @@
                 <th>Blk No</th>
                 <th>Lot No</th>
                 <th>Address</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -32,6 +33,7 @@
                     <td>@obj.BlkNO</td>
                     <td>@obj.LotNo</td>
                     <td>@obj.Address</td>
+                    <td><a asp-action="_EditHomesList" class="btn btn-success btn-sm" asp-route-id="@obj.HomeID" model="@Model.Homes">Edit<i class='bx bxs-edit-alt'></i></a></td>
                 </tr>
             }
 

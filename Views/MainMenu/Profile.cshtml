@@ -86,20 +86,20 @@
 					<div class="card-body">
 						<div class="row gutters">
 							<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-								<h6 class="mb-2 text-primary">Change Username And Password</h6>
+								<h6 class="mb-2 text-primary">Profile</h6>
 							</div>
 							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
 								<input asp-for="AccountID" name="AccountID" hidden />
 								<div class="form-group">
 									<label asp-for="Username"></label>
-									<input type="text" class="form-control" asp-for="Username" name="Username" />
+									<input type="text" id="User" class="form-control" asp-for="Username" name="Username" readonly/>
 									<span asp-validation-for="Username"></span>
 								</div>
 							</div>
 							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
 								<div class="form-group">
 									<label asp-for="Password">Password</label>
-									<input type="password" id="Pass" class="form-control" asp-for="Password" value="@Model.Password" name="Password" />
+									<input type="password" id="Pass" class="form-control" asp-for="Password" value="@Model.Password" name="Password" readonly/>
 									<span asp-validation-for="Password"></span>
 								</div>
 							</div>
@@ -154,10 +154,14 @@
 	$("#Edit").on('click', function () {
 		$("#Cancel").removeAttr("hidden");
 		$("#SubmitForm").removeAttr("hidden");
+		$("#User").removeAttr("readonly");
+		$("#Pass").removeAttr("readonly");
 		$("#Edit").attr("hidden", true);
 	});
 	$("#Cancel").on('click', function () {
 		$("#Cancel").attr("hidden", true);
+		$("#User").attr("readonly",true);
+		$("#Pass").attr("readonly",true);
 		$("#SubmitForm").attr("hidden", true);
 		$("#Edit").removeAttr("hidden");
 	});

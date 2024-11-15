@@ -16,6 +16,8 @@ using System.ComponentModel.DataAnnotations;
 using ClosedXML.Excel;
 using System.Data;
 using DocumentFormat.OpenXml.EMMA;
+using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
@@ -25,14 +27,16 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
     {
         private readonly AppDbContext _db;
         private readonly ILogger _logger;
+        private readonly IHubContext<MyHub> _hub;
         private readonly EnvironmentModel _env;
         private readonly IWebHostEnvironment _webenv;
-        public MainMenuController(AppDbContext db, ILogger<MainMenuController> logger, IOptions<EnvironmentModel> Accessor, IWebHostEnvironment environment)
+        public MainMenuController(AppDbContext db, ILogger<MainMenuController> logger, IOptions<EnvironmentModel> Accessor, IWebHostEnvironment environment, IHubContext<MyHub> hubContext)
         {
             _db = db;
             _logger = logger;
             _env = Accessor.Value;
             _webenv = environment;
+            _hub = hubContext;
         }
         //Test
         public IActionResult Sample()
@@ -937,6 +941,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return RedirectToAction("AccessDenied", "Home");
         }
+        public IActionResult _AddHomesList() {
+            return PartialView();
+        }
         [HttpPost]
         public IActionResult _AddHomesList(NewModel info){
             if (info.Home != null) { 
@@ -952,8 +959,25 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return RedirectToAction("HomesList");
         }
-        //Json Result
+        public IActionResult _EditHomesList(int? id) {
+            var result = _db.homesLists.Where(_=>_.HomeID == id).FirstOrDefault();
+            if (result == null) {
+                return NotFound();
+            }
+            return PartialView(result);
+        }
         [HttpPost]
+        public IActionResult _EditHomesList(HomesList info)
+        {
+            if (ModelState.IsValid) {
+                _db.homesLists.Update(info);
+                _db.SaveChanges();
+                return RedirectToAction("HomesList", "MainMenu");
+            }
+            return RedirectToAction("HomesList", "MainMenu");
+        }
+            //Json Result
+            [HttpPost]
         public JsonResult CheckAmount(string userdata, string AccountID)
         {
             Console.WriteLine("Check aMOUNT:" + userdata);
