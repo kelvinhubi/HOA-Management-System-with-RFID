@@ -42,9 +42,10 @@ public class GuardMenuController : Controller
         while (true)
         {
             string data = await _arduinoLog.ReadLineAsync();
-            bool online = await ConnectivityChecker.IsOnline();
+            await Task.Delay(2000);
             if (data != string.Empty)
             {
+                bool online = await ConnectivityChecker.IsOnline();
                 if (online)
                 {
                     using (var context = _asyncdb.CreateDbContext())

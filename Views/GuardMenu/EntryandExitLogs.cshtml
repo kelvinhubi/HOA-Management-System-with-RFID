@@ -39,6 +39,7 @@
 <script>
     window.onload = function(){
         Timer();
+        populate();
     }
     async function Timer() { 
         setInterval(function () {
@@ -48,7 +49,7 @@
                     populate();
                 }
             });
-        }, 1000);
+        }, 2000);
     }
     let updatedvalue = 0;
    async function populate() { 
@@ -58,6 +59,7 @@
         $('#mytable tbody').empty();
         $.get('@Url.Action("GetEntryLogs","GuardMenu")', 
         function (data1) {
+            console.log(data1);
             updatedvalue = data1.length;
             var table = $('#mytable').DataTable({
                     data: data1,

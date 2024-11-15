@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
 {
     public class Guard_Information
@@ -13,10 +15,14 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         [Required]
         public string Password { get; set; } = string.Empty;
         [Required(ErrorMessage = "Please enter your FirstName"), MaxLength(15)]
+        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Enter only Letter")]
         public string FirstName { get; set; } = string.Empty;
-		[Required(ErrorMessage = "Please enter your MiddleName"), MaxLength(15)]
-		public string MiddleName { get; set; } = string.Empty;
+        [ValidateNever]
+        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Middle name should only contain letters")]
+        public string? MiddleName { get; set; } = string.Empty;
+        
 		[Required(ErrorMessage = "Please enter your LastName"), MaxLength(15)]
+        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Enter only Letter")]
         public string LastName { get; set; } = string.Empty;
         [Required]
         [RegularExpression(@"^(09|\+639)\d{9}$", ErrorMessage = "Not a valid phone number")]

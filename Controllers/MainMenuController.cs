@@ -604,6 +604,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     FirstName = info.FirstName,
                     LastName = info.LastName,
                     Username = info.Username,
+                    MiddleName = info.MiddleName,
                     Password = Encryption.Encrpyt(info.Password, _env.EncryptionKey, _env.IVKey),
                     PhoneNumber = info.PhoneNumber,
                     Email = info.Email,

@@ -35,9 +35,9 @@ builder.Services.AddQuartz(options => {
     var jobkey = JobKey.Create("CheckDuesJob");
     var jobkey2 = JobKey.Create("OnlineChecker");
     options.AddJob<DependencyInjection>(jobkey)
-    .AddTrigger(Trigger=> Trigger.ForJob(jobkey).WithSimpleSchedule(s=>s.WithIntervalInHours(5).RepeatForever()));
+    .AddTrigger(Trigger=> Trigger.ForJob(jobkey).WithSimpleSchedule(s=>s.WithIntervalInMinutes(1).RepeatForever()));
 options.AddJob<SyncEntryExitLogs>(jobkey2).
-AddTrigger(Trigger => Trigger.ForJob(jobkey2).WithSimpleSchedule(s => s.WithIntervalInSeconds(60).RepeatForever()));
+AddTrigger(Trigger => Trigger.ForJob(jobkey2).WithSimpleSchedule(s => s.WithIntervalInMinutes(2).RepeatForever()));
 });
 builder.Services.AddQuartzHostedService(options => {
     options.WaitForJobsToComplete = true;

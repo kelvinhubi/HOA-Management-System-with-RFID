@@ -27,7 +27,7 @@
             @foreach (var obj in Model)
             {
                 <tr>
-                    @{string fullname = obj.FirstName + " " + obj.LastName;}
+                    @{string fullname = obj.FirstName + " "+obj.MiddleName+" " + obj.LastName;}
                     <td>@fullname</td>
                     <td>@obj.Username</td>
                     <td>@obj.Email</td>
