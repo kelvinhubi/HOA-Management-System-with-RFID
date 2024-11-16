@@ -42,7 +42,6 @@ public class GuardMenuController : Controller
         while (true)
         {
             string data = await _arduinoLog.ReadLineAsync();
-            await Task.Delay(2000);
             if (data != string.Empty)
             {
                 bool online = await ConnectivityChecker.IsOnline();
@@ -101,9 +100,13 @@ public class GuardMenuController : Controller
                                 await _hub.Clients.All.SendAsync("GetGuardLogSuccess", "RFID Scanned Successfully");
                             }
                         }
+                        else if (result == null)
+                        {
+                            await _hub.Clients.All.SendAsync("GetGuardLogFail", "Scan Fail! RFID not Registered");
+                        }
                         else
                         {
-                            await _hub.Clients.All.SendAsync("GetGuardLogFail", "Unkown RFID Due to Homeowner have pending payments or RFID not Registered");
+                            await _hub.Clients.All.SendAsync("GetGuardLogFail", "Scan Fail! Due to Homeowner have pending payments");
                         }
                     }
                 }
@@ -171,7 +174,6 @@ public class GuardMenuController : Controller
                     }
                 }
             }
-           await Task.Delay(2000);
         }
     }
     public IActionResult EntryandExitLogs() {

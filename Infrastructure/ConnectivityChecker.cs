@@ -13,7 +13,6 @@
 
                     // Make a request to a known online endpoint
                     HttpResponseMessage response = await httpClient.GetAsync("https://google.com");
-                   await Task.Delay(3000);
                     return response.IsSuccessStatusCode; // Returns true if status is 200-299
                 }
             }
