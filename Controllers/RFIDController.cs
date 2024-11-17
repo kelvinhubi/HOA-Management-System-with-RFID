@@ -16,6 +16,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         [HttpGet]
         public JsonResult ReadRFID()
         {
+            
             if (_port != null) {
                 try {
                     if (_port.IsOpen == true) { _port.Close(); }
@@ -36,10 +37,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return Json("0");
 		}
-
+        public JsonResult showPorts() {
+            string[] ports = SerialPort.GetPortNames();
+            return Json(ports.ToList());
+        }
         public IActionResult ShowRFID()
         {
-
+            
             return View();
         }
         public IActionResult DeleteRFID()

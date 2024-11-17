@@ -84,8 +84,16 @@
                 isValue = true;
             }
         });
+        $.get("@Url.Action("showPorts", "Rfid")", function (data) {
+            if (data == 0) {
+                console.log("data is 0");
+            }
+            else {
+                console.log(data);
+            }
+        });
 
-    });
+    });p         p
     async function Timer(time) {
         setTimeout(function () {
             if (isValue == false || $("#RFIDnumber").val() == "Listening...") {
