@@ -13,6 +13,7 @@
 @Html.AntiForgeryToken();
 <div id="UserPartial">
     <h2>Entry and Exit Logs</h2>
+    <button id="connect">Connect</button>
     <table id="mytable" class="table table-bordered">
         <thead class="table-light">
             <tr>
@@ -37,7 +38,7 @@
 </div>
     <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script>
 <script>
-    window.onload = function(){
+    window.onload = async function(){
         Timer();
         populate();
     }
@@ -45,8 +46,11 @@
         setInterval(function () {
             console.log("PR");
             $.get('@Url.Action("getCount", "GuardMenu")', function (data) {
+                console.log(data);
+                console.log(updatedvalue);
                 if (updatedvalue < data) {
                     populate();
+                    
                 }
             });
         }, 2000);
@@ -94,4 +98,49 @@ connection2.on("GetGuardLogFail", function (Message) {
         notification.textContent = "";
     }, 5000);
 });
+
+//read rfid
+    $("#connect").on('click', function () { 
+        readport();
+    });
+    var ports;
+    async function readport() {
+        if (ports == null) {
+            console.log("port is null");
+            ports = await requestport();
+            console.log(ports);
+            await ports.open({ baudRate: 921600 });
+        }
+        if (ports.connected) {
+
+            const textDecoder = new TextDecoder();
+            const reader = port.readable.getReader();
+            while (true) {
+                const { value, done } = await reader.read();
+                if (value) {
+                    var text = textDecoder.decode(value)
+                    var gettext = text.replace(/ /g, "");
+                    console.log(gettext);
+                    $.post("@Url.Action("EntryLogging","GuardMenu")", 
+                    {
+                        rfid: gettext
+                    }, 
+                    function (data) 
+                    { 
+                        
+                    });
+                }
+                if (done) {
+                    console.log('[readLoop] DONE', done);
+                    reader.releaseLock();
+                    break;
+                }
+            }
+        }
+
+    }
+    async function requestport() {
+        port = await navigator.serial.requestPort();
+        return port;
+    }
 </script>

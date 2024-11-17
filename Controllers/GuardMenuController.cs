@@ -16,6 +16,7 @@ using QuestPDF.Infrastructure;
 using QuestPDF.Fluent;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Infrastructure;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.Text.RegularExpressions;
 public class GuardMenuController : Controller
 {
     private readonly AppDbContext _db;
@@ -33,15 +34,11 @@ public class GuardMenuController : Controller
         _asyncdb = db2;
         _asyncdb2 = db3;
         _env = env.Value;
-        Task.Run(EntryLogging);
     }
-    public async Task EntryLogging()
+    public async Task<JsonResult> EntryLogging(string rfid)
     {
-        await _arduinoLog.InitializeAsync();
-        
-        while (true)
-        {
-            string data = await _arduinoLog.ReadLineAsync();
+            
+            string data = Regex.Replace(rfid, @"\r\n", ""); ;
             if (data != string.Empty)
             {
                 bool online = await ConnectivityChecker.IsOnline();
@@ -174,7 +171,7 @@ public class GuardMenuController : Controller
                     }
                 }
             }
-        }
+        return Json(0);
     }
     public IActionResult EntryandExitLogs() {
         SessionID = Convert.ToInt32(HttpContext.Session.GetString("SessionID"));

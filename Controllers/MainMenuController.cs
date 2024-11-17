@@ -697,6 +697,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         [HttpPost]
         public async Task<IActionResult> _CreateVehicle(NewModel info)
         {
+            if (info.Vehicle.RFID_number.Equals("")) {
+                info.Vehicle.RFID_number = "N/A";
+            }
             _db.Vehicle_Information.Add(info.Vehicle);
             _db.logsLists.Add(new LogsList
             {

@@ -2,7 +2,7 @@
 @{
    
 }
-<Button runat="server" id="bution" class="btn btn-primary" style="position:sticky;background-color:#16a085;color:black;">Add Vehicle</Button>
+<Button runat="server" id="bution" class="btn btn-success" style="position:sticky;">Add Vehicle</Button>
 <form asp-action="View" class="form" id="thisform">
     <p class="title">Add Vehicle</p>
     <input asp-for="@Model.Vehicle.AccountID" value="" id="AccountID" class="form-control" hidden />
@@ -42,6 +42,7 @@
     </div>
 </form>
 <script>
+    
     var btn = document.getElementById("bution")
     $(".form").css("display", "none");
     btn.onclick = function () {
@@ -71,34 +72,41 @@
         $("#AccountID").val(initialid);
     }
     var isValue = false
-    $("#RFIDnumber").on('click', function () {
-        $(this).val("Listening...");
-        Timer(5000);
+    var ports;
+    $("#RFIDnumber").on('click',async function () {
         //do dome scanning on rfid
-        $.get("@Url.Action("ReadRFID", "Rfid")", function (data) {
-            if (data == 0) {
-                isValue = false;
+        //client
+        readport();
+    });
+   async function readport() { 
+        if (ports == null) {
+            console.log("port is null");
+            ports = await requestport();
+            console.log(ports);
+            await ports.open({ baudRate: 921600 });
+        }
+       if (ports.connected) { 
+            
+            const textDecoder = new TextDecoder();
+            const reader = port.readable.getReader();
+            while (true) {
+                const { value, done } = await reader.read();
+                if (value) {
+                    var text = textDecoder.decode(value)
+                    $("#RFIDnumber").val(text.replace(/ /g, ""));
+                }
+                if (done) {
+                    console.log('[readLoop] DONE', done);
+                    reader.releaseLock();
+                    break;
+                }
             }
-            else {
-                $("#RFIDnumber").val(data);
-                isValue = true;
-            }
-        });
-        $.get("@Url.Action("showPorts", "Rfid")", function (data) {
-            if (data == 0) {
-                console.log("data is 0");
-            }
-            else {
-                console.log(data);
-            }
-        });
-
-    });p         p
-    async function Timer(time) {
-        setTimeout(function () {
-            if (isValue == false || $("#RFIDnumber").val() == "Listening...") {
-                $("#RFIDnumber").val("N/A");
-            }
-        }, time);
+       }
+        
     }
+   async function requestport() { 
+        port = await navigator.serial.requestPort();
+       return port;
+    }
+
 </script>
