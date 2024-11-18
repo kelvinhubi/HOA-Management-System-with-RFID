@@ -40,10 +40,8 @@ body {
     right: 30px;
 
 }
-.chat-form-container {
-    display:none;
-}
-.form-container {
+
+.form-container{
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -92,16 +90,21 @@ body {
     display: flex;
     flex-direction: column;
     margin-bottom: 12px;
+    overflow-wrap: break-word;
+    overflow: hidden;
 }
-.msg p {
+    .msg p {
+        flex-shrink: 0;
         font-size: 12px;
+        word-wrap: break-word;
         line-height: 1.8;
-}
+    }
 
-.msg span {
+    .msg span {
+        flex-shrink: 0;
         font-size: 10px;
         color: grey;
-}
+    }
 .msg-reverse {
     background-color: #7d72E4;
     padding: 10px 16px;
@@ -109,17 +112,22 @@ body {
     width: 80%;
     display: flex;
     flex-direction: column;
-    margin-left:3.5rem;
-    margin-bottom:12px;
+    margin-left: 3.5rem;
+    margin-bottom: 12px;
+    overflow-wrap: break-word;
+    overflow: hidden;
 }
-.msg-reverse p{
-    font-size: 12px;
-    line-height: 1.8;
-}
-.msg-reverse span {
-    font-size: 10px;
-    color: black;
-}
+    .msg-reverse p {
+        flex-shrink: 0;
+        font-size: 12px;
+        word-wrap: break-word;
+        line-height: 1.8;
+    }
+    .msg-reverse span {
+        flex-shrink: 0;
+        font-size: 10px;
+        color: black;
+    }
 .chat-box-container{
     display: flex;
     height: 46px;
