@@ -31,6 +31,7 @@
     <div class="form-group">
         <label asp-for="@Model.Vehicle.VehicleType" class="control-label">Vehicle Type</label>
         <input asp-for="@Model.Vehicle.VehicleType" class="form-control input" />
+        <span asp-validation-for="@Model.Vehicle.VehicleType" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="@Model.Vehicle.RFID_number" class="control-label">RFID Number</label>

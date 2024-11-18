@@ -9,7 +9,25 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { 
         
         }
-       public DbSet<User_Account> User_Accounts { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Dues>()
+                .HasIndex(c => c.Invoice)
+                .IsUnique();
+            modelBuilder.Entity<User_Account>()
+                .HasIndex(c => c.Username)
+                .IsUnique();
+            modelBuilder.Entity<FeesList>()
+                .HasIndex(c => c.FeesName)
+                .IsUnique();
+            modelBuilder.Entity<Vehicle_Information>()
+                .HasIndex(c => c.PlateNo)
+                .IsUnique();
+            modelBuilder.Entity<Guard_Information>()
+                .HasIndex(c => c.Username)
+                .IsUnique();
+        }
+        public DbSet<User_Account> User_Accounts { get; set; }
        public DbSet<Admin_Account> Admin_Accounts { get; set; }
         public DbSet<Homeowner_details> Homeowner_Details { get; set; }
         public DbSet<Guard_Information> Guard_Information { get; set; }

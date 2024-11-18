@@ -134,6 +134,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations.OfflineAppDb
 
                     b.HasKey("DueID");
 
+                    b.HasIndex("Invoice")
+                        .IsUnique();
+
                     b.ToTable("Due_Details");
                 });
 
@@ -152,7 +155,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations.OfflineAppDb
 
                     b.Property<string>("FeesName")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -163,6 +166,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations.OfflineAppDb
                         .HasColumnType("longtext");
 
                     b.HasKey("IDFees");
+
+                    b.HasIndex("FeesName")
+                        .IsUnique();
 
                     b.ToTable("feesLists");
                 });
@@ -202,9 +208,12 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations.OfflineAppDb
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("Username")
+                        .IsUnique();
 
                     b.ToTable("Guard_Information");
                 });
@@ -371,9 +380,12 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations.OfflineAppDb
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("AccountID");
+
+                    b.HasIndex("Username")
+                        .IsUnique();
 
                     b.ToTable("User_Accounts");
                 });
@@ -395,11 +407,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations.OfflineAppDb
 
                     b.Property<string>("PlateNo")
                         .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("varchar(8)");
+                        .HasMaxLength(7)
+                        .HasColumnType("varchar(7)");
 
                     b.Property<string>("RFID_number")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("RFID_status")
@@ -415,6 +426,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations.OfflineAppDb
                         .HasColumnType("longtext");
 
                     b.HasKey("VehicleID");
+
+                    b.HasIndex("PlateNo")
+                        .IsUnique();
 
                     b.ToTable("Vehicle_Information");
                 });

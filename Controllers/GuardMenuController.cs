@@ -400,4 +400,9 @@ public class GuardMenuController : Controller
 		}
 		return Json(new { success = false });
 	}
+    //Chat
+    public IActionResult Chat()
+    {
+        return PartialView();
+    }
 }

@@ -281,7 +281,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         [HttpPost]
         public JsonResult CheckUsername(string userdata) {
             System.Threading.Thread.Sleep(200);
-            var SearchData = _db.User_Accounts.Where(x => x.Username == userdata).SingleOrDefault();
+            var SearchData = _db.User_Accounts.Where(x => x.Username == userdata).FirstOrDefault();
             if (SearchData != null)
             {
                 return Json(1);
@@ -295,6 +295,20 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         {
             System.Threading.Thread.Sleep(200);
             var SearchData = _db.Guard_Information.Where(x => x.Username == userdata).SingleOrDefault();
+            if (SearchData != null)
+            {
+                return Json(1);
+            }
+            else
+            {
+                return Json(0);
+            }
+        }
+        [HttpPost]
+        public JsonResult CheckAdmin(string userdata)
+        {
+            System.Threading.Thread.Sleep(200);
+            var SearchData = _db.Admin_Accounts.Where(x => x.Username == userdata).FirstOrDefault();
             if (SearchData != null)
             {
                 return Json(1);

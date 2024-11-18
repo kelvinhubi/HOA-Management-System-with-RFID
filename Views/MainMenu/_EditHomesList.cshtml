@@ -5,13 +5,8 @@
     ViewData["Title"] = "Edit HomesList";
 }
 
-<h1>Edit</h1>
-
-<h4>Fees List</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="_EditHomesList">
+<form asp-action="_EditHomesList" class="form" id="thisform" style="bottom:29rem; display:block">
+<p class="title">Edit Home?</p>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="HomeID" hidden/>
             <input asp-for="AccountID" hidden/>
@@ -42,11 +37,9 @@
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
-    </div>
-</div>
 
 <div>
-    <a asp-action="HomesList">Back to List</a>
+    <a asp-action="HomesList" class="btn btn-success" style="padding:5px; position:fixed">Back to List</a>
 </div>
 
 @section Scripts {

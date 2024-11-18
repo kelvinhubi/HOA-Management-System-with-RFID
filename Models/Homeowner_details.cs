@@ -9,16 +9,25 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         [Key]
         public int AccountID { get; set; }
         public string Username { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "Please enter your Surname"), MaxLength(20)]
-        public string Surname { get; set; } = string.Empty;
+		[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Enter only Letter")]
+		public string Surname { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "Please enter your Firstname"), MaxLength(20)]
-        public string Firstname { get; set; } = string.Empty;
+		[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Enter only Letter")]
+		public string Firstname { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "Please enter your Middlename"), MaxLength(20)]
-        public string Middlename { get; set; } = string.Empty;
+		[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Enter only Letter")]
+		public string Middlename { get; set; } = string.Empty;
+
         [Required]
         public DateOnly Birthdate { get; set; }
+
         [RegularExpression(@"^(09|\+639)\d{9}$", ErrorMessage = "Not a valid phone number")]
         public string PhoneNo { get; set; } = string.Empty;
+
         [NotMapped]
         [Display(Name = "Full Name")]
         public string FullName { get { return Firstname + " " + Middlename + " " + Surname; } }

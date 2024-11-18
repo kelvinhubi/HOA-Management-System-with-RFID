@@ -18,6 +18,8 @@ using System.Data;
 using DocumentFormat.OpenXml.EMMA;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
@@ -224,6 +226,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             Console.WriteLine(info.AccountID);
             if (ModelState.IsValid)
             {
+                
                 var mailMessage = new MimeMessage();
                 var Username = info.Username;
                 var Password = info.Password;
@@ -254,8 +257,14 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     LogDescription = "Logged In Username:" + HttpContext.Session.GetString("SessionUsername"),
                     LogUserRole = "" + HttpContext.Session.GetString("UserType"),
                 });
+                //This error only happens if created at the same time frame
+                var existingUser = await _db.User_Accounts.FirstOrDefaultAsync(_ => _.Username == info.Username) != null ? true : false;
+                if (existingUser)
+                {
+                    
+                    return BadRequest("Error Bad Request Username already Exist");
+                }
                 await _db.SaveChangesAsync();
-
                 return RedirectToAction("UserManagement");
             }
             return View();
@@ -570,12 +579,14 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
         //Chat
         public IActionResult Chat() {
-            return View();
+            return PartialView();
         }
         //Guards Controller
         public IActionResult Guards()
         {
-            if (CheckRole()) { return View(_db.Guard_Information.ToList()); }
+            if (CheckRole()) {
+                    return View(_db.Guard_Information.ToList());
+            }
             return RedirectToAction("AccessDenied", "Home");
         }
         public IActionResult _GuardManagementCreate() {
@@ -697,7 +708,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         [HttpPost]
         public async Task<IActionResult> _CreateVehicle(NewModel info)
         {
-            if (info.Vehicle.RFID_number.Equals("")) {
+            if (info.Vehicle.RFID_number == null) {
                 info.Vehicle.RFID_number = "N/A";
             }
             _db.Vehicle_Information.Add(info.Vehicle);
@@ -1022,7 +1033,20 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         {
             return View(ID);
         }
-
+        [HttpPost]
+        public JsonResult CheckFeesName(string userdata)
+        {
+            System.Threading.Thread.Sleep(200);
+            var SearchData = _db.feesLists.Where(x => x.FeesName == userdata).FirstOrDefault();
+            if (SearchData != null)
+            {
+                return Json(1);
+            }
+            else
+            {
+                return Json(0);
+            }
+        }
 
         public bool CheckRole()
         {

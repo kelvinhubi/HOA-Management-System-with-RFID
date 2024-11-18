@@ -43,9 +43,9 @@
             <div class="header_toggle"> <i class='bx bx-menu' id="header-toggle"></i> </div>
         </header>
         <div class="l-navbar" id="nav-bar">
+        <input id="Nameval" value="" hidden />
             <nav class="nav">
-                <div>
-                <a href="#" class="nav_logo" style="text-decoration:none;"> <i class='bx bx-home nav_logo-icon'></i> <span class="nav_logo-name" style="text-decoration:none; font-size:13px">C.S.H.A HOA System</span> </a>
+                <div href="#" class="nav_logo" style="text-decoration:none;"> <i class='bx bx-home nav_logo-icon'></i> <span class="nav_logo-name" style="text-decoration:none; font-size:13px">C.S.H.A HOA System</span> </div>
                     <div class="nav_list">
 
                     @{ url = Url.Action("Dashboard", "UserMenu");}
@@ -89,9 +89,11 @@
     <div class="height-100" style="margin-top:4rem">
         
             @RenderBody()
+             @await Html.PartialAsync("../MainMenu/Chat.cshtml")
         </div>
         <!--Container Main end-->
     <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script>
+    <script src="~/js/Hub.js"></script>
     <script src="~/js/notification.js"></script>
     <script src="~/js/Layout1.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)

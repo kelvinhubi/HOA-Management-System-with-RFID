@@ -32,20 +32,27 @@ $('form').keypress(function (event) {
     }
 });
 connection.on("RecieveMessage", function (Name, Message, Time) {
-    var li = document.createElement("li");
     var MainUser = $('#Nameval').val();
-    console.log(MainUser);
-    console.log(Name);
-    if (MainUser == Name) {
-        $('#pops').append('<div class="direct-chat-msg end"><div class="direct-chat-infos clearfix"><span class="direct-chat-name float-start">'
-            + Name + '</span><span class="direct-chat-timestamp float-end">'
-            + Time + '</span></div><div class="direct-chat-text">'
-            + Message + '</div></div>');
+    if (MainUser === Name) {
+        $('#pops').append('<div class="msg-reverse"><p>'
+            + Message + '</p><span>'
+            + Name + ' ' + Time + '</span></div>');
     }
     if (MainUser != Name) {
-        $('#pops').append('<divclass="direct-chat-msg"><div class="direct-chat-infos clearfix"><span class="direct-chat-name float-end">'
-            + Name + '</span><span class="direct-chat-timestamp float-start">'
-            + Time + '</span></div><div class="direct-chat-text">'
-            + Message + '</div></div>');
+        $('#pops').append('<div class="msg"><p>'
+            + Message + '</p><span>'
+            +Name + ' ' + Time +'</span></div>');
     }
+});
+connection.on("AdminError", function (Message) {
+    const notification = document.getElementById('notifications');
+    notification.classList.remove('notification');
+    notification.textContent = "";
+    notification.classList.add('notification');
+    notification.textContent = Message;
+    console.log(Message);
+    setTimeout(() => {
+        notification.classList.remove('notification');
+        notification.textContent = "";
+    }, 5000);
 });

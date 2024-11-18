@@ -1,4 +1,6 @@
 ﻿using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models

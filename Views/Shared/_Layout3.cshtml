@@ -67,15 +67,18 @@
                         </li>
                         </ul>
                 </div>
+                </div>
                 <a asp-action="Index" asp-controller="Home" class="nav_link"> <i class='bx bx-log-out nav_icon'></i> <span class="nav_name">SignOut</span> </a>
             </nav>
         </div>
         <!--Container Main start-->
     <div class="height-100" style="margin-top:4rem">
             @RenderBody()
+        @await Html.PartialAsync("../MainMenu/Chat.cshtml")
         </div>
         <!--Container Main end-->
-
+    <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script>
+    <script src="~/js/Hub.js"></script>
     <script src="~/js/Layout1.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

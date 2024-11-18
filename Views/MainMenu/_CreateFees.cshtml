@@ -7,8 +7,8 @@
     <div class="form-group">
 
         <label asp-for="FeesName" class="control-label"></label>
-        <input asp-for="FeesName" class="form-control" class="input" />
-        <span asp-validation-for="FeesName" class="text-danger"></span>
+        <input asp-for="FeesName" class="form-control" id="FeesName" oninput="UserCheck()" class="input" />
+        <span asp-validation-for="FeesName" id="Status1" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="TypeOfFees" class="control-label"></label>
@@ -20,11 +20,15 @@
         <input asp-for="Amount" class="form-control" class="input"/>
         <span asp-validation-for="Amount" class="text-danger"></span>
     </div>
-    <div class="form-group">
+    <div class="form-group" style="margin-top:5px">
         <input asp-controller="MainMenu" asp-action="_CreateFees" type="submit" id="button1" value="Create" class="btn btn-primary" style="background-color:#16a085;color:black;" />
     </div>
 </form>
-
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
 <script>
     var btn = document.getElementById("bution")
     $(".form").css("display", "none");
@@ -47,5 +51,24 @@
             $("body").css("background", "rgba(0, 0, 0, 0.4)");
 
         }
+    }
+    function UserCheck() {
+        $("#Status1").html("Checking...");
+        $.post("@Url.Action("CheckFeesName", "MainMenu")",
+            {
+                userdata: $("#FeesName").val()
+            },
+            function (data) {
+                if (data == 0) {
+                    $("#Status1").html('<font color = "Green"> FeesName Available!.</font>');
+                    $("#FeesName").css("border-color", "Green");
+                    $("#button1").removeAttr('disabled');
+                }
+                else {
+                    $("#Status1").html('<font color = "White"> FeesName already Exist!.</font>');
+                    $("#FeesName").css("border-color", "Green");
+                    $("#button1").attr('disabled', 'disabled');
+                }
+            });
     }
 </script>

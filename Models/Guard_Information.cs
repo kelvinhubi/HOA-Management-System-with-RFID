@@ -15,15 +15,14 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         [Required]
         public string Password { get; set; } = string.Empty;
         [Required(ErrorMessage = "Please enter your FirstName"), MaxLength(15)]
-        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Enter only Letter")]
-        public string FirstName { get; set; } = string.Empty;
-        [ValidateNever]
-        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Middle name should only contain letters")]
-        public string? MiddleName { get; set; } = string.Empty;
+		[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Enter only Letter")]
+		public string FirstName { get; set; } = string.Empty;
+		[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Enter only Letter")]
+		public string? MiddleName { get; set; } = string.Empty;
         
 		[Required(ErrorMessage = "Please enter your LastName"), MaxLength(15)]
-        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Enter only Letter")]
-        public string LastName { get; set; } = string.Empty;
+		[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Enter only Letter")]
+		public string LastName { get; set; } = string.Empty;
         [Required]
         [RegularExpression(@"^(09|\+639)\d{9}$", ErrorMessage = "Not a valid phone number")]
         public string PhoneNumber { get; set; } = string.Empty;

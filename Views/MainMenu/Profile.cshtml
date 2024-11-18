@@ -92,8 +92,8 @@
 								<input asp-for="AccountID" name="AccountID" hidden />
 								<div class="form-group">
 									<label asp-for="Username"></label>
-									<input type="text" id="User" class="form-control" asp-for="Username" name="Username" readonly/>
-									<span asp-validation-for="Username"></span>
+									<input type="text" id="User" class="form-control" asp-for="Username" name="Username" oninput="UserCheck();" readonly />
+									<span id="Status" asp-validation-for="Username"></span>
 								</div>
 							</div>
 							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
@@ -165,4 +165,24 @@
 		$("#SubmitForm").attr("hidden", true);
 		$("#Edit").removeAttr("hidden");
 	});
+
+	function UserCheck() {
+		$("#Status").html("Checking...");
+		$.post("@Url.Action("CheckAdmin", "Login")",
+			{
+				userdata: $("#User").val()
+			},
+			function (data) {
+				if (data == 0) {
+					$("#Status").html('<font color = "Green"> Username Available!.</font>');
+					$("#User").css("border-color", "Green");
+					$("#SubmitForm").removeAttr('disabled');
+				}
+				else {
+					$("#Status").html('<font color = "Red"> Username already Taken!.</font>');
+					$("#User").css("border-color", "Green");
+					$("#SubmitForm").attr('disabled', 'disabled');
+				}
+			});
+	}
 </script>

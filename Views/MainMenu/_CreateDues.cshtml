@@ -35,7 +35,7 @@ var setmin = DateTime.Now.ToString("yyyy-MM-dd");;
         <input asp-for="@Model.dues.Date" type="date" min="@setmin" max="@setmax" name="Date" class="form-control input" />
         <span asp-validation-for="@Model.dues.Date" class="text-danger"></span>
     </div>
-    <div class="form-group">
+    <div class="form-group" style="margin-top:5px;">
         <input asp-controller="MainMenu" asp-action="_CreateDues" type="submit" id="button1" value="Create" class="btn btn-primary"/>
     </div>
 </form>

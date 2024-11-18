@@ -4,16 +4,19 @@ using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
+namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations.OfflineAppDb
 {
-    [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(OfflineAppDbContext))]
+    [Migration("20241118101254_VehicleUpdate")]
+    partial class VehicleUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -411,6 +414,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                         .HasColumnType("varchar(7)");
 
                     b.Property<string>("RFID_number")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("RFID_status")

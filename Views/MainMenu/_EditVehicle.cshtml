@@ -37,6 +37,11 @@
         <input type="submit" id="button1" value="Save" class="btn btn-primary" style="margin-top:10px;" />
     </div>
 </form>
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
 <a asp-controller="MainMenu" asp-action="VehicleManagement" class="btn btn-success" style="padding:5px; position:fixed">Back to List</a>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
@@ -76,4 +81,6 @@
         port = await navigator.serial.requestPort();
        return port;
     }
+
+
 </script>

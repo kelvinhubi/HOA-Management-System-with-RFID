@@ -188,6 +188,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 			}
 			return Json(new { success = false });
 		}
+        //Chat
+        public IActionResult Chat()
+        {
+            return PartialView();
+        }
 
-	}
+    }
 }
