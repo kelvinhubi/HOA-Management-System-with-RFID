@@ -1,4 +1,8 @@
-﻿@model User_Account
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,23 +17,9 @@
 <div class="container">
     <div class="wrapper">
         <div class="title"><span>Forgot Password</span></div>
-        @Html.AntiForgeryToken()
         <form method="post" asp-action="UserForgotPassword">
-            <div class="row">
-                <i class="fas fa-user"></i>
-                <input type="email" name="email" placeholder="Email" required>
-                <span asp-validation-for="Email" class="text-danger" style="margin:auto;"></span>
-                @Html.ValidationMessage("EmailError")
-            </div>
-            <div class="row button">
-                <input type="submit" value="Send">
-            </div>
+            <h2>Email Sent! </h2>
             <div class="signup-link"><a asp-controller="Login" asp-action="LoginForm">Back to Login</a></div>
         </form>
     </div>
 </div>
-@section Scripts {
-    @{
-        <partial name="_ValidationScriptsPartial" />
-    }
-}

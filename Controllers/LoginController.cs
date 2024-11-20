@@ -231,28 +231,107 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public IActionResult UserForgotPassword() {
             return View();
         }
-        [HttpPost]   
-        public IActionResult UserForgotPassword(string email){
-            var result = _db.User_Accounts.Where(_ => _.Email == email).FirstOrDefault();
-            if (result != null) {
-				var mailMessage = new MimeMessage();
+        public IActionResult AdminForgotPassword()
+        {
+            return View();
+        }
+        public IActionResult GuardForgotPassword()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UserForgotPassword(User_Account info){
+            var result = _db.User_Accounts.Where(_ => _.Email == info.Email).FirstOrDefault();
+            if (result != null)
+            {
+                var mailMessage = new MimeMessage();
                 var Username = result.Username;
-				var Password = Encryption.Decrypt(result.Password,_env.EncryptionKey,_env.IVKey);
-				var bodybuild = new BodyBuilder();
-				bodybuild.HtmlBody = MainMenuController.CreateMailBody(Username, Password);
-				mailMessage.From.Add(new MailboxAddress("Cessna", _env.Email));
-				mailMessage.To.Add(new MailboxAddress(result.Username, result.Email));
-				mailMessage.Subject = "User Forgot Username and Password";
-				mailMessage.Body = bodybuild.ToMessageBody();
-				using (var smtpclient = new SmtpClient())
-				{
-					smtpclient.Connect(_env.Host, Convert.ToInt32(_env.Port), SecureSocketOptions.StartTls);
-					smtpclient.Authenticate(_env.Email, _env.Password);
-					smtpclient.Send(mailMessage);
-					smtpclient.Disconnect(true);
-				}
-			}
-            return RedirectToAction("LoginForm");
+                var Password = Encryption.Decrypt(result.Password, _env.EncryptionKey, _env.IVKey);
+                var bodybuild = new BodyBuilder();
+                bodybuild.HtmlBody = MainMenuController.CreateMailBody(Username, Password);
+                mailMessage.From.Add(new MailboxAddress("Cessna", _env.Email));
+                mailMessage.To.Add(new MailboxAddress(result.Username, result.Email));
+                mailMessage.Subject = "User Forgot Username and Password";
+                mailMessage.Body = bodybuild.ToMessageBody();
+                using (var smtpclient = new SmtpClient())
+                {
+                    smtpclient.Connect(_env.Host, Convert.ToInt32(_env.Port), SecureSocketOptions.StartTls);
+                    smtpclient.Authenticate(_env.Email, _env.Password);
+                    smtpclient.Send(mailMessage);
+                    smtpclient.Disconnect(true);
+                }
+                ModelState.AddModelError("EmailError", "Email Sent!");
+            }
+            else {
+                ModelState.AddModelError("EmailError", "Email Not Found");
+            }
+            
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AdminForgotPassword(Admin_Account info)
+        {
+            var result = _db.Admin_Accounts.Where(_ => _.Email == info.Email).FirstOrDefault();
+            if (result != null)
+            {
+                var mailMessage = new MimeMessage();
+                var Username = result.Username;
+                var Password = Encryption.Decrypt(result.Password, _env.EncryptionKey, _env.IVKey);
+                var bodybuild = new BodyBuilder();
+                bodybuild.HtmlBody = MainMenuController.CreateMailBody(Username, Password);
+                mailMessage.From.Add(new MailboxAddress("Cessna", _env.Email));
+                mailMessage.To.Add(new MailboxAddress(result.Username, result.Email));
+                mailMessage.Subject = "User Forgot Username and Password";
+                mailMessage.Body = bodybuild.ToMessageBody();
+                using (var smtpclient = new SmtpClient())
+                {
+                    smtpclient.Connect(_env.Host, Convert.ToInt32(_env.Port), SecureSocketOptions.StartTls);
+                    smtpclient.Authenticate(_env.Email, _env.Password);
+                    smtpclient.Send(mailMessage);
+                    smtpclient.Disconnect(true);
+                }
+                ModelState.AddModelError("EmailError", "Email Sent!");
+            }
+            else
+            {
+                ModelState.AddModelError("EmailError", "Email Not Found");
+            }
+
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult GuardForgotPassword(Guard_Information info)
+        {
+            var result = _db.Guard_Information.Where(_ => _.Email == info.Email).FirstOrDefault();
+            if (result != null)
+            {
+                var mailMessage = new MimeMessage();
+                var Username = result.Username;
+                var Password = Encryption.Decrypt(result.Password, _env.EncryptionKey, _env.IVKey);
+                var bodybuild = new BodyBuilder();
+                bodybuild.HtmlBody = MainMenuController.CreateMailBody(Username, Password);
+                mailMessage.From.Add(new MailboxAddress("Cessna", _env.Email));
+                mailMessage.To.Add(new MailboxAddress(result.Username, result.Email));
+                mailMessage.Subject = "User Forgot Username and Password";
+                mailMessage.Body = bodybuild.ToMessageBody();
+                using (var smtpclient = new SmtpClient())
+                {
+                    smtpclient.Connect(_env.Host, Convert.ToInt32(_env.Port), SecureSocketOptions.StartTls);
+                    smtpclient.Authenticate(_env.Email, _env.Password);
+                    smtpclient.Send(mailMessage);
+                    smtpclient.Disconnect(true);
+                }
+                ModelState.AddModelError("EmailError", "Email Sent!");
+            }
+            else
+            {
+                ModelState.AddModelError("EmailError", "Email Not Found");
+            }
+
+            return View();
         }
 
 

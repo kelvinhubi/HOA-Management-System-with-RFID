@@ -21,7 +21,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             var CheckAdmin = _db.Admin_Accounts.Count();
             var CheckGuard = _db.Guard_Information.Count();
             if (CheckAdmin == 0) {
-                _db.Admin_Accounts.Add(new Admin_Account { Username="ADMIN", Password = Encryption.Encrpyt("ADMIN1234", _env.EncryptionKey, _env.IVKey) });
+                _db.Admin_Accounts.Add(new Admin_Account { Username="ADMIN", Password = Encryption.Encrpyt("ADMIN1234", _env.EncryptionKey, _env.IVKey), Email = "krfortin15@gmail.com" });
                 _db.SaveChanges();
             }
         }

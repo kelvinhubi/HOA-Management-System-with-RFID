@@ -38,13 +38,12 @@
 </head>
     <body id="body-pd">
         <header class="header" id="header">
-        <div id="notifications"></div>
+
             <div class="header_toggle"> <i class='bx bx-menu' id="header-toggle"></i> </div>
         </header>
         <div class="l-navbar" id="nav-bar">
         <input id="Nameval" value="" hidden />
             <nav class="nav">
-                <div>
                 <a href="#" class="nav_logo" style="text-decoration:none;"> <i class='bx bx-home nav_logo-icon'></i> <span class="nav_logo-name" style="text-decoration:none; font-size:13px">C.S.H.A HOA System</span> </a>
                     <div class="nav_list">
 
@@ -68,12 +67,12 @@
                         </li>
                         </ul>
                 </div>
-                </div>
                 <a asp-action="Index" asp-controller="Home" class="nav_link"> <i class='bx bx-log-out nav_icon'></i> <span class="nav_name">SignOut</span> </a>
             </nav>
         </div>
         <!--Container Main start-->
     <div class="height-100" style="margin-top:4rem">
+        <div id="notifications"></div>
             @RenderBody()
         @await Html.PartialAsync("../MainMenu/Chat.cshtml")
         </div>
