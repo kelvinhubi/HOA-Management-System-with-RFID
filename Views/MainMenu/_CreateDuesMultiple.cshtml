@@ -10,7 +10,7 @@
     <input asp-for="@Model.dues.Status" name="Status" class="form-control" hidden />
     <input asp-for="@Model.dues.FeesName" name="FeesName" id="FeesName" hidden />
     <div class="form-group">
-        <label for="typeofdue" class="control-label">Select Homeowner</label>
+        <label for="typeofdue" class="control-label">Select Type of Due</label>
         <select name="TypeofDues" id="typeofdue" class="form-control">
             @{
                 var recentvar = "";
@@ -25,6 +25,7 @@
         </select>
     </div>
     <div class="form-group">
+        <label class="control-label">Select Homeowner</label>
         <table class="table table-bordered" style="width:100%">
             <thead class="table-light">
                 <tr>

@@ -51,7 +51,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             {
 
                 ViewData["User Registrations"] = _db.Homeowner_Details.Count();
-                ViewData["RFID Registrations"] = _db.Vehicle_Information.Where(x => x.RFID_number != "").Count();
+                ViewData["RFID Registrations"] = _db.Vehicle_Information.Count();
                 ViewData["Pending Payments"] = _db.Due_Details.Where(x => x.Status == "Unpaid").Count();
                 return View();
             }
@@ -290,6 +290,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
             if (CheckRole())
             {
+                var amount = _db.Due_Details.Where(x => x.Status == "Unpaid").ToList();
+                ViewData["Total Amount Pending"] = amount.Sum(i => Convert.ToInt32(i.Amount));
                 var result = (from due in _db.Due_Details
                               join
                               homeacc in _db.Homeowner_Details on due.AccountID equals homeacc.AccountID
@@ -1117,6 +1119,25 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         {
             if (ModelState.IsValid) {
                 _db.homesLists.Update(info);
+                _db.SaveChanges();
+                return RedirectToAction("HomesList", "MainMenu");
+            }
+            return RedirectToAction("HomesList", "MainMenu");
+        }
+        public IActionResult _DeleteHomesList(int? id)
+        {
+            var result = _db.homesLists.Where(_ => _.HomeID == id).FirstOrDefault();
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return PartialView(result);
+        }
+        [HttpPost]
+        public IActionResult _DeleteHomesList(HomesList info) {
+            if (ModelState.IsValid)
+            {
+                _db.homesLists.Remove(info);
                 _db.SaveChanges();
                 return RedirectToAction("HomesList", "MainMenu");
             }

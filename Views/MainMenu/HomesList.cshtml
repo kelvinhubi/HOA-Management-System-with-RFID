@@ -1,6 +1,7 @@
 ﻿@model NewModel
 @{
     Layout = "~/Views/Shared/_Layout1.cshtml";
+
 }
 <head>
     <title>
@@ -33,7 +34,7 @@
                     <td>@obj.BlkNO</td>
                     <td>@obj.LotNo</td>
                     <td>@obj.Address</td>
-                    <td><a asp-action="_EditHomesList" class="btn btn-success btn-sm" asp-route-id="@obj.HomeID" model="@Model.Homes">Edit<i class='bx bxs-edit-alt'></i></a></td>
+                    <td><a asp-action="_EditHomesList" class="btn btn-success btn-sm" asp-route-id="@obj.HomeID" model="@Model.Homes">Edit<i class='bx bxs-edit-alt'></i></a><a asp-action="_DeleteHomesList" class="btn btn-danger btn-sm" asp-route-id="@obj.HomeID" model="@Model.Homes">Delete<i class='bx bxs-trash'></i></a></td>
                 </tr>
             }
 
