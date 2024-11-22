@@ -1179,7 +1179,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 return Json(0);
             }
         }
-
         public bool CheckRole()
         {
             string? usertype = HttpContext.Session.GetString("UserType");

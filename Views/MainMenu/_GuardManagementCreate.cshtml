@@ -1,7 +1,7 @@
 ﻿@model Guard_Information
 <Button runat="server" id="bution" class="btn btn-success">Create User Account</Button>
 <form method="post" asp-action="GuardCreate" class="form" id="thisform">
-    <p class="title">Add Homeowner User Account</p>
+    <p class="title">Add Guard Account</p>
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input asp-for="ID" class="form-control" class="input" hidden />
     <div class="form-group">
@@ -22,13 +22,12 @@
     <div class="form-group">
         <label asp-for="Username" class="control-label"></label>
         <input asp-for="Username" class="form-control" class="input" oninput="UserCheck();" />
-        <p id="Status" />
-        <span asp-validation-for="Username" class="text-danger"></span>
+        <span asp-validation-for="Username" id="Status" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="Email" class="control-label"></label>
-        <input asp-for="Email" class="form-control" class="input" />
-        <span asp-validation-for="Email" class="text-danger"></span>
+        <input asp-for="Email" class="form-control" class="input" oninput="UserCheckEmail();"/>
+        <span asp-validation-for="Email" id="StatusEmail" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="PhoneNumber" class="control-label"></label>
@@ -87,14 +86,46 @@
                 if (data == 0) {
                     $("#Status").html('<font color = "Green"> Username Available!.</font>');
                     $("#Username").css("border-color", "Green");
-                    $("#button1").removeAttr('disabled');
+                    Username = true;
                 }
                 else {
                     $("#Status").html('<font color = "White"> Username already Taken!.</font>');
                     $("#Username").css("border-color", "Green");
-                    $("#button1").attr('disabled', 'disabled');
+                    Username = false;
+
                 }
             });
     }
+    
+    function UserCheckEmail() {
+        $("#StatusEmail").html("Checking...");
+        $.post("@Url.Action("CheckGuardEmail", "Login")",
+            {
+                userdata: $("#Email").val()
+            },
+            function (data) {
+                if (data == 0) {
+                    $("#StatusEmail").html('<font color = "Green"> Email Available!.</font>');
+                    $("#Email").css("border-color", "Green");
+                    Email = true
+                }
+                else {
+                    $("#StatusEmail").html('<font color = "White"> Email already Taken!.</font>');
+                    $("#Email").css("border-color", "Green");
+                    Email = false;
+                }
+            });
+    }
+    var Username = false;
+    var Email = false;
 
+    setInterval(Validation, 200);
+    function Validation() { 
+        console.log(Username);
+        if (Username == true && Email == true) {
+            $("#button1").removeAttr('disabled');
+        } else {
+            $("#button1").attr('disabled', 'disabled');
+        }
+    }
 </script>
