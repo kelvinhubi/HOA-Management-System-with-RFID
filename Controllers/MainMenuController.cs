@@ -18,8 +18,6 @@ using System.Data;
 using DocumentFormat.OpenXml.EMMA;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Hubs;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
@@ -457,6 +455,140 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return RedirectToAction("AssociationDues");
         }
 
+        [HttpPost]
+        public IActionResult _ExportDuesExcel(string startDate, string endDate) {
+            string nameformat = string.Empty;
+            var Dues = (from dues in _db.Due_Details
+                        join
+                        homeacc in _db.Homeowner_Details on dues.AccountID equals homeacc.AccountID
+                        select new
+                        {
+                            FullName = homeacc.FullName,
+                            Invoice = dues.Invoice,
+                            FeesName = dues.FeesName,
+                            TypeOfFee = dues.TypeOfFee,
+                            Date = dues.Date,
+                            Status = dues.Status
+                        });
+            
+            DataTable dt = new DataTable("Student");
+            dt.Columns.AddRange(new DataColumn[6] {
+                                            new DataColumn("Homeowner Name"),
+                                            new DataColumn("Invoice"),
+                                            new DataColumn("Fee Name"),
+                                            new DataColumn("Type of Due"),
+                                            new DataColumn("Date"),
+                                            new DataColumn("Status")});
+
+
+            var Logs = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate)).ToList();
+
+            foreach (var loglists in Logs)
+            {
+                dt.Rows.Add(loglists.FullName, loglists.Invoice, loglists.FeesName, loglists.TypeOfFee,loglists.Date,loglists.Status);
+            }
+
+            using (XLWorkbook wb = new XLWorkbook())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    wb.SaveAs(stream);
+                    _db.logsLists.Add(new LogsList
+                    {
+                        LogName = "Export Dues",
+                        LogDescription = "Export FileType: Excel " + "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                        LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+                    });
+                    _db.SaveChanges();
+                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_Logs.xlsx");
+                }
+            }
+        }
+
+        [HttpPost]
+        public IActionResult _ExportDuesPDF(string startDate, string endDate) {
+            string nameformat = string.Empty;
+            var Dues = (from dues in _db.Due_Details 
+                        join
+                        homeacc in _db.Homeowner_Details on dues.AccountID equals homeacc.AccountID
+                        select new
+                        {
+                            FullName = homeacc.FullName,
+                            Invoice = dues.Invoice,
+                            FeesName = dues.FeesName,
+                            TypeOfFee = dues.TypeOfFee,
+                            Date = dues.Date,
+                            Status = dues.Status
+                        });
+            
+            if (nameformat == null)
+            {
+                nameformat = "ExportPdf";
+            }
+            string filepath = "wwwroot\\ExportedFiles\\" + nameformat + "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_Logs.pdf";
+            QuestPDF.Settings.License = LicenseType.Community;
+            void ComposeTable(IContainer container)
+            {
+                container.Border(1).Table(table =>
+                {
+                    table.ColumnsDefinition(columns =>
+                    {
+                        columns.ConstantColumn(100);
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                    });
+
+                    table.Header(header =>
+                    {
+                        header.Cell().Text("Homeowner Name");
+                        header.Cell().Text("Invoice");
+                        header.Cell().Text("Fee Name");
+                        header.Cell().Text("Type of Due");
+                        header.Cell().Text("Date");
+                        header.Cell().Text("Status");
+                    });
+                    var result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate)).ToList();
+                    if (result.Count != 0)
+                    {
+                        foreach (var item in result)
+                        {
+                            table.Cell().Text(item.FullName.ToString());
+                            table.Cell().Text(item.Invoice.ToString());
+                            table.Cell().Text(item.FeesName.ToString());
+                            table.Cell().Text(item.TypeOfFee.ToString());
+                            table.Cell().Text(item.Date.ToString());
+                            table.Cell().Text(item.Status.ToString());
+                        }
+                    }
+                });
+            }
+            Document.Create(Print =>
+            {
+                Print.Page(page =>
+                {
+                    page.Content()
+                    .Column(c => ComposeTable(c.Item()));
+                    page.Size(PageSizes.A4);
+                    page.Header()
+                    .Text("Logs")
+                    .SemiBold()
+                    .FontSize(30);
+
+                });
+            }).GeneratePdf(filepath); //RENAMING USING RANDOM WORDS
+            _db.logsLists.Add(new LogsList
+            {
+                LogName = "Export Dues",
+                LogDescription = "Export FileType: PDF " + "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+            });
+            _db.SaveChanges();
+            return File(System.IO.File.ReadAllBytes(filepath), "application/pdf", nameformat + "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_ExportDues.pdf");
+        }
         //Logs Controller
         public IActionResult Logs()
         {

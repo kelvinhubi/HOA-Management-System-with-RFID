@@ -30,7 +30,7 @@
             @foreach (Dues obj in Model.ListDues)
             {
                 <tr>
-                    <td>@obj.TypeOfFee</td>
+                    <td>@obj.FullName</td>
                     <td>@obj.FeesName</td>
                     <td>@obj.Invoice</td>
                     <td>@obj.Amount</td>
@@ -47,53 +47,85 @@
 <div style="display:flex">
     <div class="CreateSingle" style="margin-left:5px;">
         @{
-            <partial name="_CreateDues" model="Model" />
+                            <partial name="_CreateDues" model="Model" />
         }
     </div>
     <div class="CreateMultiple" style="margin-left:5px;">
         @{
-            <partial name="_CreateDuesMultiple" model="Model" />
+                            <partial name="_CreateDuesMultiple" model="Model" />
         }
+    </div>
+    <div class="ExportPDF" style="margin-left:5px;">
+        <Button runat="server" id="bution2" class="btn btn-success" style="position:sticky;">Export as PDF</Button>
+        <form asp-action="_ExportDuesPDF" class="form form3" id="thisform" style="bottom:29rem; display:block">
+            <p class="title">Export As PDF</p>
+            <div class="form-group">
+                <label for="startDate" class="control-label">Start Date</label>
+                <input id="startDate" type="date" name="startDate" class="form-control input" required />
+            </div>
+            <div class="form-group">
+                <label for="endDate" class="control-label">End Date</label>
+                <input id="endDate" type="date" name="endDate" class="form-control input" required disabled/>
+                @Html.ValidationMessage("DateError")
+            </div>
+            <button class="btn btn-success" id="PdfButton" value="submit">Export</button>
+        </form>
+    </div>
+
+    <div class="ExportExcel" style="margin-left:5px;">
+        <Button runat="server" id="bution3" class="btn btn-success" style="position:sticky;">Export as Excel</Button>
+        <form asp-action="_ExportDuesExcel" class="form form4" id="thisform" style="bottom:29rem; display:block">
+            <p class="title">Export As Excel</p>
+            <div class="form-group">
+                <label for="startDate2" class="control-label">Start Date</label>
+                <input id="startDate2" type="date" name="startDate" class="form-control input" required />
+            </div>
+            <div class="form-group">
+                <label for="endDate2" class="control-label">End Date</label>
+                <input id="endDate2" type="date" name="endDate" class="form-control input" required disabled/>
+                @Html.ValidationMessage("DateError")
+            </div>
+            <button class="btn btn-success" id="ExcelButton" value="submit">Export</button>
+        </form>
     </div>
     <a id="PaidDues" asp-action="ClearPaid" controller="MainMenu" class="btn btn-danger" style="margin-left:5px;">Clear Paid Dues</a>
 </div>
 
 @section Scripts {
     @{
-                                    <partial name="_ValidationScriptsPartial" />
+                                                    <partial name="_ValidationScriptsPartial" />
     }
 }
 <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script>
 <script src="~/js/notification.js"></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
     new DataTable('#mytable');
-    window.onload = function () { 
-        var table = document.querySelectorAll("#status");
-            for (let i = 0; i < table.length; i++) {
-                let col = table[i].innerHTML;
-                if (col == "Unpaid") {
-                    table[i].classList.add('bx', 'bxs-user-x', 'card-danger', 'bg-danger')
-                    table[i].style.cssText = "width:100%; padding:15px;";
-                }
-                if (col == "Paid") {
-                    table[i].classList.add('bx', 'bxs-user-x', 'card-success', 'bg-success')
-                    table[i].style.cssText = "width:100%; padding:15px;";
-                }
-            }
-            var table = document.querySelectorAll("#duedate");
-            for (let i = 0; i < table.length; i++) {
-                let col = table[i].innerHTML
-                var due = new Date(col)
-                var date = new Date()
-                if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
-                    table[i].classList.add('bx', 'bxs-error-alt', 'card-warning', 'bg-warning');
-                    table[i].style.cssText = "width:100%; padding:15px;";
-
-                }
-
-            }
-    }
     $(document).ready(function () {
+        var table = document.querySelectorAll("#status");
+        for (let i = 0; i < table.length; i++) {
+            let col = table[i].innerHTML;
+            if (col == "Unpaid") {
+                table[i].classList.add('bx', 'bxs-user-x', 'card-danger', 'bg-danger')
+                table[i].style.cssText = "width:100%; padding:15px;";
+            }
+            if (col == "Paid") {
+                table[i].classList.add('bx', 'bxs-user-x', 'card-success', 'bg-success')
+                table[i].style.cssText = "width:100%; padding:15px;";
+            }
+        }
+        var table = document.querySelectorAll("#duedate");
+        for (let i = 0; i < table.length; i++) {
+            let col = table[i].innerHTML
+            var due = new Date(col)
+            var date = new Date()
+            if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
+                table[i].classList.add('bx', 'bxs-error-alt', 'card-warning', 'bg-warning');
+                table[i].style.cssText = "width:100%; padding:15px;";
+
+            }
+
+        }
         $(document,"dt-column-title").on('click change',function () {
             var table = document.querySelectorAll("#status");
             for (let i = 0; i < table.length; i++) {
@@ -122,5 +154,94 @@
         })
     });
 
+    var btn11 = document.getElementById("bution2");
+    $(".form3").css("display", "none");
+    btn11.onclick = function () {
+        if ($(".form3").css("display") == "block") {
+            $(".form3").css("display", "none");
+            $("#UserPartial").css("display", "block");
+            $("#PaidDues").css("display", "block");
+            $(".CreateMultiple").css("display", "block");
+            $(".CreateSingle").css("display", "block");
+            $(".ExportExcel").css("display", "block");
+            $("#bution2").html('Export as PDF');
+            $("body").css("background", "rgba(0, 0, 0, 0)");
+            $('#forpass').val("")
+            $("#forpass").attr('disabled', 'disabled');
+        }
+        else {
+            this.blur();
+            $(".form3").css("display", "block");
+            CheckName();
+            CheckFees();
+            $("#UserPartial").css("display", "none");
+            $("#PaidDues").css("display", "none");
+            $(".CreateMultiple").css("display", "none");
+            $(".CreateSingle").css("display", "none");
+            $(".ExportExcel").css("display", "none");
+            $("#bution2").html('Hide');
+            $("body").css("background", "rgba(0, 0, 0, 0.4)");
 
+        }
+    }
+
+    var btn12 = document.getElementById("bution3");
+    $(".form4").css("display", "none");
+    btn12.onclick = function () {
+        if ($(".form4").css("display") == "block") {
+            $(".form4").css("display", "none");
+            $("#UserPartial").css("display", "block");
+            $("#PaidDues").css("display", "block");
+            $(".CreateMultiple").css("display", "block");
+            $(".CreateSingle").css("display", "block");
+            $(".ExportPDF").css("display", "block");
+            $("#bution3").html('Export as Excel');
+            $("body").css("background", "rgba(0, 0, 0, 0)");
+            $('#forpass').val("");
+            $("#forpass").attr('disabled', 'disabled');
+        }
+        else {
+            this.blur();
+            $(".form4").css("display", "block");
+            CheckName();
+            CheckFees();
+            $("#UserPartial").css("display", "none");
+            $("#PaidDues").css("display", "none");
+            $(".CreateMultiple").css("display", "none");
+            $(".CreateSingle").css("display", "none");
+            $(".ExportPDF").css("display", "none");
+            $("#bution3").html('Hide');
+            $("body").css("background", "rgba(0, 0, 0, 0.4)");
+        }
+    }
+    $("#startDate").on('change', function () {
+
+        $("#endDate").removeAttr('disabled');
+    });
+    $(".form3").on('change', function () {
+        var fit_start_time = $("#startDate").val();
+        var fit_end_time = $("#endDate").val();
+        if (new Date(fit_end_time) <= new Date(fit_start_time)) {
+            $("#PdfButton").attr('disabled', 'disabled');
+            alert("End Date must be greater than start date");
+        }
+        else { 
+            $("#PdfButton").removeAttr('disabled');
+        }
+    });
+    $("#startDate2").on('change', function () {
+
+        $("#endDate2").removeAttr('disabled');
+    });
+    $(".form4").on('change', function () {
+        var fit_start_time = $("#startDate2").val();
+        var fit_end_time = $("#endDate2").val();
+        if (new Date(fit_end_time) <= new Date(fit_start_time)) {
+            $("#ExcelButton").attr('disabled', 'disabled');
+            alert("End Date must be greater than start date");
+        }
+        else {
+            $("#ExcelButton").removeAttr('disabled');
+        }
+    });
 </script>
