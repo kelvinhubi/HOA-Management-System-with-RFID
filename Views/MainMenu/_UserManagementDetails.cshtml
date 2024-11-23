@@ -4,8 +4,8 @@
     Homeowner_details details = Model.Homeowner;
     int Year = Convert.ToInt32(details.Birthdate.Year);
     int Age = Convert.ToInt32(DateTime.Today.Year) - Year;
-    string cars = Model.Vehicles.Count() == 0 ? "N/A":Model.Vehicles.Count().ToString();
-    string ownedhomes = Model.Homes.Count() == 0 ? "N/A" : Model.Homes.Count().ToString();
+    string cars = Model.Vehicles.Count() == 0 ? "N/A" : Model.Vehicles.Count().ToString();
+    var ownedhomes = ViewData["HomeCount"];
 }
 <div id="UserPartial">
     <h2>User Details</h2>
@@ -15,7 +15,8 @@
                 <th>Full Name</th>
                 <th>Phone Number</th>
                 <td>Age</td>
-                <th>Owned Homes</th>
+                <td>Role</td>
+                <th>Homes</th>
                 <th>Cars</th>
             </tr>
         </thead>
@@ -24,31 +25,44 @@
                 <td>@Html.DisplayFor(m => m.Homeowner.Firstname) @Html.DisplayFor(m => m.Homeowner.Middlename) @Html.DisplayFor(m => m.Homeowner.Surname)</td>
                 <td>@Html.DisplayFor(m => m.Homeowner.PhoneNo)</td>
                 <td>@Age</td>
+                <td>@Html.DisplayFor(m => m.Homeowner.Role)</td>
                 <td>@ownedhomes</td>
                 <td>@cars</td>
                 </tr>
         </tbody>
         
     </table>
-    
-    <form asp-action="_UserManagementDetails">
-        <p style="margin-bottom:0px;">Fees Option:</p>
-        <input type="hidden" name="ID" value="@Html.DisplayFor(m => m.Homeowner.AccountID)" />
-        @{
-            for (int i = 0; i < Model.CheckMe.Count(); i++)
-            {
-                                    <input  asp-for="@Model.CheckMe[i].ID" hidden/>
-                                    <label for="@Model.CheckMe[i].FeesName">@Model.CheckMe[i].FeesName</label>
-                                    <input asp-for="@Model.CheckMe[i].FeesName" hidden/>
-                                    <input  asp-for="@Model.CheckMe[i].IsChecked" type="checkbox"/>
-            }
+
+    @{
+        if (Model.Homeowner.Role == "Homeowner")
+        {
+            <form asp-action="_UserManagementDetails">
+                <p style="margin-bottom:0px;">Fees Option:</p>
+                <input type="hidden" name="ID" value="@Html.DisplayFor(m => m.Homeowner.AccountID)" />
+                @{
+                    for (int i = 0; i < Model.CheckMe.Count(); i++)
+                    {
+                        <input asp-for="@Model.CheckMe[i].ID" hidden />
+                        <label for="@Model.CheckMe[i].FeesName">@Model.CheckMe[i].FeesName</label>
+                        <input asp-for="@Model.CheckMe[i].FeesName" hidden />
+                        <input asp-for="@Model.CheckMe[i].IsChecked" type="checkbox" />
+                    }
+                }
+                <div class="add">
+
+                    <a class="btn btn-success" id="Back" asp-controller="MainMenu" asp-action="UserManagement">Back to Accounts</a>
+                </div>
+
+            </form>
         }
-        <div class="add">
-            
-            <a class="btn btn-success" id="Back" asp-controller="MainMenu" asp-action="UserManagement">Back to Accounts</a>
-        </div>
-        
-    </form>
+        else
+        {
+            <div class="add">
+
+                <a class="btn btn-success" id="Back" asp-controller="MainMenu" asp-action="UserManagement">Back to Accounts</a>
+            </div>
+        }
+    }
    
     
 </div>

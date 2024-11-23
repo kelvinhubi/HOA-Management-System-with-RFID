@@ -1,23 +1,36 @@
 ﻿@model User_Account
+@{
+    string[] Roles = { "Homeowner", "Resident" };
+}
 <Button runat="server" id="bution" class="btn btn-success" >Create User Account</Button>
 <form asp-action="View" class="form" id="thisform">
     <p class="title">Add Homeowner User Account</p>
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-     <input asp-for="AccountID" class="form-control" class="input" hidden />
+     <input asp-for="AccountID" class="form-control input"  hidden />
     <div class="form-group">
         <label asp-for="Username" class="control-label"></label>
-        <input asp-for="Username" class="form-control" class="input" oninput="UserCheck();" />
+        <input asp-for="Username" class="form-control input"  oninput="UserCheck();" />
         <span asp-validation-for="Username" id="Status" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="Email" class="control-label"></label>
-        <input asp-for="Email" class="form-control" class="input" oninput="UserCheckEmail();" />
+        <input asp-for="Email" class="form-control input"  oninput="UserCheckEmail();" />
         <span asp-validation-for="Email" id="StatusEmail" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="Password" class="control-label"></label>
-        <input id="forpass" asp-for="Password" type="password" class="form-control" class="input" readonly />
+        <input id="forpass" asp-for="Password" type="password" class="form-control input" readonly />
         <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Role" class="control-label"></label>
+        <select asp-for="Role" class="form-select">
+            @foreach (var role in Roles)
+            {
+                <option value="@role">@role</option>
+            }
+        </select>
+        <span asp-validation-for="Role" class="text-danger"></span>
     </div>
     <div class="form-group">
         <Button onclick="GeneratePass();" type="button" class="btn btn-secondary" style="margin-top:5px;margin-bottom:5px;">Generate Password</Button>

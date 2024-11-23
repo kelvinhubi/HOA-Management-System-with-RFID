@@ -94,7 +94,18 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return RedirectToAction("Announcements");
         }
 
-
+        public IActionResult _DeleteAnnouncement(int? id) {
+            if (id == null) {
+                return NotFound();
+            }
+            var info = _db.Announcements.FirstOrDefault(_ => _.AnnouncementID == id);
+            if (info == null) {
+                return NotFound();
+            }
+            _db.Announcements.Remove(info);
+            _db.SaveChanges();
+            return RedirectToAction("Announcements");
+        }
 
 
         //UserManagement Controller
@@ -136,8 +147,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             try
             {
                 var forhomeowner = _db.Homeowner_Details.FirstOrDefault(x => x.AccountID == obj.AccountID);
-                var forUserDues = _db.Due_Details.Where(x => x.AccountID == obj.AccountID).ToList();
-                var forUserfeestatus = _db.userFeesStatuses.Where(_ => _.AccountID == obj.AccountID).ToList();
+                var forUserDues = _db.Due_Details.Where(x => x.AccountID == obj.AccountID && obj.Role == "Homeowner").ToList();
+                var forUserfeestatus = _db.userFeesStatuses.Where(_ => _.AccountID == obj.AccountID && obj.Role =="Homeowner").ToList();
+                var forHomes = _db.homesLists.Where(x => x.AccountID == obj.AccountID).ToList();
+                var homerequests = _db.homeRequests.Where(x => x.ResidentID == obj.AccountID).ToList();
                 _db.User_Accounts.Remove(obj);
                 if (forhomeowner != null)
                 {
@@ -155,6 +168,12 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 {
                     _db.userFeesStatuses.RemoveRange(forUserfeestatus);
                     _db.SaveChanges();
+                }
+                if (forHomes != null) { 
+                    _db.homesLists.RemoveRange(forHomes);
+                }
+                if (homerequests != null) { 
+                    _db.homeRequests.RemoveRange(homerequests);
                 }
                 _db.SaveChanges();
                 _db.logsLists.Add(new LogsList
@@ -178,7 +197,14 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             var model = new NewModel();
             var useracc = _db.Homeowner_Details.AsNoTracking().FirstOrDefault(m => m.AccountID == ID);
             var cars = _db.Vehicle_Information.AsNoTracking().Where(_ => _.AccountID == ID);
-            var homes = _db.homesLists.AsNoTracking().Where(_ => _.AccountID == ID);
+            if (useracc.Role.Equals("Homeowner"))
+            {
+                ViewData["HomeCount"] = _db.homesLists.Where(_ => _.AccountID == ID).AsNoTracking().Count() == 0 ? "N/A" : _db.homesLists.Where(_ => _.AccountID == ID).AsNoTracking().Count();
+            }
+            else {
+                var count = _db.homeRequests.Where(_ => _.ResidentID == ID && _.Status.Equals("Approved")).AsNoTracking().Count();
+                ViewData["HomeCount"] = _db.homeRequests.Where(_ => _.ResidentID == ID && _.Status.Equals("Approved")).AsNoTracking().Count() == 0 ? "N/A" : _db.homeRequests.Where(_ => _.ResidentID == ID && _.Status.Equals("Approved")).AsNoTracking().Count();
+            }
             model.CheckMe = _db.userFeesStatuses.Where(x => x.AccountID == ID).Select(vm => new CheckBoxItem()
             {
                 ID = vm.UserFeeID,
@@ -192,7 +218,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             model.Vehicles = cars;
             model.Homeowner = useracc;
-            model.Homes = homes;
             return View(model);
         }
         [HttpPost]
@@ -246,7 +271,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     Username = info.Username,
                     Password = Encryption.Encrpyt(info.Password, _env.EncryptionKey, _env.IVKey),
                     Email = info.Email,
-                    AccountID = info.AccountID
+                    AccountID = info.AccountID,
+                    Role = info.Role
                 };
                 _db.User_Accounts.Add(info);
                 _db.logsLists.Add(new LogsList
@@ -295,6 +321,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 var result = (from due in _db.Due_Details
                               join
                               homeacc in _db.Homeowner_Details on due.AccountID equals homeacc.AccountID
+                              where homeacc.Role == "Homeowner"
                               select new Dues
                               {
                                   AccountID = due.AccountID,
@@ -304,7 +331,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                                   Invoice = due.Invoice,
                                   FeesName = due.FeesName,
                                   TypeOfFee = due.TypeOfFee,
-                                  Status = due.Status
+                                  Status = due.Status,
                               });
                 NewModel model = new NewModel();
                 model.Homeacc = _db.Homeowner_Details.ToList();
@@ -326,7 +353,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             var result = (from homeacc in _db.Homeowner_Details
                           join
-                          userfees in _db.userFeesStatuses on homeacc.AccountID equals userfees.AccountID where userfees.Status.Equals("Enabled") && userfees.TypeOfFees.Equals(userdata)
+                          userfees in _db.userFeesStatuses on homeacc.AccountID equals userfees.AccountID where userfees.Status.Equals("Enabled") && userfees.TypeOfFees.Equals(userdata) && homeacc.Role == "Homeowner"
                           select new Homeowner_details
                           {
                               Firstname = homeacc.Firstname,
@@ -463,6 +490,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             var Dues = (from dues in _db.Due_Details
                         join
                         homeacc in _db.Homeowner_Details on dues.AccountID equals homeacc.AccountID
+                        where homeacc.Role == "Homeowner"
                         select new
                         {
                             FullName = homeacc.FullName,
@@ -514,6 +542,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             var Dues = (from dues in _db.Due_Details 
                         join
                         homeacc in _db.Homeowner_Details on dues.AccountID equals homeacc.AccountID
+                        where homeacc.Role == "Homeowner"
                         select new
                         {
                             FullName = homeacc.FullName,
@@ -827,7 +856,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                                   VehicleType = vehicle.VehicleType,
                                   RFID_number = vehicle.RFID_number,
                                   RFID_status = vehicle.RFID_status
-
                               });
                 NewModel model = new NewModel();
                 model.Vehicle = new Vehicle_Information();
@@ -914,7 +942,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             {
                 _db.feesLists.Add(info);
                 _db.SaveChanges();
-                var data1 = _db.Homeowner_Details.ToList();
+                var data1 = _db.Homeowner_Details.Where(_=>_.Role == "Homeowner").ToList();
                 foreach (var x in data1)
                 {
                     var data2 = new UserFeesStatus
@@ -1084,7 +1112,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 NewModel model = new NewModel();
                 model.Homes = _db.homesLists.ToList();
                 model.Home = new HomesList();
-                model.Homeacc = _db.Homeowner_Details.ToList();
+                model.Homeacc = _db.Homeowner_Details.Where(_=>_.Role =="Homeowner").ToList();
                 return View(model);
             }
             return RedirectToAction("AccessDenied", "Home");
@@ -1166,7 +1194,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         [HttpPost]
         public JsonResult CheckFees(string userdata)
         {
-            Console.WriteLine("Hello World" + userdata);
             if (userdata != null)
             {
 
@@ -1199,6 +1226,23 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             {
                 return Json(0);
             }
+        }
+        [HttpPost]
+        public JsonResult CheckHome(string userdata) {
+            if (userdata != null)
+            {
+
+                var SearchData = _db.homesLists.Where(x => x.AccountID == Convert.ToInt32(userdata)).ToList();
+                if (SearchData != null)
+                {
+                    return Json(SearchData.OrderBy(_ => _.HomeName).ToList());
+                }
+                else
+                {
+                    return Json(0);
+                }
+            }
+            return Json(0);
         }
         public bool CheckRole()
         {

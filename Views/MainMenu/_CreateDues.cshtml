@@ -12,7 +12,7 @@ var setmin = DateTime.Now.ToString("yyyy-MM-dd");;
     <div class="form-group">
         <label asp-for="@Model.dues.FullName" class="control-label">Select Homeowner</label>
         <select asp-for="@Model.dues.FullName" onclick="CheckName();CheckFees()" id="FullName" class="form-control">
-            @foreach (var obj in Model.Homeacc)
+            @foreach (var obj in Model.Homeacc.Where(_=>_.Role == "Homeowner"))
             {
                 <option  value="@obj.FullName" data-another="@obj.AccountID">@obj.FullName</option>
             }

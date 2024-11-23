@@ -27,7 +27,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
 
         [RegularExpression(@"^(09|\+639)\d{9}$", ErrorMessage = "Not a valid phone number")]
         public string PhoneNo { get; set; } = string.Empty;
-
+        public string Role {  get; set; } = string.Empty;
         [NotMapped]
         [Display(Name = "Full Name")]
         public string FullName { get { return Firstname + " " + Middlename + " " + Surname; } }

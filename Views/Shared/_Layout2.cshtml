@@ -53,15 +53,15 @@
 
 
                     @{url = Url.Action("AssociationDues", "UserMenu");}
-                    <a  class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-user nav_icon'></i> <span class="nav_name">My Dues</span> </a>
+                <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-dollar nav-icon'></i> <span class="nav_name">My Dues</span> </a>
                     
                     @{
                         url = Url.Action("Announcements", "UserMenu");
                     }
-                    <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-user nav_icon'></i> <span class="nav_name">Announcements</span> </a>
+                <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-bell nav-icon'></i> <span class="nav_name">Announcements</span> </a>
                     
                     @{url = Url.Action("VehiclesList", "UserMenu");}
-                    <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-car nav_icon'></i> <span class="nav_name">Vehicles List</span></a>
+                <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-car nav-icon'></i> <span class="nav_name">Vehicles List</span></a>
                     
                     @{url = Url.Action("HomeList", "UserMenu");}
                     <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-building-house nav_icon'></i> <span class="nav_name">Home List</span></a>

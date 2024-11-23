@@ -87,6 +87,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             var pass = info.Password;
             _account.Username = info.Username;
             _account.AccountID = _db.User_Accounts.Where(x => x.Username == info.Username).Select(x => x.AccountID).FirstOrDefault();
+            _account.Role = _db.User_Accounts.Where(x => x.Username == info.Username).Select(x => x.Role).FirstOrDefault();
             MySqlCommand mySqlCommand = new MySqlCommand("Select Username,Password From user_accounts", conn);
             conn.Open();
             bool isLoggedIn = false;
@@ -114,18 +115,44 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 try
                 {
                     var SearchData = _db.Homeowner_Details.FirstOrDefault(x => x.Username == info.Username);
+                    var Role = _db.User_Accounts.FirstOrDefault(x => x.Username == info.Username);
                     if (SearchData == null)
                     {
-                        Console.WriteLine("Logged In" + _account.Username);
-                        return RedirectToAction("Sign_Up2");
+                        if (Role != null) {
+                            if (Role.Role =="Homeowner")
+                            {
+                                Console.WriteLine("Logged In" + _account.Username);
+                                return RedirectToAction("Sign_Up2");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Logged In" + _account.Username);
+                                return RedirectToAction("Sign_Up3");
+                            }
+                        }
+                        
                     }
                     else
                     {
-                        HttpContext.Session.SetString("SessionUsername", _account.Username);
-                        HttpContext.Session.SetString("SessionID", Convert.ToString(SearchData.AccountID));
-                        HttpContext.Session.SetString("UserType", "User");//JsonConvert.SerializeObject
-                        Console.WriteLine("Logged In");
-                        return RedirectToAction("Dashboard", "UserMenu");
+                        if (Role != null) {
+                            if (Role.Role == "Homeowner")
+                            {
+                                HttpContext.Session.SetString("SessionUsername", _account.Username);
+                                HttpContext.Session.SetString("SessionID", Convert.ToString(SearchData.AccountID));
+                                ViewData["SessionID"] = Convert.ToString(SearchData.AccountID);
+                                HttpContext.Session.SetString("UserType", "User");//JsonConvert.SerializeObject
+                                Console.WriteLine("Logged In");
+                                return RedirectToAction("Dashboard", "UserMenu");
+                            }
+                            else {
+                                HttpContext.Session.SetString("SessionUsername", _account.Username);
+                                HttpContext.Session.SetString("SessionID", Convert.ToString(SearchData.AccountID));
+                                ViewData["SessionID"] = Convert.ToString(SearchData.AccountID);
+                                HttpContext.Session.SetString("UserType", "Resident");//JsonConvert.SerializeObject
+                                Console.WriteLine("Logged In");
+                                return RedirectToAction("Dashboard", "ResidentMenu");
+                            }
+                        }
                     }
                 }
                 catch (Exception ex) { Console.WriteLine(ex.Message); }
@@ -188,6 +215,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return View();
         }
         public IActionResult Sign_Up2 (){ return View(); }
+        public IActionResult Sign_Up3 (){ return View(); }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Sign_Up2(Homeowner_details info)
@@ -203,6 +231,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     Middlename = info.Middlename,
                     Birthdate = info.Birthdate,
                     PhoneNo = info.PhoneNo,
+                    Role = _account.Role
                 });
                 _db.SaveChanges();
                 var data1 = _db.feesLists.ToList();
@@ -219,6 +248,28 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     };
                     _db.userFeesStatuses.Add(data2);
                 }
+                await _db.SaveChangesAsync();
+                return RedirectToAction("Index", "Home");
+            }
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Sign_Up3(Homeowner_details info)
+        {
+            if (ModelState.IsValid)
+            {
+                _db.Homeowner_Details.Add(new Homeowner_details
+                {
+                    AccountID = _account.AccountID,
+                    Username = _account.Username.ToString(),
+                    Surname = info.Surname,
+                    Firstname = info.Firstname,
+                    Middlename = info.Middlename,
+                    Birthdate = info.Birthdate,
+                    PhoneNo = info.PhoneNo,
+                    Role = _account.Role
+                });
                 await _db.SaveChangesAsync();
                 return RedirectToAction("Index", "Home");
             }

@@ -1,0 +1,58 @@
+﻿<head>
+    <link href="~/css/Chat.css" rel="stylesheet" />
+    <script src="~/js/Chat.js"></script> 
+</head>
+<button class="open-btn" onclick="openChatWindow()"><i class='bx bxs-conversation'></i>Chat</button>
+
+<div class="chat-popup" id="chat-form-container" style="display:none">
+    <form action="/" method="post" class="form-container">
+        <div class="chat-window-head">
+            <h4><i class='bx bxs-conversation'></i>Chat Window</h4>
+            <span class="close-btn" onclick="closeChatWindow()">
+                <i class='bx bxs-x-circle'></i>
+            </span>
+        </div>
+
+        <div class="div msg-container" id="pops">
+            <!--Generate Messages-->
+        </div>
+
+        <div class="div chat-box-container">
+            <div class="div chat-box">
+                <input type="text" placeholder="Type your message..." id="message" name="msg" required>
+                <button type="button" id="sendmessage" class="newbtn"><i class='bx bxs-chevron-right-circle send-btn'></i></button>
+            </div>
+
+        </div>
+    </form>
+</div>
+<!--<div class="card direct-chat direct-chat-primary mb-4">
+
+    <div class="card-header">
+        <h3 class="card-title">Chat</h3>
+    </div> 
+<div class="card-body">
+    <input id="Nameval" value="" hidden />
+    
+    <div class="direct-chat-messages" id="pops">
+    </div> 
+</div>
+<div class="card-footer">
+    <form action="#" method="post">
+        <div class="input-group">
+            <input type="text" name="message" id="message" placeholder="Type Message ..." class="form-control"> <span class="input-group-append">
+                <button type="button" id="sendmessage" class="btn btn-primary">
+                    Send
+                </button>
+            </span>
+        </div>
+    </form>
+</div>
+</div>-->
+<script>
+    window.onload = function () { 
+        $.get('@Url.Action("GetSessionName","Login")', function (data) {
+            $('#Nameval').val(data);
+        });
+    }
+</script>

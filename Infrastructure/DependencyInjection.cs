@@ -19,21 +19,58 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Infrastructure
                 var result = _db.Homeowner_Details.ToList();
                 foreach (var user in result)
                 {
-                    var dues = _db.Due_Details.Where(_ => _.AccountID == user.AccountID && _.Status.Equals("Unpaid") && DateOnly.FromDateTime(DateTime.Now) > _.Date).Count();
-                    if (dues == 0)
-                    {
-                        var update = _db.Vehicle_Information.Where(_ => _.AccountID == user.AccountID).ToList();
-                        foreach (var car in update)
+
+                    if (user.Role.Equals("Homeowner")) {
+                        var homeownerhome = _db.homesLists.FirstOrDefault(_ => _.AccountID == user.AccountID);
+                        var dues = _db.Due_Details.Where(_ => _.AccountID == user.AccountID && _.Status.Equals("Unpaid") && DateOnly.FromDateTime(DateTime.Now) > _.Date).Count();
+                        if (dues == 0)
                         {
-                            car.RFID_status = "Enabled";
-                            _db.Vehicle_Information.Update(car);
-                            _db.SaveChanges();
+                            var update = _db.Vehicle_Information.Where(_ => _.AccountID == user.AccountID).ToList();
+                            foreach (var car in update)
+                            {
+                                car.RFID_status = "Enabled";
+                                _db.Vehicle_Information.Update(car);
+                                _db.SaveChanges();
+                            }
+                            var residentID = _db.homeRequests.Where(_=>_.AccountID == user.AccountID && _.Status.Equals("Approved")).Select(_=>_.ResidentID).ToList();
+                            foreach (var id in residentID) {
+                                var update2 = _db.Vehicle_Information.Where(_ => _.AccountID == id).ToList();
+                                foreach (var car in update2)
+                                {
+                                    car.RFID_status = "Enabled";
+                                    _db.Vehicle_Information.Update(car);
+                                    _db.SaveChanges();
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            var update = _db.Vehicle_Information.Where(_ => _.AccountID == user.AccountID).ToList();
+                            foreach (var car in update)
+                            {
+                                car.RFID_status = "Disabled";
+                                _db.Vehicle_Information.Update(car);
+                                _db.SaveChanges();
+                            }
+                            var residentID = _db.homeRequests.Where(_ => _.AccountID == user.AccountID && _.Status.Equals("Approved")).Select(_ => _.ResidentID).ToList();
+                            foreach (var id in residentID)
+                            {
+                                var update2 = _db.Vehicle_Information.Where(_ => _.AccountID == id).ToList();
+                                foreach (var car in update2)
+                                {
+                                    car.RFID_status = "Disabled";
+                                    _db.Vehicle_Information.Update(car);
+                                    _db.SaveChanges();
+                                }
+                            }
                         }
                     }
-                    else
+                    var residentIDs = _db.homeRequests.Where(_ => _.AccountID == user.AccountID && !_.Status.Equals("Approved")).Select(_ => _.ResidentID).ToList();
+                    foreach (var id in residentIDs)
                     {
-                        var update = _db.Vehicle_Information.Where(_ => _.AccountID == user.AccountID).ToList();
-                        foreach (var car in update)
+                        var update2 = _db.Vehicle_Information.Where(_ => _.AccountID == id).ToList();
+                        foreach (var car in update2)
                         {
                             car.RFID_status = "Disabled";
                             _db.Vehicle_Information.Update(car);

@@ -22,7 +22,7 @@
                             <div class="card-body">
                                 @items.Description
                             </div> <!-- /.card-body -->
-                                <div class="card-footer">Date Posted: @items.DatePosted.ToString("MMMM dd, yyyy h:mm tt")</div> <!-- /.card-footer-->
+                                <div class="card-footer">Date Posted: @items.DatePosted.ToString("MMMM dd, yyyy h:mm tt") <a asp-action="_DeleteAnnouncement" asp-controller="MainMenu" asp-route-id="@items.AnnouncementID" class="btn-sm btn-danger">Remove</a></div> <!-- /.card-footer-->
                         </div> <!-- /.card -->
                     </div>
                 </div> <!--end::Row-->

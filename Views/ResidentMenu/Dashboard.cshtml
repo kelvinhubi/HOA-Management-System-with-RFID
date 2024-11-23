@@ -1,0 +1,42 @@
+﻿@model NewModel
+@{
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+
+}
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        @{
+            ViewData["Title"] = "Dashboard";
+        }
+    </title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.3.0/styles/overlayscrollbars.min.css" integrity="sha256-dSokZseQNT08wYEWiz5iLI8QPlKxG+TswNRD8k35cpg=" crossorigin="anonymous"><!--end::Third Party Plugin(OverlayScrollbars)--><!--begin::Third Party Plugin(Bootstrap Icons)-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css" integrity="sha256-Qsx5lrStHZyR9REqhUF8iQt73X06c8LGIUPzpOhwRrI=" crossorigin="anonymous"><!--end::Third Party Plugin(Bootstrap Icons)--><!--begin::Required Plugin(AdminLTE)-->
+    <link rel="stylesheet" href="../../../dist/css/adminlte.css"><!--end::Required Plugin(AdminLTE)-->
+</head> <!--end::Head--> <!--begin::Body-->
+<h2>Dashboard</h2>
+<div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::Row-->
+        <div class="row">
+            <!--begin::Col-->
+
+            <div class="col-lg-3 col-6">
+                <!--begin::Small Box Widget 1-->
+                <div class="small-box text-bg-primary">
+                    <div class="inner">
+                        <h3>@@</h3>
+                        <p>Joined Homes</p>
+                    </div>  <a asp-action="UserManagement" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+                        More info <i class="bi bi-link-45deg"></i>
+                    </a>
+                </div> <!--end::Small Box Widget 1-->
+            </div> <!--end::Col-->
+
+        </div> <!--end::Row--> <!--begin::Row-->
+    </div>
+</div>
+
+<!-- asp:button runat="server" asp-controller="RFID" onclick="CheckButton()" class="btn btn-primary" >Click ME</asp:button> -->

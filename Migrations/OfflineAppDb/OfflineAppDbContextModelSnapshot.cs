@@ -61,6 +61,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations.OfflineAppDb
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("AccountID"));
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Password")
@@ -221,6 +222,52 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations.OfflineAppDb
                     b.ToTable("Guard_Information");
                 });
 
+            modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.HomeRequest", b =>
+                {
+                    b.Property<int>("HomeReqID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("HomeReqID"));
+
+                    b.Property<int>("AccountID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BlkNO")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("HomeID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("HomeName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LotNo")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ResidentID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("HomeReqID");
+
+                    b.ToTable("homeRequests");
+                });
+
             modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.Homeowner_details", b =>
                 {
                     b.Property<int>("AccountID")
@@ -243,6 +290,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations.OfflineAppDb
                         .HasColumnType("varchar(20)");
 
                     b.Property<string>("PhoneNo")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -378,6 +429,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations.OfflineAppDb
                         .HasColumnType("longtext");
 
                     b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("longtext");
 

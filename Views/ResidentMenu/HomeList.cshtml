@@ -1,0 +1,98 @@
+﻿@model NewModel
+@{
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+    var id = ViewData["SessionID"];
+}
+<div id="UserPartial">
+    <h2>Available Homes</h2>
+    <table id="mytable" class="table table-bordered" style="width:100%">
+        <thead class="table-light">
+            <tr>
+                <th>Homeowner Name</th>
+                <th>Home Type</th>
+                <th>Blk No</th>
+                <th>Address</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model.Homes)
+            {
+                var obj2 = Model.HomeRequests.Where(_=>_.HomeID == obj.HomeID).FirstOrDefault();
+                if (obj2 == null)
+                {
+                    <tr>
+                        <td>@obj.FullName</td>
+                        <td>@obj.HomeName</td>
+                        <td>@obj.LotNo</td>
+                        <td>@obj.BlkNO</td>
+                        <td>@obj.Address</td>
+                        <td>
+                            <a asp-action="JoinHome" asp-controller="ResidentMenu" class="btn btn-primary btn-sm" asp-route-id="@obj.HomeID">Request Join<i class='bx bxs-user-detail'></i></a>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    if (obj2.Status.Equals("Requested"))
+                    {
+                        <tr>
+                            <td>@obj.FullName</td>
+                            <td>@obj.HomeName</td>
+                            <td>@obj.LotNo</td>
+                            <td>@obj.BlkNO</td>
+                            <td>@obj.Address</td>
+                            <td>
+                                <a class="btn btn-primary btn-sm" asp-route-id="@obj.HomeID">Requested<i class='bx bxs-user-detail'></i></a>
+                            </td>
+                        </tr>
+                    }
+                    if (obj2.Status.Equals("Rejected"))
+                    {
+
+                        <tr>
+                            <td>@obj.FullName</td>
+                            <td>@obj.HomeName</td>
+                            <td>@obj.LotNo</td>
+                            <td>@obj.BlkNO</td>
+                            <td>@obj.Address</td>
+                            <td>
+                                <a  class="btn btn-warning btn-sm" asp-route-id="@obj.HomeID">Rejected<i class='bx bxs-user-detail'></i></a>
+                            </td>
+                        </tr>
+                    }
+
+                }
+            }
+        </tbody>
+    </table>
+
+    <h2>Joined Homes</h2>
+    <table id="mytable1" class="table table-bordered" style="width:100%">
+        <thead class="table-light">
+            <tr>
+                <th>Homeowner Name</th>
+                <th>Home Type</th>
+                <th>Lot No</th>
+                <th>Blk No</th>
+                <th>Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model.HomeRequests.Where(_=>_.Status=="Approved"))
+            {
+                <tr>
+                    <td>@obj.FullName</td>
+                    <td>@obj.HomeName</td>
+                    <td>@obj.LotNo</td>
+                    <td>@obj.BlkNO</td>
+                    <td>@obj.Address</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script>
+    new DataTable('#mytable');
+    new DataTable('#mytable1');
+</script>

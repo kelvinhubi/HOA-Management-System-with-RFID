@@ -1,0 +1,185 @@
+﻿@model Homeowner_details
+@{
+	Layout = "~/Views/Shared/_Layout4.cshtml";
+}
+<head>
+	<style>
+		body {
+			margin: 0;
+			padding-top: 40px;
+			color: #2e323c;
+			background: #f5f6fa;
+			position: relative;
+			height: 100%;
+		}
+
+		.account-settings .user-profile {
+			margin: 0 0 1rem 0;
+			padding-bottom: 1rem;
+			text-align: center;
+		}
+
+			.account-settings .user-profile .user-avatar {
+				margin: 0 0 1rem 0;
+			}
+
+				.account-settings .user-profile .user-avatar img {
+					width: 90px;
+					height: 90px;
+					-webkit-border-radius: 100px;
+					-moz-border-radius: 100px;
+					border-radius: 100px;
+				}
+
+			.account-settings .user-profile h5.user-name {
+				margin: 0 0 0.5rem 0;
+			}
+
+			.account-settings .user-profile h6.user-email {
+				margin: 0;
+				font-size: 0.8rem;
+				font-weight: 400;
+				color: #9fa8b9;
+			}
+
+		.account-settings .about {
+			margin: 2rem 0 0 0;
+			text-align: center;
+		}
+
+			.account-settings .about h5 {
+				margin: 0 0 15px 0;
+				color: #007ae1;
+			}
+
+			.account-settings .about p {
+				font-size: 0.825rem;
+			}
+
+		.form-control {
+			border: 1px solid #cfd1d8;
+			-webkit-border-radius: 2px;
+			-moz-border-radius: 2px;
+			border-radius: 2px;
+			font-size: .825rem;
+			background: #ffffff;
+			color: #2e323c;
+		}
+
+		.card {
+			background: #ffffff;
+			-webkit-border-radius: 5px;
+			-moz-border-radius: 5px;
+			border-radius: 5px;
+			border: 0;
+			margin-bottom: 1rem;
+		}
+
+	</style>
+</head>
+<form id="thisform">
+	<div class="container">
+		<div class="row gutters">
+
+			<div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+				<div class="card h-100">
+					<div class="card-body">
+						<div class="row gutters">
+							<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+								<h6 class="mb-2 text-primary">Change Username And Password</h6>
+							</div>
+								<input asp-for="AccountID" name="AccountID" hidden />
+								<input asp-for="Username" name="Username" hidden />
+							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+								<div class="form-group">
+									<label asp-for="Firstname">First Name</label>
+									<input type="text" class="form-control" asp-for="Firstname" readonly />
+									<span asp-validation-for="Firstname"></span>
+								</div>
+							</div>
+							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+								<div class="form-group">
+									<label asp-for="Middlename">Middle Name</label>
+									<input type="text" class="form-control" asp-for="Middlename" readonly />
+									<span asp-validation-for="Middlename"></span>
+								</div>
+							</div>
+							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+								<div class="form-group">
+									<label asp-for="Surname">Surname</label>
+									<input type="text" class="form-control" asp-for="Surname" readonly />
+									<span asp-validation-for="Surname"></span>
+								</div>
+							</div>
+							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+								<div class="form-group">
+									<label asp-for="Birthdate">First Name</label>
+									<input type="date" class="form-control" asp-for="Birthdate" readonly />
+									<span asp-validation-for="Birthdate"></span>
+								</div>
+							</div>
+							<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+								<div class="form-group">
+									<label asp-for="PhoneNo">Phone No.</label>
+									<input type="text" class="form-control" asp-for="PhoneNo"/>
+									<span asp-validation-for="PhoneNo"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row gutters">
+							<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+								<div class="text-right">
+									<button type="button" name="Edit" id="Edit" class="btn btn-warning">Edit</button>
+									<button type="button" id="Cancel" name="cancel" class="btn btn-secondary" hidden>Cancel</button>
+									<button type="button" id="SubmitForm" name="submit" class="btn btn-primary" hidden>Update</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
+@section Scripts {
+	@{
+		<partial name="_ValidationScriptsPartial" />
+	}
+}
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+	$("#SubmitForm").on('click', function () {
+		let formdat = new FormData(document.getElementById('thisform'));
+		$.ajax({
+			url: '@Url.Action("UpdateDetails", "UserMenu")', // Replace with your controller and action
+			type: 'POST',
+			data: formdat,
+			contentType: false, // Important for FormData
+			processData: false, // Important for FormData
+			success: function (response) {
+				if (!response.success) { alert("Profile Update Fail");
+					window.location.reload();
+				}
+				else { alert("Profile Updated Successfully"); window.location.reload(); }
+			},
+			error: function (xhr, status, error) {
+				alert("Profile Update Fail");
+				window.location.reload();
+			}
+		});
+		$("#thisform").trigger("reset");
+		$("#Cancel").attr("hidden", true);
+		$("#SubmitForm").attr("hidden", true);
+		$("#Edit").removeAttr("hidden");
+	});
+	$("#Edit").on('click', function () {
+		$("#Cancel").removeAttr("hidden");
+		$("#SubmitForm").removeAttr("hidden");
+		$("#Edit").attr("hidden",true);
+	});
+	$("#Cancel").on('click', function () {
+		$("#Cancel").attr("hidden", true);
+		$("#SubmitForm").attr("hidden", true);
+		$("#Edit").removeAttr("hidden");
+	});
+</script>

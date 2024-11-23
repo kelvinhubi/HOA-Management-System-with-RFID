@@ -8,8 +8,8 @@
     <input asp-for="@Model.Home.CreatedAt" id="FeesName" hidden />
     <div class="form-group">
         <label asp-for="@Model.Home.FullName" class="control-label">Select Homeowner</label>
-        <select asp-for="@Model.Home.FullName" onclick="CheckName()" id="FullName" class="form-control">
-            @foreach (var obj in Model.Homeacc)
+        <select asp-for="@Model.Home.FullName" onclick="CheckName()"  id="FullName" class="form-control">
+            @foreach (var obj in Model.Homeacc.Where(_=>_.Role == "Homeowner"))
             {
                 <option value="@obj.FullName" data-another="@obj.AccountID">@obj.FullName</option>
             }
@@ -59,7 +59,7 @@
             $("#UserPartial").css("display", "none");
             $("#bution").html('Hide');
             $("body").css("background", "rgba(0, 0, 0, 0.4)");
-
+            CheckName();
         }
     }
     function CheckName() {

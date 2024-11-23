@@ -2,6 +2,7 @@
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.InfoSec;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -110,16 +111,40 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public IActionResult HomeList()
         {
             if (CheckRole()) {
-                var result = _db.homesLists.Where(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
-                if (result != null)
-                {
-                    return View(result);
-                }
-                return View();
+                NewModel model = new NewModel();
+                model.Homes = _db.homesLists.ToList();
+                model.Homeacc = _db.Homeowner_Details.ToList();
+                model.HomeRequests = _db.homeRequests.Where(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+                return View(model);
             }
             return RedirectToAction("AccessDenied", "Home");
         }
 
+        public IActionResult _AcceptRequest(int? id) {
+            if (id == null) {
+                return NotFound();
+            }
+            var info = _db.homeRequests.FirstOrDefault(_ => _.HomeReqID == id);
+            if (info == null) { return NotFound(); }
+            info.Status = "Approved";
+            _db.homeRequests.Update(info);
+            _db.SaveChanges();
+            return RedirectToAction("HomeList", "UserMenu");
+        }
+
+        public IActionResult _RejectRequest(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var info = _db.homeRequests.FirstOrDefault(_ => _.HomeReqID == id);
+            if (info == null) { return NotFound();}
+            info.Status = "Rejected";
+            _db.homeRequests.Update(info);
+            _db.SaveChanges();
+            return RedirectToAction("HomeList", "UserMenu");
+        }
         public bool CheckRole()
         {
             var usertype = HttpContext.Session.GetString("UserType");
