@@ -56,7 +56,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 return View();
             }
 
-            return RedirectToAction("AccessDenied", "Home");
+            return RedirectToAction("AccessDenied", "MainMenu");
 
         }
         //Announcements
@@ -68,7 +68,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 model.Announcement = new Announcements();
                 return View(model);
             }
-            return RedirectToAction("AccessDenied", "Home");
+            return RedirectToAction("AccessDenied", "MainMenu");
 
         }
 
@@ -118,7 +118,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
                 return View(model);
             }
-            return RedirectToAction("AccessDenied", "Home");
+            return RedirectToAction("AccessDenied", "MainMenu");
         }
 
         public IActionResult _UserManagementCreate()
@@ -341,7 +341,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 model.ListDues = result.ToList();
                 return View(model);
             }
-            return RedirectToAction("AccessDenied", "Home");
+            return RedirectToAction("AccessDenied", "MainMenu");
 
         }
         [HttpPost]
@@ -628,7 +628,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
                 return View(_db.logsLists.ToList());
             }
-            return RedirectToAction("AccessDenied", "Home");
+            return RedirectToAction("AccessDenied", "MainMenu");
         }
         public IActionResult PrintLogs(string? nameformat)
         {
@@ -750,7 +750,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             if (CheckRole()) {
                     return View(_db.Guard_Information.ToList());
             }
-            return RedirectToAction("AccessDenied", "Home");
+            return RedirectToAction("AccessDenied", "MainMenu");
         }
         public IActionResult _GuardManagementCreate() {
             return PartialView();
@@ -863,7 +863,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 model.Homeacc = _db.Homeowner_Details.ToList();
                 return View(model);
             }
-            return RedirectToAction("AccessDenied", "Home");
+            return RedirectToAction("AccessDenied", "MainMenu");
         }
 
         public IActionResult _CreateVehicle() { return PartialView(); }
@@ -1115,7 +1115,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 model.Homeacc = _db.Homeowner_Details.Where(_=>_.Role =="Homeowner").ToList();
                 return View(model);
             }
-            return RedirectToAction("AccessDenied", "Home");
+            return RedirectToAction("AccessDenied", "MainMenu");
         }
         public IActionResult _AddHomesList() {
             return PartialView();
@@ -1297,6 +1297,15 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 }
             }
             return false;
+        }
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index", "Home");
+        }
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
         public static string CreateMailBody(string Username, string Password)
         {

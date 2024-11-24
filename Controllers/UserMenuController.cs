@@ -26,8 +26,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         {
             if (CheckRole()) {
                 NewModel model = new NewModel();
+                model.Vehicles = _db.Vehicle_Information.Where(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID"))).ToList();
                 model.ListDues = _db.Due_Details.Where(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID"))).ToList();
-                return View(model); }
+                model.Homes = _db.homesLists.Where(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID"))).ToList();
+                return View(model); 
+            }
             return RedirectToAction("AccessDenied", "Home");
         }
         public IActionResult AssociationDues()
@@ -104,7 +107,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 }
                 return View();
             }
-            return RedirectToAction("AccessDenied", "Home");
+            return RedirectToAction("AccessDenied", "UserMenu");
         }
 
 
@@ -117,7 +120,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 model.HomeRequests = _db.homeRequests.Where(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
                 return View(model);
             }
-            return RedirectToAction("AccessDenied", "Home");
+            return RedirectToAction("AccessDenied", "UserMenu");
         }
 
         public IActionResult _AcceptRequest(int? id) {
@@ -129,7 +132,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             info.Status = "Approved";
             _db.homeRequests.Update(info);
             _db.SaveChanges();
-            return RedirectToAction("HomeList", "UserMenu");
+            return RedirectToAction("AccessDenied", "UserMenu");
         }
 
         public IActionResult _RejectRequest(int? id)
@@ -164,13 +167,21 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
         public IActionResult _ChangeUserPass()
         {
-            var result = _db.User_Accounts.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
-            return View(result);
+            if (CheckRole()) {
+                var result = _db.User_Accounts.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+                return View(result);
+            }
+            return RedirectToAction("AccessDenied", "UserMenu");
         }
         public IActionResult _ChangeDetails()
         {
-            var result = _db.Homeowner_Details.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
-            return View(result);
+            if (CheckRole())
+            {
+                var result = _db.Homeowner_Details.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+                return View(result);
+            }
+                
+            return RedirectToAction("AccessDenied", "UserMenu");
         }
         [HttpPost]
         public JsonResult UpdateDetails(Homeowner_details info) {
@@ -213,6 +224,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 			}
 			return Json(new { success = false });
 		}
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
         //Chat
         public IActionResult Chat()
         {

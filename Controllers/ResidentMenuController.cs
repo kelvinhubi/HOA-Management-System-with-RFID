@@ -17,11 +17,21 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
         public IActionResult Dashboard()
         {
-            return View();
+            if (CheckRole()) { 
+                ViewData["JoinedHomes"] = _db.homeRequests.Where(_ => _.ResidentID == Convert.ToInt32(HttpContext.Session.GetString("SessionID"))).Count();
+                ViewData["Vehicles"] = _db.Vehicle_Information.Where(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID"))).Count();
+                return View();
+            }
+            return RedirectToAction("Index", "Home");
         }
 
         //Announcements
-        public IActionResult Announcements() { return View(_db.Announcements.ToList()); }
+        public IActionResult Announcements() { 
+            if (CheckRole()) {
+                return View(_db.Announcements.ToList());
+            }
+            return RedirectToAction("AccessDenied", "ResidentMenu");
+        }
         //HomesList
         public IActionResult HomeList() {
             if (CheckRole())
@@ -51,15 +61,22 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
 
         //Profile
-        public IActionResult _ChangeUserPass()
+       public IActionResult _ChangeUserPass()
         {
-            var result = _db.User_Accounts.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
-            return View(result);
+            if (CheckRole()) {
+                var result = _db.User_Accounts.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+                return View(result);
+            }
+            return RedirectToAction("AccessDenied", "ResidentMenu");
         }
         public IActionResult _ChangeDetails()
         {
-            var result = _db.Homeowner_Details.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
-            return View(result);
+            if (CheckRole())
+            {
+                var result = _db.Homeowner_Details.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+                return View(result);
+            }
+            return RedirectToAction("AccessDenied", "ResidentMenu");
         }
         [HttpPost]
         public JsonResult UpdateDetails(Homeowner_details info)
@@ -127,7 +144,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             _db.SaveChanges();
             return RedirectToAction("HomeList","ResidentMenu");
         }
-
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index", "Home");
+        }
         public bool CheckRole()
         {
             var usertype = HttpContext.Session.GetString("UserType");
@@ -145,6 +166,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 }
             }
             return false;
+        }
+        public IActionResult AccessDenied() {
+            return View();
         }
     }
 }

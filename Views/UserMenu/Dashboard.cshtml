@@ -6,6 +6,8 @@
     var TotalAmountDue = model1.Sum(_ => Convert.ToInt32(_.Amount));
     var OverDue = model2;
     var PendingPaymentsCount = ViewData["Pending Payments"];
+    var vehicle = Model.Vehicles.Count();
+    var Homes = Model.Homes.Count();
 }
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -29,15 +31,27 @@
 
             <div class="col-lg-3 col-6">
                 <!--begin::Small Box Widget 1-->
-                <div class="small-box text-bg-primary">
+                <div class="small-box text-bg-success">
                     <div class="inner">
-                        <h3>@@</h3>
-                        <p>User</p>
+                        <h3>@vehicle</h3>
+                        <p>Vehicles</p>
                     </div>  <a asp-action="UserManagement" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
                         More info <i class="bi bi-link-45deg"></i>
                     </a>
                 </div> <!--end::Small Box Widget 1-->
-            </div> <!--end::Col-->
+            </div><!--end::Col-->
+
+            <div class="col-lg-3 col-6">
+                <!--begin::Small Box Widget 2-->
+                <div class="small-box text-bg-warning">
+                    <div class="inner">
+                        <h3>@TotalAmountDue</h3>
+                        <p>Owned Homes</p>
+                    </div>  <a asp-action="AssociationDues" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+                        More info <i class="bi bi-link-45deg"></i>
+                    </a>
+                </div> <!--end::Small Box Widget 2-->
+            </div>
 
             <div class="col-lg-3 col-6">
                 <!--begin::Small Box Widget 2-->

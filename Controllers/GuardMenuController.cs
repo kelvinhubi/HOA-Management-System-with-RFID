@@ -176,7 +176,10 @@ public class GuardMenuController : Controller
         return Json(0);
     }
     public IActionResult EntryandExitLogs() {
-        return View();
+        if (CheckRole()) {
+            return View();
+        }
+        return RedirectToAction("AccessDenied", "GuardMenu");
     }
     public async Task<IActionResult> PrintLogs(string? nameformat)
     {
@@ -346,17 +349,25 @@ public class GuardMenuController : Controller
         var result =  _db.accessLogs.Count();
         return Json(result);
     }
-	public IActionResult _ChangeUserPass()
-	{
-		var result = _db.Guard_Information.FirstOrDefault(_ => _.ID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
-		return View(result);
-	}
-	public IActionResult _ChangeDetails()
-	{
-		var result = _db.Guard_Information.FirstOrDefault(_ => _.ID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
-		return View(result);
-	}
-	[HttpPost]
+    public IActionResult _ChangeUserPass()
+    {
+        if (CheckRole())
+        {
+            var result = _db.Guard_Information.FirstOrDefault(_ => _.ID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+            return View(result);
+        }
+        return RedirectToAction("AccessDenied", "UserMenu");
+    }
+    public IActionResult _ChangeDetails()
+    {
+        if (CheckRole())
+        {
+            var result = _db.Guard_Information.FirstOrDefault(_ => _.ID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+            return View(result);
+        }
+        return RedirectToAction("AccessDenied", "UserMenu");
+    }
+    [HttpPost]
 	public JsonResult UpdateDetails(Guard_Information info)
 	{
 		if (ModelState.IsValid)
@@ -401,6 +412,32 @@ public class GuardMenuController : Controller
 		}
 		return Json(new { success = false });
 	}
+    public IActionResult Logout() {
+        HttpContext.Session.Clear();
+        return RedirectToAction("Index","Home");
+    }
+    public bool CheckRole()
+    {
+        string? usertype = HttpContext.Session.GetString("UserType");
+        Console.WriteLine(usertype);
+        if (usertype != null)
+        {
+            if (usertype == "Guard")
+            {
+                return true;
+
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return false;
+    }
+    public IActionResult AccessDenied()
+    {
+        return View();
+    }
     //Chat
     public IActionResult Chat()
     {
