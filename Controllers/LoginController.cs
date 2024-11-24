@@ -191,8 +191,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     }
                     else
                     {
-                        HttpContext.Session.SetString("SessionID", _account.AccountID.ToString());
-                        HttpContext.Session.SetString("SessionUsername", info.Username);
+                        
                         isLoggedIn = true;
                     }
 
@@ -204,6 +203,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 try
                 {
 
+                    HttpContext.Session.SetString("SessionID", _account.AccountID.ToString());
+                    HttpContext.Session.SetString("SessionUsername", info.Username);
                     HttpContext.Session.SetString("UserType", "Guard");//JsonConvert.SerializeObject
                     return RedirectToAction("EntryandExitLogs", "GuardMenu");
                 }

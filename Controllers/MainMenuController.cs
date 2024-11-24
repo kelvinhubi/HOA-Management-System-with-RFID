@@ -1244,6 +1244,42 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return Json(0);
         }
+        [HttpPost]
+        public JsonResult CheckPlateNo(string userdata)
+        {
+            if (userdata != null)
+            {
+
+                var SearchData = _db.Vehicle_Information.Where(x => x.PlateNo == userdata).Count();
+                if (SearchData != 0)
+                {
+                    return Json(1);
+                }
+                else
+                {
+                    return Json(0);
+                }
+            }
+            return Json(0);
+        }
+        [HttpPost]
+        public JsonResult CheckRfidNumber(string userdata)
+        {
+            if (userdata != null)
+            {
+
+                var SearchData = _db.Vehicle_Information.Where(x => x.RFID_number == userdata).Count();
+                if (SearchData != 0)
+                {
+                    return Json(1);
+                }
+                else
+                {
+                    return Json(0);
+                }
+            }
+            return Json(0);
+        }
         public bool CheckRole()
         {
             string? usertype = HttpContext.Session.GetString("UserType");

@@ -38,23 +38,7 @@
 </div>
     <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script>
 <script>
-    window.onload = async function(){
-        Timer();
-        populate();
-    }
-    async function Timer() { 
-        setInterval(function () {
-            console.log("PR");
-            $.get('@Url.Action("getCount", "GuardMenu")', function (data) {
-                console.log(data);
-                console.log(updatedvalue);
-                if (updatedvalue < data) {
-                    populate();
-                    
-                }
-            });
-        }, 2000);
-    }
+    populate();
     let updatedvalue = 0;
    async function populate() { 
         if ($.fn.DataTable.isDataTable('#mytable')) {
@@ -81,6 +65,7 @@
     notification.textContent = "";
     notification.classList.add('notification');
     notification.textContent = Message;
+        populate();
     setTimeout(() => {
         notification.classList.remove('notification');
         notification.textContent = "";

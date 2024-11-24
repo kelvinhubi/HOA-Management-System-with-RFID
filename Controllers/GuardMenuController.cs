@@ -17,6 +17,7 @@ using QuestPDF.Fluent;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Infrastructure;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Text.RegularExpressions;
+using DocumentFormat.OpenXml.Bibliography;
 public class GuardMenuController : Controller
 {
     private readonly AppDbContext _db;
@@ -25,7 +26,7 @@ public class GuardMenuController : Controller
     private readonly IDbContextFactory<OfflineAppDbContext> _asyncdb2;
     private readonly IHubContext<MyHub> _hub;
     private readonly EnvironmentModel _env;
-    public int SessionID;
+
     public GuardMenuController(AppDbContext context, ArduinoLog service,IDbContextFactory<AppDbContext> db2, IDbContextFactory<OfflineAppDbContext> db3, IHubContext<MyHub> hubContext, IOptions<EnvironmentModel> env)
     {
          _db = context;
@@ -38,8 +39,9 @@ public class GuardMenuController : Controller
     public async Task<JsonResult> EntryLogging(string rfid)
     {
             
-            string data = Regex.Replace(rfid, @"\r\n", ""); ;
-            if (data != string.Empty)
+            string data = Regex.Replace(rfid, @"\r\n", "");
+        int SessionID = Convert.ToInt32(HttpContext.Session.GetString("SessionID"));
+        if (data != string.Empty)
             {
                 bool online = await ConnectivityChecker.IsOnline();
                 if (online)
@@ -174,7 +176,6 @@ public class GuardMenuController : Controller
         return Json(0);
     }
     public IActionResult EntryandExitLogs() {
-        SessionID = Convert.ToInt32(HttpContext.Session.GetString("SessionID"));
         return View();
     }
     public async Task<IActionResult> PrintLogs(string? nameformat)
