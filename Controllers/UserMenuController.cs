@@ -31,7 +31,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 model.Homes = _db.homesLists.Where(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID"))).ToList();
                 return View(model); 
             }
-            return RedirectToAction("AccessDenied", "Home");
+            return RedirectToAction("AccessDenied", "UserMenu");
         }
         public IActionResult AssociationDues()
         {
@@ -41,7 +41,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("AccessDenied", "Home");
+            return RedirectToAction("AccessDenied", "UserMenu");
         }
         [HttpPost]
         public async Task<JsonResult> Payout(string Amount, string Invoice) {
@@ -227,6 +227,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public IActionResult AccessDenied()
         {
             return View();
+        }
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index", "Home");
         }
         //Chat
         public IActionResult Chat()

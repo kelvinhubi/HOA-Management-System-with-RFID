@@ -18,7 +18,6 @@ using System.Data;
 using DocumentFormat.OpenXml.EMMA;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Hubs;
 using Microsoft.AspNetCore.SignalR;
-
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
 
@@ -932,7 +931,12 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
 
         //Fees Controller
-        public IActionResult Fees() { return View(_db.feesLists.ToList()); }
+        public IActionResult Fees() { 
+            if (CheckRole()) {
+                return View(_db.feesLists.ToList());
+            }
+            return RedirectToAction("AccessDenied", "MainMenu");
+        }
 
         public IActionResult _CreateFees() { return PartialView(); }
         [HttpPost]
@@ -1066,8 +1070,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
         //Profile
         public IActionResult Profile() {
-            var result = _db.Admin_Accounts.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
-            return View(result);
+            if (CheckRole()) {
+                var result = _db.Admin_Accounts.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+                return View(result);
+            }
+            return RedirectToAction("AccessDenied", "MainMenu");
         }
 		[HttpPost]
 		public JsonResult UpdateProfile(int AccountID, string Password, string Username)

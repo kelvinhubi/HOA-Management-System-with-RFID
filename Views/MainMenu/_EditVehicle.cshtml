@@ -92,12 +92,12 @@
                 if (data == 0) {
                     $("#Status1").html('<font color = "Green"> RFID Number Available.</font>');
                     $("#button1").removeAttr('disabled');
-                    RFID = false;
+                    PLATE = true;
                 }
                 else {
                     $("#Status1").html('<font color = "White"> RFID Number already Exist!.</font>');
                     $("#button1").attr('disabled', 'disabled');
-                    RFID = true;
+                    RFID = false;
                 }
             });
     }
@@ -111,16 +111,16 @@
                 if (data == 0) {
                     $("#Status").html('<font color = "Green"> RFID Number Available.</font>');
                     $("#button1").removeAttr('disabled');
-                    PLATE = false;
+                    PLATE = true;
                 }
                 else {
                     $("#Status").html('<font color = "White"> RFID Number already Exist!.</font>');
                     $("#button1").attr('disabled', 'disabled');
-                    PLATE = true;
+                    PLATE = false;
                 }
             });
     }
-    var RFID = false;
+    var RFID = true;
     var PLATE = false;
 
     setInterval(Validation, 200);
