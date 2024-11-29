@@ -40,5 +40,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data
         public DbSet<HomesList> homesLists { get; set; }
         public DbSet<AccessLog> accessLogs { get; set; }
         public DbSet<HomeRequest> homeRequests { get; set; }
+        public DbSet<ChatHistory> chatHistory { get; set; }
     }
 }

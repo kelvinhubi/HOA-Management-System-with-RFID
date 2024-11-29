@@ -44,6 +44,7 @@ connection.on("RecieveMessage", function (Name, Message, Time) {
             +Name + ' ' + Time +'</span></div>');
     }
 });
+
 connection.on("AdminError", function (Message) {
     const notification = document.getElementById('notifications');
     notification.classList.remove('notification');
