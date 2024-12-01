@@ -54,5 +54,23 @@
         $.get('@Url.Action("GetSessionName","Login")', function (data) {
             $('#Nameval').val(data);
         });
+        $.get('@Url.Action("LoadChatHistory", "MainMenu")', function (data) {
+            console.log(data);
+            if (data != 0) {
+                var MainUser = $('#Nameval').val();
+                for (i = 0; i < data.length; i++) {
+                    if (MainUser === data[i].userName) {
+                        $('#pops').append('<div class="msg-reverse"><p>'
+                            + data[i].message + '</p><span>'
+                            + data[i].userName + ' ' + data[i].date + '</span></div>');
+                    }
+                    if (MainUser != data[i].userName) {
+                        $('#pops').append('<div class="msg"><p>'
+                            + data[i].message + '</p><span>'
+                            + data[i].userName + ' ' + data[i].date + '</span></div>');
+                    }
+                }
+            }
+        });
     }
 </script>

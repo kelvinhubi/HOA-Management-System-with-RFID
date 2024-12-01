@@ -1,6 +1,7 @@
 ﻿var connection = new signalR.HubConnectionBuilder().withUrl("/chat").build();
 connection.start().catch(function (err) {
     return console.error(err.toString());
+
 });
 $("#sendmessage").on('click', function (event) {
     var message = document.getElementById("message").value;
@@ -37,11 +38,13 @@ connection.on("RecieveMessage", function (Name, Message, Time) {
         $('#pops').append('<div class="msg-reverse"><p>'
             + Message + '</p><span>'
             + Name + ' ' + Time + '</span></div>');
+        scrollbot();
     }
     if (MainUser != Name) {
         $('#pops').append('<div class="msg"><p>'
             + Message + '</p><span>'
-            +Name + ' ' + Time +'</span></div>');
+            + Name + ' ' + Time + '</span></div>');
+        scrollbot();
     }
 });
 
@@ -51,9 +54,17 @@ connection.on("AdminError", function (Message) {
     notification.textContent = "";
     notification.classList.add('notification');
     notification.textContent = Message;
-    console.log(Message);
     setTimeout(() => {
         notification.classList.remove('notification');
         notification.textContent = "";
     }, 5000);
 });
+let out = document.querySelector("#pops");
+function scrollbot() {
+
+    let isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop;
+    console.log(isScrolledToBottom);
+    if (!isScrolledToBottom) {
+        out.scrollTop = out.scrollHeight - out.clientHeight;
+    }
+}
