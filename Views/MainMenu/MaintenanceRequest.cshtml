@@ -16,7 +16,6 @@
         <thead class="table-light">
             <tr>
                 <th>Request ID</th>
-                <th>Homeowner Name</th>
                 <th>Request Type</th>
                 <th>Request Date</th>
                 <th>Request Status</th>
@@ -30,7 +29,6 @@
                 var obj2 = Model.Homeacc.FirstOrDefault(_ => _.AccountID == obj.AccountID);
                 <tr>
                     <td>@obj.RequestID</td>
-                    <td>@obj2.FullName</td>
                     <td>@obj.RequestType</td>
                     <td><div id="duedate">@obj.RequestDate</div></td>
                     @if (obj.RequestStatus == "Completed")

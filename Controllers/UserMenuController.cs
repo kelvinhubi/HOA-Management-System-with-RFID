@@ -188,6 +188,16 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
             return PartialView(result);
         }
+
+        //Pets
+        public IActionResult Pets() { 
+            OwnerPetInfo model = new OwnerPetInfo();
+            model.Pets = _db.PetInformation.ToList();
+            return View(model); 
+        }
+        public IActionResult _AddPets(OwnerPetInfo info) { 
+            return View(info);
+        }
         public bool CheckRole()
         {
             var usertype = HttpContext.Session.GetString("UserType");

@@ -1,0 +1,68 @@
+﻿@model OwnerPetInfo
+@{
+    Model.Pets.Add(new PetInformation { AccountID = 0, Name="",Species="",Age=0 });
+}
+<head>
+    <style>p{margin-top: 5px}</style>
+</head>
+<Button runat="server" id="bution" class="btn btn-success" style="position:sticky;">Add Pets</Button>
+<form asp-action="_AddPets" asp-controller="UserMenu" class="form" id="thisform">
+    <p class="title">Pet Information</p>
+    <input asp-for="Pets[0].AccountID" class="form-control" value="" hidden />
+    <div id="pets">
+        <p>Pet #1</p>
+        <div class="form-group">
+            <label asp-for="Pets[0].Name" class="form-label">Name:</label>
+            <input asp-for="Pets[0].Name" class="form-control" type="text" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Pets[0].Species" class="form-label">Species:</label>
+            <input asp-for="Pets[0].Species" class="form-control" type="text" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Pets[0].Age" class="form-label">Age:</label>
+            <input asp-for="Pets[0].Age" class="form-control" />
+        </div>
+    </div>
+    <button class="btn-sm btn-primary" type="button" onclick="addPet()">Add another pet</button>
+    <div class="form-group">
+        <input type="submit" value="Request" class="btn btn-primary" />
+    </div>
+</form>
+<script>
+    var newPetCount = 1;
+    function addPet() {
+        // Add a new Pet object to the Model.Pets collection using JavaScript
+        var newPetHtml = '<div class="pet"><p>Pet #' + (newPetCount+1) +'</p>' +
+            '<label for="Pets[' + newPetCount + '].Name"class="form-label">Name:</label>' +
+            '<input class="form-control" type="text" id="Pets[' + newPetCount + '].Name" name="Pets[' + newPetCount + '].Name" />' +
+            '<label for="Pets[' + newPetCount + '].Species" class="form-label">Species:</label>' +
+            '<input class="form-control" type="text" id="Pets[' + newPetCount + '].Species" name="Pets[' + newPetCount + '].Species" />' +
+            '<label for="Pets[' + newPetCount + '].Age" class="form-label">Age:</label>' +
+            '<input class="form-control" type="text" id="Pets[' + newPetCount + '].Age" name="Pets[' + newPetCount + '].Age" />' +
+            '</div>';
+        $("#pets").append(newPetHtml);
+        newPetCount++;
+    }
+
+
+    var btn = document.getElementById("bution")
+    $("#thisform").css("display", "none");
+    btn.onclick = function () {
+        if ($("#thisform").css("display") == "block") {
+            $("#thisform").css("display", "none");
+            $("#UserPartial").css("display", "block");
+            $("#bution").html('Add Home');
+            document.getElementById("bution").style.cssText = "display: block; position: inherit;";
+            $("body").css("background", "rgba(0, 0, 0, 0)");
+        }
+        else {
+            this.blur();
+            $("#thisform").css("display", "block");
+            document.getElementById("bution").style.cssText = "position: fixed;";
+            $("#UserPartial").css("display", "none");
+            $("#bution").html('Hide');
+            $("body").css("background", "rgba(0, 0, 0, 0.4)");
+        }
+    }
+</script>
