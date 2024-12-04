@@ -62,7 +62,10 @@
                     
                     @{url = Url.Action("VehiclesList", "UserMenu");}
                 <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-car nav-icon'></i> <span class="nav_name">Vehicles List</span></a>
-                    
+                @{
+                    url = Url.Action("MaintenanceRequest", "UserMenu");
+                }
+                <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-car nav-icon'></i> <span class="nav_name">My Maintenance Requests</span></a>
                     @{url = Url.Action("HomeList", "UserMenu");}
                     <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-building-house nav_icon'></i> <span class="nav_name">Home List</span></a>
                         <a  class="nav_link dropdown-toggle" data-bs-toggle="dropdown">
@@ -89,7 +92,7 @@
     <div class="height-100" style="margin-top:4rem">
         <div id="notifications"></div>
             @RenderBody()
-             @await Html.PartialAsync("../MainMenu/Chat.cshtml")
+             @await Html.PartialAsync("../UserMenu/Chat.cshtml")
         </div>
         <!--Container Main end-->
     <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script>

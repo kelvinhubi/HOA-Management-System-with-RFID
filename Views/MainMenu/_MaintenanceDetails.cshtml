@@ -1,0 +1,55 @@
+﻿@model NewModel
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<head>
+    <title>
+        @{
+            ViewData["Title"] = "Request Details";
+        }
+    </title>
+
+</head>
+<div class="card mb-4">
+    <div class="card-header">Request Details</div>
+    <div class="card-body">
+        <form>
+            <div class="mb-3">
+                <label class="small mb-1" asp-for="@Model.maintenance.RequestType">Request Type</label>
+                <input asp-for="@Model.maintenance.RequestType" class="form-control" type="text" readonly>
+            </div>
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="@Model.Homeowner.FullName">Full Name</label>
+                    <input asp-for="@Model.Homeowner.FullName" class="form-control" type="text" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="@Model.maintenance.RequestDexcription">Request Description</label>
+                    <textarea asp-for="@Model.maintenance.RequestDexcription" class="form-control" readonly></textarea>
+                </div>
+            </div>
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="@Model.maintenance.RequestDate">Request Date</label>
+                    <input asp-for="@Model.maintenance.RequestDate" class="form-control" type="date" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="@Model.maintenance.RequestStatus">Status</label>
+                    <input asp-for="@Model.maintenance.RequestStatus" class="form-control" readonly>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="small mb-1">Completion Date</label>
+                <input class="form-control" value="@Model.maintenance.CompletionDate.ToString("MMM dd, yyyy hh:mm tt")" readonly>
+            </div>
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="@Model.Homeowner.PhoneNo">Phone number</label>
+                    <input asp-for ="@Model.Homeowner.PhoneNo" class="form-control" readonly>
+                </div>
+                
+            </div>
+            <a asp-action="MaintenanceRequest" class="btn btn-primary">Back To List</a>
+        </form>
+    </div>
+</div>

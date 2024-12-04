@@ -5,6 +5,7 @@
             nav = document.getElementById(navId),
             bodypd = document.getElementById(bodyId),
             headerpd = document.getElementById(headerId)
+
         // Validate that all variables exist
         if (toggle && nav && bodypd && headerpd) {
             toggle.addEventListener('click', () => {
@@ -19,7 +20,18 @@
             })
         }
     }
-
+    const toggle2 = document.getElementById('header-toggle'),
+        nav2 = document.getElementById('nav-bar'),
+        bodypd2 = document.getElementById('body-pd'),
+        headerpd2 = document.getElementById('header')
+    // show navbar
+    nav2.classList.toggle('show')
+    // change icon
+    toggle2.classList.toggle('bx-x')
+    // add padding to body
+    bodypd2.classList.toggle('body-pd')
+    // add padding to header
+    headerpd2.classList.toggle('body-pd')
     showNavbar('header-toggle', 'nav-bar', 'body-pd', 'header')
 
     /*===== LINK ACTIVE =====*/

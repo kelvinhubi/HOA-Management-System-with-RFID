@@ -1,0 +1,149 @@
+﻿@model NewModel
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+
+}
+<head>
+    <title>
+        @{
+            ViewData["Title"] = "Maintenance Requests";
+        }
+    </title>
+</head>
+<div id="UserPartial">
+    <h2>Maintenance Requests</h2>
+    <table id="mytable" class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Request ID</th>
+                <th>Homeowner Name</th>
+                <th>Request Type</th>
+                <th>Request Date</th>
+                <th>Request Status</th>
+                <th>Completion Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model.maintenances)
+            {
+                var obj2 = Model.Homeacc.FirstOrDefault(_ => _.AccountID == obj.AccountID);
+                <tr>
+                    <td>@obj.RequestID</td>
+                    <td>@obj2.FullName</td>
+                    <td>@obj.RequestType</td>
+                    <td><div id="duedate">@obj.RequestDate</div></td>
+                    @if (obj.RequestStatus == "Completed")
+                    {
+                        <td><div id="status">@obj.RequestStatus</div></td>
+                        <td><div>@obj.CompletionDate.ToString("MMM dd, yyyy hh:mm tt")</div></td>
+                    }
+                    else if (obj.RequestStatus == string.Empty)
+                    {
+                        <td>Waiting for Approval</td>
+                        <td><div>N/A</div></td>
+                    }
+                    else
+                    {
+                        <td><div id="status">@obj.RequestStatus</div></td>
+                        <td>N/A</td>
+                    }
+                    @if (obj.RequestStatus == "Pending")
+                    {
+                        <td>
+                            <a asp-action="_MaintenanceDetails" class="btn btn-success btn-sm" asp-route-id="@obj.RequestID" model="@Model">Details<i class='bx bxs-user-detail'></i></a>
+                            <a asp-action="_MaintenanceComplete" class="btn btn-primary btn-sm" asp-route-id="@obj.RequestID">Complete Request</a>
+                        </td>
+
+                    }
+                    else if (obj.RequestStatus == "Completed")
+                    {
+
+                        <td><a asp-action="_MaintenanceDetails" class="btn btn-success btn-sm" asp-route-id="@obj.RequestID" model="@Model">Details<i class='bx bxs-user-detail'></i></a></td>
+                    }
+                    else
+                    {
+                        <td>
+                            <a asp-action="_MaintenanceDetails" class="btn btn-success btn-sm" asp-route-id="@obj.RequestID" model="@Model">Details<i class='bx bxs-user-detail'></i></a>
+                            <a asp-action="_MaintenanceReject" class="btn btn-danger btn-sm" asp-route-id="@obj.RequestID">Reject Request<i class='bx bxs-trash'></i></a>
+                            <a asp-action="_MaintenancePending" class="btn btn-primary btn-sm" asp-route-id="@obj.RequestID">Accept Request<i class='bx bxs-trash'></i></a>
+                        </td>
+                    }
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script>
+    var table = new DataTable('#mytable');
+    $(document).ready(function () {
+        var table = document.querySelectorAll("#status");
+        for (let i = 0; i < table.length; i++) {
+            let col = table[i].innerHTML;
+            if (col == "Rejected") {
+                table[i].classList.add('bx', 'bxs-user-x', 'card-danger', 'bg-danger')
+                table[i].style.cssText = "width:100%; padding:15px;";
+            }
+            if (col == "Completed") {
+                table[i].classList.add('bx', 'bxs-user-x', 'card-success', 'bg-success')
+                table[i].style.cssText = "width:100%; padding:15px;";
+            }
+            if (col == "Pending") {
+                table[i].classList.add('bx', 'bxs-user-x', 'card-warning', 'bg-success')
+                table[i].style.cssText = "width:100%; padding:15px;";
+            }
+        }
+        var table = document.querySelectorAll("#duedate");
+        for (let i = 0; i < table.length; i++) {
+            let col = table[i].innerHTML
+            var due = new Date(col)
+            var date = new Date()
+            if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
+                table[i].classList.add('bx', 'bxs-error-alt', 'card-warning', 'bg-warning');
+                table[i].style.cssText = "width:100%; padding:15px;";
+
+            }
+
+        }
+        $(document, "dt-column-title").on('click change', function () {
+            var table = document.querySelectorAll("#status");
+            for (let i = 0; i < table.length; i++) {
+                let col = table[i].innerHTML;
+                if (col == "Unpaid") {
+                    table[i].classList.add('bx', 'bxs-user-x', 'card-danger', 'bg-danger')
+                    table[i].style.cssText = "width:100%; padding:15px;";
+                }
+                if (col == "Paid") {
+                    table[i].classList.add('bx', 'bxs-user-x', 'card-success', 'bg-success')
+                    table[i].style.cssText = "width:100%; padding:15px;";
+                }
+            }
+            var table = document.querySelectorAll("#duedate");
+            for (let i = 0; i < table.length; i++) {
+                let col = table[i].innerHTML
+                var due = new Date(col)
+                var date = new Date()
+                if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
+                    table[i].classList.add('bx', 'bxs-error-alt', 'card-warning', 'bg-warning');
+                    table[i].style.cssText = "width:100%; padding:15px;";
+
+                }
+
+            }
+        })
+    });
+</script>
+<!--<div class="col-md-3 col-sm-6 col-12">
+    <div class="info-box text-bg-warning" style="display: flex;flex-direction: column;overflow-wrap:break-word;overflow: hidden; width:100%;">
+        <span class="info-box-icon"> <i class='bx bxs-info-square'></i> </span>
+        <div class="info-box-content">
+            <span class="info-box-text">Likes</span> <span class="info-box-number">jjfdksl;fjdkla;jkfdl;ajklf;dasjkl;fdjaskl;jfdkasl;jfdksal;jfdksal;jfdkals;jfdklsa;jkflds;ajkfld;sajkfldsa;jkfdls;ajfkdlas;jfkdlsa;jklf;dsa<br />fdsajkfl;dsajkl;fdajskl;fdjsakl;jfdkasl;jkl;fdas</span><span class="info-box-text">Likes</span> <span class="info-box-number">jjfdksl;fjdkla;jkfdl;ajklf;dasjkl;fdjaskl;jfdkasl;jfdksal;jfdksal;jfdkals;jfdklsa;jkflds;ajkfld;sajkfldsa;jkfdls;ajfkdlas;jfkdlsa;jklf;dsa<br />fdsajkfl;dsajkl;fdajskl;fdjsakl;jfdkasl;jkl;fdas</span>
+            <div class="progress">
+                <div class="progress-bar" style="width: 70%"></div>
+            </div> <span class="progress-description">
+                <button class="btn btn-sm btn-primary">Approve</button>
+            </span>
+        </div>
+    </div> 
+</div>  /.col -->

@@ -60,11 +60,14 @@ connection.on("AdminError", function (Message) {
     }, 5000);
 });
 let out = document.querySelector("#pops");
-function scrollbot() {
 
-    let isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop;
-    console.log(isScrolledToBottom);
-    if (!isScrolledToBottom) {
+function scrollbot() {
+    let value = out.scrollHeight - out.clientHeight;
+    let isScrolledToBottom = value <= out.scrollTop +200;
+    if (isScrolledToBottom) {
         out.scrollTop = out.scrollHeight - out.clientHeight;
     }
+}
+function scrollbotonopen(){
+    out.scrollTop = out.scrollHeight - out.clientHeight;
 }

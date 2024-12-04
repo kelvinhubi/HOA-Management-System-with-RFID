@@ -1,7 +1,7 @@
 ﻿
 function openChatWindow() {
     document.getElementById("chat-form-container").style.display = "block";
-    scrollbot();
+    scrollbotonopen();
 }
 
 function closeChatWindow() {

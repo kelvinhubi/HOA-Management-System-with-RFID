@@ -29,5 +29,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         public IEnumerable<Guard_Information> guards { get; set; }
         public Guard_Information Guard { get; set; }
         public IEnumerable<HomeRequest> HomeRequests {get; set;} = Enumerable.Empty<HomeRequest>();
+        public IEnumerable<MaintenanceRequests> maintenances { get; set; } = Enumerable.Empty<MaintenanceRequests>();
+        public MaintenanceRequests maintenance { get; set; }
     }
 }

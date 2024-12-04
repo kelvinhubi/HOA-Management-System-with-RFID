@@ -96,7 +96,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return RedirectToAction("AccessDenied", "UserMenu");
         }
 
-
+        //VehicleList
         public IActionResult VehiclesList()
         {
             if (CheckRole()) {
@@ -110,7 +110,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return RedirectToAction("AccessDenied", "UserMenu");
         }
 
-
+        //HomeList
         public IActionResult HomeList()
         {
             if (CheckRole()) {
@@ -147,6 +147,46 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             _db.homeRequests.Update(info);
             _db.SaveChanges();
             return RedirectToAction("HomeList", "UserMenu");
+        }
+
+        //MaintenanceRequest
+        public IActionResult MaintenanceRequest() { 
+            NewModel model = new NewModel();
+            model.maintenances = _db.maintenanceRequests.Where(_=>_.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID"))).ToList();
+            return View(model);
+        }
+        public IActionResult _AddRequest(MaintenanceRequests info) {
+            info.AccountID = Convert.ToInt32(HttpContext.Session.GetString("SessionID"));
+            _db.maintenanceRequests.Add(info);
+            _db.SaveChanges();
+            return RedirectToAction("MaintenanceRequest");
+        }
+        public IActionResult _MaintenanceCancel(int? id)
+        {
+            if (id == null) { 
+                return NotFound();
+            }
+            var result = _db.maintenanceRequests.FirstOrDefault(_ => _.RequestID == id);
+            if (result == null) {
+                return NotFound();
+            }
+            _db.maintenanceRequests.Remove(result);
+            _db.SaveChanges();
+            return RedirectToAction("MaintenanceRequest");
+        }
+        public IActionResult _MaintenanceDetails(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var result = _db.maintenanceRequests.FirstOrDefault(_ => _.RequestID == id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return PartialView(result);
         }
         public bool CheckRole()
         {

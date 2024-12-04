@@ -1,0 +1,128 @@
+﻿@model NewModel
+@{
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+<head>
+    <title>
+        @{
+            ViewData["Title"] = "Payment Dues";
+        }
+    </title>
+</head>
+<div id="UserPartial">
+    <h2>My Maintenance Requests</h2>
+    <table id="mytable" class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Request ID</th>
+                <th>Request Type</th>
+                <th>Request Date</th>
+                <th>Request Status</th>
+                <th>Completion Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model.maintenances)
+            {
+                <tr>
+                    <td>@obj.RequestID</td>
+                    <td>@obj.RequestType</td>
+                    <td><div id="duedate">@obj.RequestDate</div></td>
+                    @if (obj.RequestStatus == "Completed")
+                    {
+                        <td><div id="status">@obj.RequestStatus</div></td>
+                        <td><div>@obj.CompletionDate</div></td>
+                        <td>
+                        <a asp-action="_MaintenanceDetails" class="btn btn-success btn-sm" asp-route-id="@obj.RequestID" model="@Model">Details<i class='bx bxs-user-detail'></i></a>
+                        <a asp-action="_MaintenanceCancel" class="btn btn-danger btn-sm" asp-route-id="@obj.RequestID">Delete Request<i class='bx bxs-trash'></i></a>
+                        </td>
+                    }
+                    else if(obj.RequestStatus ==string.Empty)
+                    {
+                        <td>Waiting for Approval</td>
+                        <td><div>N/A</div></td>
+                        <td>
+                        <a asp-action="_MaintenanceDetails" class="btn btn-success btn-sm" asp-route-id="@obj.RequestID" model="@Model">Details<i class='bx bxs-user-detail'></i></a>
+                        <a asp-action="_MaintenanceCancel" class="btn btn-danger btn-sm" asp-route-id="@obj.RequestID">Cancel Request<i class='bx bxs-trash'></i></a>
+                        </td>
+                    }
+                    else
+                    {
+                        <td><div id="status">@obj.RequestStatus</div></td>
+                        <td>N/A</td>
+                        <td>
+                        <a asp-action="_MaintenanceDetails" class="btn btn-success btn-sm" asp-route-id="@obj.RequestID" model="@Model">Details<i class='bx bxs-user-detail'></i></a>
+                        <a asp-action="_MaintenanceCancel" class="btn btn-danger btn-sm" asp-route-id="@obj.RequestID">Cancel Request<i class='bx bxs-trash'></i></a>
+                        </td>
+                    }
+                    
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@{
+    MaintenanceRequests user = new MaintenanceRequests();
+    <partial name="_AddRequest" model="user" />
+}
+<script>
+    var table = new DataTable('#mytable');
+    $(document).ready(function () {
+        var table = document.querySelectorAll("#status");
+        for (let i = 0; i < table.length; i++) {
+            let col = table[i].innerHTML;
+            if (col == "Rejected") {
+                table[i].classList.add('bx', 'bxs-user-x', 'card-danger', 'bg-danger')
+                table[i].style.cssText = "width:100%; padding:15px;";
+            }
+            if (col == "Completed") {
+                table[i].classList.add('bx', 'bxs-user-x', 'card-success', 'bg-success')
+                table[i].style.cssText = "width:100%; padding:15px;";
+            }
+            if (col == "Pending") {
+                table[i].classList.add('bx', 'bxs-user-x', 'card-warning', 'bg-success')
+                table[i].style.cssText = "width:100%; padding:15px;";
+            }
+        }
+        var table = document.querySelectorAll("#duedate");
+        for (let i = 0; i < table.length; i++) {
+            let col = table[i].innerHTML
+            var due = new Date(col)
+            var date = new Date()
+            if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
+                table[i].classList.add('bx', 'bxs-error-alt', 'card-warning', 'bg-warning');
+                table[i].style.cssText = "width:100%; padding:15px;";
+
+            }
+
+        }
+        $(document,"dt-column-title").on('click change',function () {
+            var table = document.querySelectorAll("#status");
+            for (let i = 0; i < table.length; i++) {
+                let col = table[i].innerHTML;
+                if (col == "Unpaid") {
+                    table[i].classList.add('bx', 'bxs-user-x', 'card-danger', 'bg-danger')
+                    table[i].style.cssText = "width:100%; padding:15px;";
+                }
+                if (col == "Paid") {
+                    table[i].classList.add('bx', 'bxs-user-x', 'card-success', 'bg-success')
+                    table[i].style.cssText = "width:100%; padding:15px;";
+                }
+            }
+            var table = document.querySelectorAll("#duedate");
+            for (let i = 0; i < table.length; i++) {
+                let col = table[i].innerHTML
+                var due = new Date(col)
+                var date = new Date()
+                if (due.getDate() <= date.getDate() && due.getMonth <= date.getMonth && due.getFullYear() <= date.getFullYear()) {
+                    table[i].classList.add('bx', 'bxs-error-alt', 'card-warning', 'bg-warning');
+                    table[i].style.cssText = "width:100%; padding:15px;";
+
+                }
+
+            }
+        })
+    });
+
+</script>

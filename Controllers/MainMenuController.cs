@@ -19,6 +19,8 @@ using DocumentFormat.OpenXml.EMMA;
 using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using QuestPDF.Companion;
+using Humanizer;
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
 
@@ -51,8 +53,12 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             {
 
                 ViewData["User Registrations"] = _db.Homeowner_Details.Count();
-                ViewData["RFID Registrations"] = _db.Vehicle_Information.Count();
+                ViewData["RFID Registrations"] = _db.Vehicle_Information.Where(_=>_.RFID_number=="N/A").Count();
                 ViewData["Pending Payments"] = _db.Due_Details.Where(x => x.Status == "Unpaid").Count();
+                ViewData["HoaMembers"] = _db.Homeowner_Details.Where(_=>_.Role =="Homeowner").Count();
+                ViewData["DeliquentMembers"] = _db.Due_Details.Where(x => x.Status == "Unpaid" && DateOnly.FromDateTime(DateTime.Now) < x.Date).Count();
+                ViewData["TotalVehicles"] = _db.Vehicle_Information.Count();
+                ViewData["Maintenance"] = _db.maintenanceRequests.Where(x => x.RequestStatus != "Completed").Count();
                 return View();
             }
 
@@ -550,7 +556,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                             FeesName = dues.FeesName,
                             TypeOfFee = dues.TypeOfFee,
                             Date = dues.Date,
-                            Status = dues.Status
+                            Status = dues.Status,
+                            Amount = dues.Amount
                         });
 
             if (nameformat == null)
@@ -559,13 +566,15 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             string filepath = "wwwroot\\ExportedFiles\\" + nameformat + "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_Logs.pdf";
             QuestPDF.Settings.License = LicenseType.Community;
-            void ComposeTable(IContainer container)
+            void ComposeTable(IContainer container,IContainer container2)
             {
-                container.Border(1).Table(table =>
+                container.Border(5).Table(table =>
                 {
+
                     table.ColumnsDefinition(columns =>
                     {
-                        columns.ConstantColumn(200);
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
                         columns.RelativeColumn();
                         columns.RelativeColumn();
                         columns.RelativeColumn();
@@ -575,37 +584,96 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
                     table.Header(header =>
                     {
-                        header.Cell().Text("Homeowner Name");
-                        header.Cell().Text("Invoice");
-                        header.Cell().Text("Fee Name");
-                        header.Cell().Text("Type of Due");
-                        header.Cell().Text("Date");
-                        header.Cell().Text("Status");
+                        header.Cell().ColumnSpan(7).Element(Block).Text("Collected Dues");
+                        header.Cell().Element(Block).Text("Homeowner Name");
+                        header.Cell().Element(Block).Text("Invoice");
+                        header.Cell().Element(Block).Text("Fee Name");
+                        header.Cell().Element(Block).Text("Type of Due");
+                        header.Cell().Element(Block).Text("Amount");
+                        header.Cell().Element(Block).Text("Date");
+                        header.Cell().Element(Block).Text("Status");
+
                     });
-                    var result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate)).ToList();
+
+
+                    var result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate) && _.Status == "Paid").ToList();
+                    var total = result.Sum(_ => Convert.ToInt32(_.Amount));
                     if (result.Count != 0)
                     {
                         foreach (var item in result)
                         {
-                            table.Cell().Text(item.FullName.ToString()).FontSize(11);
-                            table.Cell().Text(item.Invoice.ToString()).FontSize(11); 
-                            table.Cell().Text(item.FeesName.ToString()).FontSize(11); 
-                            table.Cell().Text(item.TypeOfFee.ToString()).FontSize(11); 
-                            table.Cell().Text(item.Date.ToString()).FontSize(11);
-                            table.Cell().Text(item.Status.ToString()).FontSize(11);
+
+                            table.Cell().RowSpan(2).Element(Block).Text(item.FullName.ToString()).FontSize(11);
+                            table.Cell().RowSpan(2).Element(Block).Text(item.Invoice.ToString()).FontSize(11);
+                            table.Cell().RowSpan(2).Element(Block).Text(item.FeesName.ToString()).FontSize(11);
+                            table.Cell().RowSpan(2).Element(Block).Text(item.TypeOfFee.ToString()).FontSize(11);
+                            table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+                            table.Cell().RowSpan(2).Element(Block).Text(item.Date.ToString()).FontSize(11);
+                            table.Cell().RowSpan(2).Element(Block).Text(item.Status.ToString()).FontSize(11);
+
                         }
+                        table.Cell().ColumnSpan(7).Element(Block).Text("Total Collected Dues: " + total.ToString()).FontSize(11);
                     }
                 });
+                container2.Border(5).Table(table =>
+                {
+                    table.ColumnsDefinition(columns =>
+                    {
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                    });
+
+                    table.Header(header =>
+                    {
+                        header.Cell().ColumnSpan(7).Element(Block).Text("Non Collected Dues");
+                        header.Cell().Element(Block).Text("Homeowner Name");
+                        header.Cell().Element(Block).Text("Invoice");
+                        header.Cell().Element(Block).Text("Fee Name");
+                        header.Cell().Element(Block).Text("Type of Due");
+                        header.Cell().Element(Block).Text("Amount");
+                        header.Cell().Element(Block).Text("Date");
+                        header.Cell().Element(Block).Text("Status");
+
+                    });
+
+
+                    var result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate) &&_.Status=="Unpaid").ToList();
+                    var total = result.Sum(_ =>Convert.ToInt32(_.Amount));
+                    if (result.Count != 0)
+                    {
+                        foreach (var item in result)
+                        {
+
+                            table.Cell().RowSpan(2).Element(Block).Text(item.FullName.ToString()).FontSize(11);
+                            table.Cell().RowSpan(2).Element(Block).Text(item.Invoice.ToString()).FontSize(11);
+                            table.Cell().RowSpan(2).Element(Block).Text(item.FeesName.ToString()).FontSize(11);
+                            table.Cell().RowSpan(2).Element(Block).Text(item.TypeOfFee.ToString()).FontSize(11);
+                            table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+                            table.Cell().RowSpan(2).Element(Block).Text(item.Date.ToString()).FontSize(11);
+                            table.Cell().RowSpan(2).Element(Block).Text(item.Status.ToString()).FontSize(11);
+
+                        }
+                        table.Cell().ColumnSpan(7).Element(Block).Text("Total Non Collected Dues: "+total.ToString()).FontSize(11);
+                    }
+
+                });
+                
             }
             Document.Create(Print =>
             {
                 Print.Page(page =>
                 {
+                    page.Margin(10);
                     page.Header()
                     .Row(row => {
                         row.RelativeItem().Column(column => {
                             column.Item()
-                            .Text("Report Name: Dues Report from "+startDate +" To " +endDate).FontSize(11).AlignCenter();
+                            .Text("Report Name: Dues Report from "+startDate +" To " +endDate).FontSize(11).AlignLeft();
                             column.Item()
                             .Text("Generated By: Admin").FontSize(11).AlignLeft();
                             
@@ -614,16 +682,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                             column.Item()
                             .Text("Generated Date: " + DateTime.Now.ToString("MMM dd yyyy"))
                             .FontSize(11).AlignRight();
-
                         });
                     });
                     page.Content()
-                    .Column(c => ComposeTable(c.Item()));
+                    .Column(c =>ComposeTable(c.Item().PaddingBottom(25).PaddingTop(25),c.Item()));
                     page.Size(PageSizes.A4);
-
-
                 });
-            }).GeneratePdf(filepath); //RENAMING USING RANDOM WORDS
+            }).ShowInCompanion(12500); //RENAMING USING RANDOM WORDS GeneratePdf(filepath)
             _db.logsLists.Add(new LogsList
             {
                 LogName = "Export Dues",
@@ -632,6 +697,17 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             });
             _db.SaveChanges();
             return File(System.IO.File.ReadAllBytes(filepath), "application/pdf", nameformat + "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_ExportDues.pdf");
+        }
+        static IContainer Block(IContainer container)
+        {
+            return container
+                .Border(1)
+                .Background(Colors.Grey.Lighten3)
+                .ShowOnce()
+                .MinWidth(50)
+                .MinHeight(50)
+                .AlignCenter()
+                .AlignMiddle();
         }
         //Logs Controller
         public IActionResult Logs()
@@ -664,6 +740,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
                     table.Header(header =>
                     {
+                        header.Cell().ColumnSpan(7).Element(Block).Text("Logs");
                         header.Cell().Text("Log Name");
                         header.Cell().Text("Log Description");
                         header.Cell().Text("User Role");
@@ -1195,6 +1272,75 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return PartialView(result);
         }
+        //MaintenanceRequests
+        public IActionResult MaintenanceRequest()
+        {
+            NewModel model = new NewModel();
+            model.maintenances = _db.maintenanceRequests.ToList();
+            model.Homeacc = _db.Homeowner_Details.ToList();
+            return View(model);
+        }
+        public IActionResult _MaintenanceDetails(int? id) {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            NewModel model = new NewModel();
+            model.maintenance = _db.maintenanceRequests.FirstOrDefault(_ => _.RequestID == id);
+            model.Homeowner = _db.Homeowner_Details.FirstOrDefault(_=>_.AccountID == model.maintenance.AccountID);
+            if (model.Homeowner == null && model.maintenance==null)
+            {
+                return NotFound();
+            }
+            
+            return View(model);
+        }
+        public IActionResult _MaintenancePending(int? id) {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var result = _db.maintenanceRequests.FirstOrDefault(_ => _.RequestID == id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            result.RequestStatus = "Pending";
+            _db.maintenanceRequests.Update(result);
+            _db.SaveChanges();
+            return RedirectToAction("MaintenanceRequest");
+        }
+        public IActionResult _MaintenanceComplete(int? id) {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var result = _db.maintenanceRequests.FirstOrDefault(_ => _.RequestID == id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            result.RequestStatus = "Completed";
+            result.CompletionDate = DateTime.Now;
+            _db.maintenanceRequests.Update(result);
+            _db.SaveChanges();
+            return RedirectToAction("MaintenanceRequest");
+        }
+        public IActionResult _MaintenanceReject(int? id) {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var result = _db.maintenanceRequests.FirstOrDefault(_ => _.RequestID == id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            result.RequestStatus = "Rejected";
+            _db.maintenanceRequests.Update(result);
+            _db.SaveChanges();
+            return RedirectToAction("MaintenanceRequest");
+        }
         [HttpPost]
         public IActionResult _DeleteHomesList(HomesList info) {
             if (ModelState.IsValid)
@@ -1368,5 +1514,21 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return body;
         }
 
+    }
+    static class SimpleExtension
+    {
+        private static IContainer Cell(this IContainer container, bool dark)
+        {
+            return container
+                .Border(1)
+                .Background(dark ? Colors.Grey.Lighten2 : Colors.White)
+                .Padding(10);
+        }
+
+        // displays only text label
+        public static void LabelCell(this IContainer container, string text) => container.Cell(true).Text(text).Medium();
+
+        // allows you to inject any type of content, e.g. image
+        public static IContainer ValueCell(this IContainer container) => container.Cell(false);
     }
 }
