@@ -1438,6 +1438,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return View(result); 
         }
+
         [HttpPost]
         public IActionResult _EditEvents(Events info)
         {
@@ -1455,6 +1456,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return View(result);
         }
+        
         public IActionResult _DeleteEvents(int? id) {
             if (id == null) { return NotFound(); }
             var result = _db.Events.FirstOrDefault(_ => _.EventID == id);
@@ -1465,6 +1467,46 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             _db.Events.Remove(result);
             _db.SaveChanges();
             return RedirectToAction("Events");
+        }
+        //Facilities
+        public IActionResult Facilities() {
+            NewModel model = new NewModel();
+            model.facilities = _db.Facilities.ToList();
+            return View(model);
+        }
+        public IActionResult _AddFacility(Facilities info) { 
+            _db.Facilities.Add(info);
+            _db.SaveChanges();
+            return RedirectToAction("Facilities");
+        }
+        public IActionResult _EditFacility(int? id)
+        {
+            if (id == null) { return NotFound(); }
+            var result = _db.Facilities.FirstOrDefault(_ => _.FacilityID== id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return View(result);
+        }
+        [HttpPost]
+        public IActionResult _EditFacility(Facilities info)
+        {
+            _db.Facilities.Update(info);
+            _db.SaveChanges();
+            return RedirectToAction("Facilities");
+        }
+        public IActionResult _DeleteFacility(int? id)
+        {
+            if (id == null) { return NotFound(); }
+            var result = _db.Facilities.FirstOrDefault(_ => _.FacilityID == id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            _db.Facilities.Remove(result);
+            _db.SaveChanges();
+            return RedirectToAction("Facilities");
         }
         //Json Result
         [HttpPost]

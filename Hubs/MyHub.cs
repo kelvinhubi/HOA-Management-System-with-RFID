@@ -14,15 +14,21 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Hubs
             if (conn.Contains("/"))
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, user);
-                if (conn == "/FAQ") {
+                if (conn.Contains("/") && conn.ToLower().Contains("faq")) {
                    
                     await Clients.Group(user).SendAsync("RecieveMessage", "Bot", "FAQs <br>1. How much are the Monthly Fees: The fees are set by the hoa and you can contact or email us at krfortin15@gmail.com for further information.<br>2. What happens if i didnt pay in time:<br> The system will detect if you have any overdue payments and admin will notify you if the said duration is not paid you will be having a violation in the hoa rules", DateTime.Now.ToString("MMMM dd, yyyy h:mm tt"));
                     return;
                 }
-                if (conn == "/Help")
+                if (conn.Contains("/") && conn.ToLower().Contains("help"))
                 {
 
                     await Clients.Group(user).SendAsync("RecieveMessage", "Bot", "If you are having trouble in using the system pls contact our ADMIN email:krfortin15@gmail.com", DateTime.Now.ToString("MMMM dd, yyyy h:mm tt"));
+                    return;
+                }
+                if (conn.Contains("/") && conn.ToLower().Contains("thank"))
+                {
+
+                    await Clients.Group(user).SendAsync("RecieveMessage", "Bot", "Your Welcome", DateTime.Now.ToString("MMMM dd, yyyy h:mm tt"));
                     return;
                 }
                 if (conn == "/") {

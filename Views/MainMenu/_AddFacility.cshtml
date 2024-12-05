@@ -1,0 +1,43 @@
+﻿@model Facilities
+
+<Button runat="server" id="bution" class="btn btn-success" style="position:sticky;">Add Event</Button>
+<form asp-action="_AddFacility" asp-controller="MainMenu" class="form" id="thisform">
+    <p class="title">Add Facility</p>
+    <input asp-for="FacilityID" class="form-control" hidden />
+    <div class="form-group">
+        <label asp-for="FacilityName" class="control-label">Facility Name</label>
+        <input asp-for="FacilityName" class="form-control" />
+        <span asp-validation-for="FacilityName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="RentalFee" class="control-label">Rental Fee</label>
+        <input asp-for="RentalFee" class="form-control" number/>
+        <span asp-validation-for="RentalFee"></span>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-success" />
+    </div>
+</form>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    var btn = document.getElementById("bution")
+    $("#thisform").css("display", "none");
+    btn.onclick = function () {
+        if ($("#thisform").css("display") == "block") {
+            $("#thisform").css("display", "none");
+            $("#UserPartial").css("display", "block");
+            $("#bution").html('Add Home');
+            document.getElementById("bution").style.cssText = "display: block; position: inherit;";
+            $("body").css("background", "rgba(0, 0, 0, 0)");
+        }
+        else {
+            this.blur();
+            $("#thisform").css("display", "block");
+            document.getElementById("bution").style.cssText = "position: fixed;";
+            $("#UserPartial").css("display", "none");
+            $("#bution").html('Hide');
+            $("body").css("background", "rgba(0, 0, 0, 0.4)");
+        }
+    }
+</script>

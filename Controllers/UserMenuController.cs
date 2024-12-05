@@ -110,6 +110,24 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return Json(new { success = false });
 
         }
+        [HttpPost]
+        public async Task<JsonResult> CheckPaymentForFacilities(string id)
+        {
+            await Task.Delay(5000);
+            var options = new RestClientOptions("https://api.paymongo.com/v1/links/" + id);
+            var client = new RestClient(options);
+            var request = new RestRequest("");
+            request.AddHeader("accept", "application/json");
+            request.AddHeader("authorization", "Basic c2tfdGVzdF9DRlRlTTRDUkdXSGVLdE1TSzFrVkw5VnE6");
+            var response = await client.GetAsync(request);
+            PayoutDetails paydetails = JsonConvert.DeserializeObject<PayoutDetails>(response.Content);
+            if (paydetails.Data.Attributes.Status != "unpaid")
+            {
+                    return Json(new { success = true });
+            }
+            return Json(new { success = false });
+
+        }
         public IActionResult Announcements() {
             if (CheckRole()) {
 
@@ -281,6 +299,30 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 return RedirectToAction("Events");
             }
             return RedirectToAction("Events");
+        }
+
+        //Facility
+
+        public IActionResult Facilities() { 
+            NewModel model = new NewModel();
+            model.facilities = _db.Facilities.ToList();
+            model.facilitiesreserved = _db.FacilitiesReserved.ToList();
+            model.Homeacc = _db.Homeowner_Details.Where(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+            return View(model);
+        }
+        public IActionResult _ReserveFacility(int? id) {
+            var result = _db.Facilities.FirstOrDefault(_=>_.FacilityID == id);
+            if (result == null) { return NotFound(); }
+            FacilityReservation info = new FacilityReservation { AccountID = Convert.ToInt32(HttpContext.Session.GetString("SessionID")), FacilityID = result.FacilityID };
+            return View(info);
+        }
+        [HttpPost]
+        public IActionResult _ReserveFacility(FacilityReservation info)
+        {
+            info.PaymentStatus = "Paid";
+            _db.FacilitiesReserved.Add(info);
+            _db.SaveChanges();
+            return RedirectToAction("Facilities");
         }
         public bool CheckRole()
         {

@@ -36,5 +36,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         public IEnumerable<Events> Events { get; set; }= Enumerable.Empty<Events>();
         public Events Event { get; set; }
         public IEnumerable<EventsReserved> EventsReserved { get; set; }= Enumerable.Empty<EventsReserved>();
+        public IEnumerable<Facilities> facilities { get; set; }= Enumerable.Empty<Facilities>();
+        public IEnumerable<FacilityReservation> facilitiesreserved { get; set; }= Enumerable.Empty<FacilityReservation>();
     }
 }

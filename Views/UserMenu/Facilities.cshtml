@@ -1,0 +1,154 @@
+﻿@model NewModel
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<head>
+    <title>
+        @{
+            ViewData["Title"] = "Facilities";
+        }
+    </title>
+    <style>
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        iframe {
+            height: 100%;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            height: 80%;
+        }
+
+        .close {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 35px;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+        }</style>
+</head>
+<div id="UserPartial">
+    <h2>Facilities</h2>
+    <table id="mytable" class="table">
+        <thead class="table-light">
+            <tr>
+                <th>Facility Name</th>
+                <th>Rental Fee</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+           @foreach (var obj in Model.facilities)
+            {
+                <tr>
+                    <td>@obj.FacilityName</td>
+                    <td>@obj.RentalFee</td>
+                    <td>
+                        <button class="btn-sm btn-success pay">Pay</button>
+                        <a asp-action="_ReserveFacility" id="reserve" class="btn btn-success btn-sm" asp-route-id="@obj.FacilityID" hidden>Reserve<i class='bx bxs-user-detail'></i></a>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+<div>
+    <h2>Reserved Facilities</h2>
+    <table id="mytable" class="table">
+        <thead class="table-light">
+            <tr>
+                <th>Name </th>
+                <th>Facility Reserved</th>
+                <th>Date Reserved</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model.facilitiesreserved)
+            {
+                var obj2 = Model.Homeacc.FirstOrDefault(_ => _.AccountID == obj.AccountID);
+                var obj3 = Model.facilities.FirstOrDefault(_ => _.FacilityID == obj.FacilityID);
+                <tr>
+                    <td>@obj2.FullName</td>
+                    <td>@obj3.FacilityName</td>
+                    <td>@obj.DateOFReservation</td>
+                    <td>@obj.StartTime.ToString("MMM dd, yyyy hh:mm tt")</td>
+                    <td>@obj.EndTime.ToString("MMM dd, yyyy hh:mm tt")</td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <iframe id="frameload" src="" frameborder="0"></iframe>
+    </div>
+</div>
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
+<script>
+    new DataTable('#mytable');
+    const modal = document.getElementById("modal");
+    const btn = document.getElementById("open-modal");
+    const span = document.getElementsByClassName("close")[0];
+    const div = document.getElementById("UserPartial");
+    var id_link = "";
+    span.onclick = function () {
+        modal.style.display = "none";
+        div.style.display = "block";
+        $.post('@Url.Action("CheckPaymentForFacilities", "UserMenu")', {
+            id: id_link
+        }, function (data) {
+            if (data.success) {
+                alert("Payment Succesfull");
+                document.getElementById("reserve").click();
+            }
+            else {
+                alert("Payment Cancelled");
+            }
+        });
+    }
+
+    $(document).on('click', '.pay', function () {
+        var invoice = $(this).closest("tr").find('td:eq(0)').text();
+        var amount = $(this).closest("tr").find('td:eq(1)').text();
+        $.post('@Url.Action("Payout", "UserMenu")', {
+            Amount: amount,
+            Invoice: invoice
+        },
+            function (json) {
+                if (json != null) {
+                    modal.style.display = "block";
+                    div.style.display = "none";
+                    id_link = json.data.id;
+                    $("#frameload").attr("src", json.data.attributes.checkout_url);
+                }
+
+            });
+    });
+</script>

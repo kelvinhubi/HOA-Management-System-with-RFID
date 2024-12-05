@@ -14,18 +14,38 @@
     <table id="mytable" class="table">
         <thead class="table-light">
             <tr>
-                
+                <th>Facility Name</th>
+                <th>Rental Fee</th>
                 <th>Action</th>
             </tr>
         </thead>
         <tbody>
-           @foreach (var obj in Model.Vehicles)
+           @foreach (var obj in Model.facilities)
             {
                 <tr>
-                    
+                    <td>@obj.FacilityName</td>
+                    <td>@obj.RentalFee</td>
+                    <td>
+
+                        <a asp-action="_FacilityDetails" class="btn btn-success btn-sm" asp-route-id="@obj.FacilityID">Details<i class='bx bxs-user-detail'></i></a>
+                        <a asp-action="_EditFacility" class="btn btn-success btn-sm" asp-route-id="@obj.FacilityID">Edit<i class='bx bxs-user-detail'></i></a>
+                        <a asp-action="_DeleteFacility" class="btn btn-danger btn-sm" asp-route-id="@obj.FacilityID">Delete<i class='bx bxs-trash'></i></a>
+                    </td>
                 </tr>
             }
 
         </tbody>
     </table>
 </div>
+@{
+    Facilities user = new Facilities();
+    <partial name="_AddFacility" model="user" />
+}
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
+<script>
+    new DataTable('#mytable');
+</script>

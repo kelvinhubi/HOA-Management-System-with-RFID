@@ -1,0 +1,28 @@
+﻿@model Facilities
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+    ViewData["Title"] = "Edit Facility";
+}
+
+<form asp-action="_EditFacility" class="form" id="thisform" style="bottom:29rem; display:block">
+    <p class="title">Edit Facility</p>
+    <input asp-for="FacilityID" class="form-control" hidden />
+    <div class="form-group">
+        <label asp-for="FacilityName" class="control-label">Facility Name</label>
+        <input asp-for="FacilityName" type="text" class="form-control input" />
+        <span asp-validation-for="FacilityName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="RentalFee" class="control-label">Rental Fee</label>
+        <input asp-for="RentalFee" class="form-control" number/>
+        <span asp-validation-for="RentalFee"></span>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-success" />
+    </div>
+</form>
+
+<div>
+    <a asp-action="Facilities" class="btn btn-success" style="padding:5px; position:fixed">Back to List</a>
+</div>

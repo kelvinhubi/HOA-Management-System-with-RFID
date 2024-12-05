@@ -46,5 +46,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data
         public DbSet<Officers> Officers { get; set; }
         public DbSet<Events> Events { get; set; }
         public DbSet<EventsReserved> EventsReserved { get; set; }
+        public DbSet<Facilities> Facilities { get; set; }
+        public DbSet<FacilityReservation> FacilitiesReserved { get; set; }
     }
 }
