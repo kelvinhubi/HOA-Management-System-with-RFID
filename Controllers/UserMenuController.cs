@@ -83,6 +83,33 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return Json(new { success = false });
 
         }
+        [HttpPost]
+        public async Task<JsonResult> CheckPaymentForEvent(string id,string EvID)
+        {
+            await Task.Delay(5000);
+            var options = new RestClientOptions("https://api.paymongo.com/v1/links/" + id);
+            var client = new RestClient(options);
+            var request = new RestRequest("");
+            request.AddHeader("accept", "application/json");
+            request.AddHeader("authorization", "Basic c2tfdGVzdF9DRlRlTTRDUkdXSGVLdE1TSzFrVkw5VnE6");
+            var response = await client.GetAsync(request);
+            PayoutDetails paydetails = JsonConvert.DeserializeObject<PayoutDetails>(response.Content);
+            if (paydetails.Data.Attributes.Status != "unpaid")
+            {
+                var result = _db.Homeowner_Details.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+                var EvResult = _db.Events.FirstOrDefault(_ => _.EventID == Convert.ToInt32(EvID));
+                if (result != null && EvResult != null)
+                {
+                    var info = new EventsReserved { AccountID = result.AccountID, EventID = EvResult.EventID, Fee = EvResult.EventFee, Status = "Joined"};
+                    _db.EventsReserved.Add(info);
+                    await _db.SaveChangesAsync();
+                    return Json(new { success = true });
+                }
+            }
+
+            return Json(new { success = false });
+
+        }
         public IActionResult Announcements() {
             if (CheckRole()) {
 
@@ -195,8 +222,65 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             model.Pets = _db.PetInformation.ToList();
             return View(model); 
         }
-        public IActionResult _AddPets(OwnerPetInfo info) { 
-            return View(info);
+        public IActionResult _AddPets(OwnerPetInfo info) {
+            foreach (var items in info.Pets) {
+                items.AccountID = Convert.ToInt32(HttpContext.Session.GetString("SessionID"));
+                _db.PetInformation.Add(items);
+            }
+            _db.SaveChanges();
+            return RedirectToAction("Pets");
+        }
+        public IActionResult _EditPets(int? id) {
+            if (id == null) {return NotFound();}
+            var result = _db.PetInformation.FirstOrDefault(_ => _.PetId == id);
+            if (result == null) { return NotFound(); }
+            return View(result);
+        }
+        [HttpPost]
+        public IActionResult _EditPets(PetInformation info) {
+            _db.PetInformation.Update(info);
+            _db.SaveChanges();
+            return RedirectToAction("Pets","UserMenu");
+        }
+        public IActionResult _DeletePets(int? id)
+        {
+            if (id == null) { return NotFound(); }
+            var result = _db.PetInformation.FirstOrDefault(_ => _.PetId == id);
+            if (result == null) { return NotFound(); }
+            _db.PetInformation.Remove(result);
+            _db.SaveChanges();
+            return RedirectToAction("Pets");
+        }
+
+        //Events
+        public IActionResult Events() {
+            ViewData["SessionID"] = HttpContext.Session.GetString("SessionID");
+            NewModel model = new NewModel();
+            model.Events = _db.Events.ToList();
+            model.EventsReserved = _db.EventsReserved.ToList();
+            return View(model);
+        }
+        public IActionResult _EventDetails(int? id)
+        {
+            if (id == null) { return NotFound(); }
+            var result = _db.Events.FirstOrDefault(_ => _.EventID == id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return View(result);
+        }
+        public IActionResult JoinFree(int? EvID) {
+            var result = _db.Homeowner_Details.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+            var EvResult = _db.Events.FirstOrDefault(_ => _.EventID == Convert.ToInt32(EvID));
+            if (result != null && EvResult != null)
+            {
+                var info = new EventsReserved { AccountID = result.AccountID, EventID = EvResult.EventID, Fee = null, Status = "Joined" };
+                _db.EventsReserved.Add(info);
+                _db.SaveChanges();
+                return RedirectToAction("Events");
+            }
+            return RedirectToAction("Events");
         }
         public bool CheckRole()
         {

@@ -3,7 +3,9 @@
     Model.Pets.Add(new PetInformation { AccountID = 0, Name="",Species="",Age=0 });
 }
 <head>
-    <style>p{margin-top: 5px}</style>
+    <style>p {margin-top: 5px;}
+        .btn-sm,.btn{margin-top:5px;}
+    </style>
 </head>
 <Button runat="server" id="bution" class="btn btn-success" style="position:sticky;">Add Pets</Button>
 <form asp-action="_AddPets" asp-controller="UserMenu" class="form" id="thisform">
@@ -16,17 +18,18 @@
             <input asp-for="Pets[0].Name" class="form-control" type="text" />
         </div>
         <div class="form-group">
-            <label asp-for="Pets[0].Species" class="form-label">Species:</label>
+            <label asp-for="Pets[0].Species" class="form-label">Type of Pet:</label>
             <input asp-for="Pets[0].Species" class="form-control" type="text" />
         </div>
         <div class="form-group">
             <label asp-for="Pets[0].Age" class="form-label">Age:</label>
-            <input asp-for="Pets[0].Age" class="form-control" />
+            <input asp-for="Pets[0].Age" class="form-control"/>
         </div>
     </div>
+    
     <button class="btn-sm btn-primary" type="button" onclick="addPet()">Add another pet</button>
     <div class="form-group">
-        <input type="submit" value="Request" class="btn btn-primary" />
+        <input type="submit" value="Add" class="btn btn-primary" />
     </div>
 </form>
 <script>
@@ -34,17 +37,20 @@
     function addPet() {
         // Add a new Pet object to the Model.Pets collection using JavaScript
         var newPetHtml = '<div class="pet"><p>Pet #' + (newPetCount+1) +'</p>' +
-            '<label for="Pets[' + newPetCount + '].Name"class="form-label">Name:</label>' +
-            '<input class="form-control" type="text" id="Pets[' + newPetCount + '].Name" name="Pets[' + newPetCount + '].Name" />' +
-            '<label for="Pets[' + newPetCount + '].Species" class="form-label">Species:</label>' +
-            '<input class="form-control" type="text" id="Pets[' + newPetCount + '].Species" name="Pets[' + newPetCount + '].Species" />' +
-            '<label for="Pets[' + newPetCount + '].Age" class="form-label">Age:</label>' +
-            '<input class="form-control" type="text" id="Pets[' + newPetCount + '].Age" name="Pets[' + newPetCount + '].Age" />' +
-            '</div>';
+            ' <div class="form-group"><label for="Pets[' + newPetCount + '].Name"class="form-label">Name:</label>' +
+            '<input class="form-control" type="text" id="Pets[' + newPetCount + '].Name" name="Pets[' + newPetCount + '].Name" /></div>' +
+            ' <div class="form-group"><label for="Pets[' + newPetCount + '].Species" class="form-label">Type of Pet:</label>' +
+            '<input class="form-control" type="text" id="Pets[' + newPetCount + '].Species" name="Pets[' + newPetCount + '].Species" /></div>' +
+            ' <div class="form-group"><label for="Pets[' + newPetCount + '].Age" class="form-label">Age:</label>' +
+            '<input class="form-control" type="text" id="Pets[' + newPetCount + '].Age" name="Pets[' + newPetCount + '].Age" /></div>' +
+            '<button class="btn-sm btn-primary" type="button" onclick="remove(this);">Remove pet</button></div>';
         $("#pets").append(newPetHtml);
         newPetCount++;
     }
-
+    function remove(button) { 
+        $(button).parent().remove();
+        newPetCount--;
+    }
 
     var btn = document.getElementById("bution")
     $("#thisform").css("display", "none");

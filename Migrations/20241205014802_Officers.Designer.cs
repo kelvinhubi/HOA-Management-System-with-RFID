@@ -4,6 +4,7 @@ using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241205014802_Officers")]
+    partial class Officers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -165,74 +168,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                         .IsUnique();
 
                     b.ToTable("Due_Details");
-                });
-
-            modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.Events", b =>
-                {
-                    b.Property<int>("EventID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("EventID"));
-
-                    b.Property<int>("EventCapacity")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly>("EventDate")
-                        .HasColumnType("date");
-
-                    b.Property<DateOnly>("EventDateEnd")
-                        .HasColumnType("date");
-
-                    b.Property<string>("EventDescription")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("EventEndDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("EventFee")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("EventLocation")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("EventStartDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("EventTitle")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("EventID");
-
-                    b.ToTable("Events");
-                });
-
-            modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.EventsReserved", b =>
-                {
-                    b.Property<int>("EventReservedID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("EventReservedID"));
-
-                    b.Property<int>("AccountID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EventID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Fee")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("EventReservedID");
-
-                    b.ToTable("EventsReserved");
                 });
 
             modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.FeesList", b =>

@@ -31,5 +31,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         public IEnumerable<HomeRequest> HomeRequests {get; set;} = Enumerable.Empty<HomeRequest>();
         public IEnumerable<MaintenanceRequests> maintenances { get; set; } = Enumerable.Empty<MaintenanceRequests>();
         public MaintenanceRequests maintenance { get; set; }
+        public IEnumerable<PetInformation> pets { get; set; }= Enumerable.Empty<PetInformation>();
+        public IEnumerable<Officers> Officers { get; set; }= Enumerable.Empty<Officers>();
+        public IEnumerable<Events> Events { get; set; }= Enumerable.Empty<Events>();
+        public Events Event { get; set; }
+        public IEnumerable<EventsReserved> EventsReserved { get; set; }= Enumerable.Empty<EventsReserved>();
     }
 }

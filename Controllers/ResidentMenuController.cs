@@ -144,6 +144,39 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             _db.SaveChanges();
             return RedirectToAction("HomeList","ResidentMenu");
         }
+        //Events
+        //Events
+        public IActionResult Events()
+        {
+            ViewData["SessionID"] = HttpContext.Session.GetString("SessionID");
+            NewModel model = new NewModel();
+            model.Events = _db.Events.ToList();
+            model.EventsReserved = _db.EventsReserved.ToList();
+            return View(model);
+        }
+        public IActionResult _EventDetails(int? id)
+        {
+            if (id == null) { return NotFound(); }
+            var result = _db.Events.FirstOrDefault(_ => _.EventID == id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return View(result);
+        }
+        public IActionResult JoinFree(int? EvID)
+        {
+            var result = _db.Homeowner_Details.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+            var EvResult = _db.Events.FirstOrDefault(_ => _.EventID == Convert.ToInt32(EvID));
+            if (result != null && EvResult != null)
+            {
+                var info = new EventsReserved { AccountID = result.AccountID, EventID = EvResult.EventID, Fee = null, Status = "Joined" };
+                _db.EventsReserved.Add(info);
+                _db.SaveChangesAsync();
+                return RedirectToAction("Events");
+            }
+            return RedirectToAction("Events");
+        }
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();

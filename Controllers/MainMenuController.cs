@@ -59,6 +59,8 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 ViewData["DeliquentMembers"] = _db.Due_Details.Where(x => x.Status == "Unpaid" && DateOnly.FromDateTime(DateTime.Now) < x.Date).Count();
                 ViewData["TotalVehicles"] = _db.Vehicle_Information.Count();
                 ViewData["Maintenance"] = _db.maintenanceRequests.Where(x => x.RequestStatus != "Completed").Count();
+                ViewData["Pets"] = _db.PetInformation.Count();
+                ViewData["Officers"] = _db.Officers.Count();
                 return View();
             }
 
@@ -1341,6 +1343,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             _db.SaveChanges();
             return RedirectToAction("MaintenanceRequest");
         }
+
+        public IActionResult Pets() {
+            NewModel model = new NewModel();
+            model.pets = _db.PetInformation.ToList();
+            model.Homeacc = _db.Homeowner_Details.ToList();
+            return View(model);
+        }
         [HttpPost]
         public IActionResult _DeleteHomesList(HomesList info) {
             if (ModelState.IsValid)
@@ -1350,6 +1359,112 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 return RedirectToAction("HomesList", "MainMenu");
             }
             return RedirectToAction("HomesList", "MainMenu");
+        }
+
+        //Officers
+
+        public IActionResult Officers() {
+            NewModel model = new NewModel();
+            model.Homeacc = _db.Homeowner_Details.ToList();
+            model.Officers = _db.Officers.ToList();
+            return View(model);
+        }
+        public IActionResult _SetPosition(int ID)
+        {
+            Officers officers = new Officers { AccountID = ID,Position =string.Empty, ID=0 };
+            return View(officers);
+        }
+        [HttpPost]
+        public IActionResult _SetPosition(Officers  info)
+        {
+            _db.Officers.Add(info);
+            _db.SaveChanges();
+            return RedirectToAction("Officers");
+        }
+        public IActionResult _EditPosition(int? ID) {
+            if (ID == null) { return NotFound(); }
+            var result = _db.Officers.FirstOrDefault(x => x.ID == ID);
+            if (result == null) {
+                return NotFound();
+            }
+            return View(result);
+        }
+        [HttpPost]
+        public IActionResult _EditPosition(Officers info)
+        {
+            _db.Officers.Update(info);
+            _db.SaveChanges();
+            return RedirectToAction("Officers");
+        }
+        public IActionResult _DeletePosition(int? ID)
+        {
+            if (ID == null) { return NotFound(); }
+            var result = _db.Officers.FirstOrDefault(x => x.ID == ID);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            _db.Officers.Remove(result);
+            _db.SaveChanges();
+            return RedirectToAction("Officers");
+        }
+
+        //Income And Non Income Generating Project
+        public IActionResult Events() {
+            NewModel model = new NewModel();
+            model.Events = _db.Events.ToList();
+            model.EventsReserved = _db.EventsReserved.ToList();
+            return View(model);
+        }
+        public IActionResult _JoinedMembers(int? id) {
+            if (id == null) {
+                return NotFound();
+            }
+            NewModel model = new NewModel();
+            model.EventsReserved = _db.EventsReserved.Where(_=>_.EventID == id).ToList();
+            model.Homeacc = _db.Homeowner_Details.ToList();
+            return View(model);
+        }
+        public IActionResult _AddEvents(Events info) {
+            _db.Events.Add(info);
+            _db.SaveChanges();
+            return RedirectToAction("Events");
+        }
+        public IActionResult _EditEvents(int? id) {
+            if (id == null) { return NotFound(); }
+            var result = _db.Events.FirstOrDefault(_=>_.EventID == id);
+            if (result == null) {
+                return NotFound();
+            }
+            return View(result); 
+        }
+        [HttpPost]
+        public IActionResult _EditEvents(Events info)
+        {
+            _db.Events.Update(info);
+            _db.SaveChanges();
+            return RedirectToAction("Events");
+        }
+        public IActionResult _EventDetails(int? id)
+        {
+            if (id == null) { return NotFound(); }
+            var result = _db.Events.FirstOrDefault(_ => _.EventID == id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return View(result);
+        }
+        public IActionResult _DeleteEvents(int? id) {
+            if (id == null) { return NotFound(); }
+            var result = _db.Events.FirstOrDefault(_ => _.EventID == id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            _db.Events.Remove(result);
+            _db.SaveChanges();
+            return RedirectToAction("Events");
         }
         //Json Result
         [HttpPost]

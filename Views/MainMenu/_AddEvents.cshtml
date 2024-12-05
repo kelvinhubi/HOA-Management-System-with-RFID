@@ -1,0 +1,77 @@
+﻿@model Events
+
+<Button runat="server" id="bution" class="btn btn-success" style="position:sticky;">Add Event</Button>
+<form asp-action="_AddEvents" asp-controller="MainMenu" class="form" id="thisform">
+    <p class="title">Add Event</p>
+    <input asp-for="EventID" id="AccountID" class="form-control" hidden />
+    <div class="form-group">
+        <label asp-for="EventTitle" class="control-label">Event Title</label>
+        <input asp-for="EventTitle" class="form-control input" />
+        <span asp-validation-for="EventTitle" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EventDescription" class="control-label">Description</label>
+        <textarea asp-for="EventDescription" class="form-control input"></textarea>
+        <span asp-validation-for="EventDescription"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EventDate" class="control-label">Event Start Date</label>
+        <input asp-for="EventDate" type="date" class="form-control"/>
+        <span asp-validation-for="EventDate"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EventDateEnd" class="control-label">Event End Date</label>
+        <input asp-for="EventDateEnd" type="date" class="form-control" />
+        <span asp-validation-for="EventDateEnd"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EventLocation" class="control-label">Address</label>
+        <input asp-for="EventLocation" class="form-control input" />
+        <span asp-validation-for="EventLocation"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EventFee" class="control-label">Fee Amount(optional)</label>
+        <input asp-for="EventFee" class="form-control input" number />
+        <span asp-validation-for="EventFee"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EventCapacity" class="control-label">Registration Limit</label>
+        <input asp-for="EventCapacity" class="form-control input" />
+        <span asp-validation-for="EventCapacity"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EventStartDate" class="control-label">Registration Start Date</label>
+        <input asp-for="EventStartDate"  class="form-control" />
+        <span asp-validation-for="EventStartDate"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EventEndDate" class="control-label">Registration End Date</label>
+        <input asp-for="EventEndDate" class="form-control" />
+        <span asp-validation-for="EventEndDate"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-success" />
+    </div>
+</form>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    var btn = document.getElementById("bution")
+    $("#thisform").css("display", "none");
+    btn.onclick = function () {
+        if ($("#thisform").css("display") == "block") {
+            $("#thisform").css("display", "none");
+            $("#UserPartial").css("display", "block");
+            $("#bution").html('Add Home');
+            document.getElementById("bution").style.cssText = "display: block; position: inherit;";
+            $("body").css("background", "rgba(0, 0, 0, 0)");
+        }
+        else {
+            this.blur();
+            $("#thisform").css("display", "block");
+            document.getElementById("bution").style.cssText = "position: fixed;";
+            $("#UserPartial").css("display", "none");
+            $("#bution").html('Hide');
+            $("body").css("background", "rgba(0, 0, 0, 0.4)");
+        }
+    }
+</script>

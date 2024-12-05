@@ -1,0 +1,73 @@
+﻿@model Events
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<head>
+    <title>
+        @{
+            ViewData["Title"] = "Event Details";
+        }
+    </title>
+
+</head>
+<div class="card mb-4">
+    <div class="card-header">Request Details</div>
+    <div class="card-body">
+        <form>
+            <div class="mb-3">
+                <label class="small mb-1" asp-for="EventTitle">Request Type</label>
+                <input asp-for="EventTitle" class="form-control" type="text" readonly>
+            </div>
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="EventDescription">Request Description</label>
+                    <textarea asp-for="EventDescription" class="form-control" readonly></textarea>
+                </div>
+            </div>
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="EventDate">Event Date</label>
+                    <input asp-for="EventDate" class="form-control" type="date" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="EventDateEnd" class="control-label">Event End Date</label>
+                    <input asp-for="EventDateEnd" type="date" class="form-control" />
+                    <span asp-validation-for="EventDateEnd"></span>
+                </div>
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="EventLocation">Location</label>
+                    <input asp-for="EventLocation" class="form-control" readonly>
+                </div>
+            </div>
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="EventFee">Fee Amount</label>
+                    @if (Model.EventFee == null)
+                    {
+                        <input value="Free" class="form-control" readonly>
+                    }
+                    else
+                    {
+                        <input asp-for="EventFee" class="form-control" readonly>
+                    }
+                    
+                </div>
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="EventCapacity">Registration Limit</label>
+                    <input asp-for="EventCapacity" class="form-control" readonly>
+                </div>
+            </div>
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="EventStartDate">Registration Start Date</label>
+                    <input asp-for="EventStartDate" class="form-control"readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="EventEndDate">Registration End Date</label>
+                    <input asp-for="EventEndDate" class="form-control" readonly>
+                </div>
+            </div>
+            <a asp-action="MaintenanceRequest" class="btn btn-primary">Back To List</a>
+        </form>
+    </div>
+</div>

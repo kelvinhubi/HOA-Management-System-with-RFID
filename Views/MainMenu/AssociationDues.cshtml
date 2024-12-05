@@ -223,7 +223,7 @@
     $(".form3").on('change', function () {
         var fit_start_time = $("#startDate").val();
         var fit_end_time = $("#endDate").val();
-        if (new Date(fit_end_time) <= new Date(fit_start_time)) {
+        if (new Date(fit_end_time) < new Date(fit_start_time)) {
             $("#PdfButton").attr('disabled', 'disabled');
             alert("End Date must be greater than start date");
         }
@@ -238,7 +238,7 @@
     $(".form4").on('change', function () {
         var fit_start_time = $("#startDate2").val();
         var fit_end_time = $("#endDate2").val();
-        if (new Date(fit_end_time) <= new Date(fit_start_time)) {
+        if (new Date(fit_end_time) < new Date(fit_start_time)) {
             $("#ExcelButton").attr('disabled', 'disabled');
             alert("End Date must be greater than start date");
         }

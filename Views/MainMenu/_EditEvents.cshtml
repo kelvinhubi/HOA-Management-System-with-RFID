@@ -1,0 +1,62 @@
+﻿@model Events
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+    ViewData["Title"] = "Edit";
+}
+
+<form asp-action="_EditEvents" class="form" id="thisform" style="bottom:29rem; display:block">
+    <p class="title">Add Event</p>
+    <input asp-for="EventID"  class="form-control" hidden />
+    <div class="form-group">
+        <label asp-for="EventTitle" class="control-label">Event Title</label>
+        <input asp-for="EventTitle" class="form-control input" />
+        <span asp-validation-for="EventTitle" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EventDescription" class="control-label">Home Type</label>
+        <textarea asp-for="EventDescription" class="form-control input"></textarea>
+        <span asp-validation-for="EventDescription"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EventDate" class="control-label">Home Type</label>
+        <input asp-for="EventDate" class="form-control "/>
+        <span asp-validation-for="EventDate"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EventDateEnd" class="control-label">Event End Date</label>
+        <input asp-for="EventDateEnd" type="date" class="form-control" />
+        <span asp-validation-for="EventDateEnd"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EventLocation" class="control-label">Address</label>
+        <input asp-for="EventLocation" class="form-control input" />
+        <span asp-validation-for="EventLocation"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EventFee" class="control-label">Fee Amount(optional)</label>
+        <input asp-for="EventFee" class="form-control input" number />
+        <span asp-validation-for="EventFee"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EventCapacity" class="control-label">Lot No</label>
+        <input asp-for="EventCapacity" class="form-control input" number/>
+        <span asp-validation-for="EventCapacity"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EventStartDate" class="control-label">Registration Start Date</label>
+        <input asp-for="EventStartDate" class="form-control" />
+        <span asp-validation-for="EventStartDate"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EventEndDate" class="control-label">Registration End Date</label>
+        <input asp-for="EventEndDate" class="form-control" />
+        <span asp-validation-for="EventEndDate"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-success" />
+    </div>
+</form>
+
+<div>
+    <a asp-action="Events" class="btn btn-success" style="padding:5px; position:fixed">Back to List</a>
+</div>

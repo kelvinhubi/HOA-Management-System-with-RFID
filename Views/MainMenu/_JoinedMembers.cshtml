@@ -1,42 +1,37 @@
 ﻿@model NewModel
-
 @{
     Layout = "~/Views/Shared/_Layout1.cshtml";
+
 }
 <head>
     <title>
         @{
-            ViewData["Title"] = "My Pets";
+            ViewData["Title"] = "User Management";
         }
     </title>
 </head>
+@Html.AntiForgeryToken();
 <div id="UserPartial">
-    <h2>My Pets</h2>
+    <h2>Event Members</h2>
     <table id="mytable" class="table table-bordered">
         <thead class="table-light">
             <tr>
-                <th>Pet ID</th>
-                <th>Pet Owner</th>
                 <th>Name</th>
-                <th>Type of Pet</th>
-                <th>Pet Age</th>
+                <th>Contact No.</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var obj in Model.pets)
+            @foreach (var obj in Model.EventsReserved)
             {
                 var obj2 = Model.Homeacc.FirstOrDefault(_ => _.AccountID == obj.AccountID);
                 <tr>
-                    <td>@obj.PetId</td>
                     <td>@obj2.FullName</td>
-                    <td>@obj.Name</td>
-                    <td>@obj.Species</td>
-                    <td>@obj.Age</td>
+                    <td>@obj2.PhoneNo</td>
                 </tr>
             }
         </tbody>
     </table>
 </div>
-<script>
-    new DataTable('#mytable');
-</script>
+<div>
+    <a asp-action="Events" class="btn btn-success" style="padding:5px; position:fixed">Back to List</a>
+</div>

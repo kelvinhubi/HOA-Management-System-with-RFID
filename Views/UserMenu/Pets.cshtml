@@ -30,7 +30,10 @@
                     <td>@obj.Name</td>
                     <td>@obj.Species</td>
                     <td>@obj.Age</td>
-                    <td></td>
+                    <td>
+                        <a asp-action="_EditPets" asp-route-id="@obj.PetId" class="btn btn-success btn-sm">Edit<i class='bx bxs-edit-alt'></i></a>
+                        <a asp-action="_DeletePets" asp-route-id="@obj.PetId" class="btn btn-danger btn-sm">Delete<i class='bx bxs-trash'></i></a>
+                    </td>
                 </tr>
             }
         </tbody>
