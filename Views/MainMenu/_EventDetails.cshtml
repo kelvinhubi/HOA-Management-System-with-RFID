@@ -31,7 +31,7 @@
                 </div>
                 <div class="col-md-6">
                     <label asp-for="EventDateEnd" class="control-label">Event End Date</label>
-                    <input asp-for="EventDateEnd" type="date" class="form-control" />
+                    <input asp-for="EventDateEnd" type="date" class="form-control" readonly/>
                     <span asp-validation-for="EventDateEnd"></span>
                 </div>
                 <div class="col-md-6">
@@ -67,7 +67,12 @@
                     <input asp-for="EventEndDate" class="form-control" readonly>
                 </div>
             </div>
-            <a asp-action="MaintenanceRequest" class="btn btn-primary">Back To List</a>
+            <a asp-action="Events" class="btn btn-primary">Back To List</a>
         </form>
     </div>
 </div>
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

@@ -1,0 +1,51 @@
+﻿@model NewModel
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<head>
+    <title>
+        @{
+            ViewData["Title"] = "Facility Details";
+        }
+    </title>
+
+</head>
+<div>
+    <h2>Reserved Dates</h2>
+    <table id="mytable" class="table">
+        <thead class="table-light">
+            <tr>
+                <th>Name </th>
+                <th>Facility Reserved</th>
+                <th>Date Reserved</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model.facilitiesreserved)
+            {
+                var obj2 = Model.Homeacc.FirstOrDefault(_ => _.AccountID == obj.AccountID);
+                var obj3 = Model.facilities.Where(_ => _.FacilityID == obj.FacilityID).FirstOrDefault();
+                <tr>
+                    <td>@obj2.FullName</td>
+                    @if (obj3 != null)
+                    {
+                        <td>@obj3.FacilityName</td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                    <td>@obj.DateOFReservation</td>
+                    <td>@obj.StartTime.ToString("MMM dd, yyyy hh:mm tt")</td>
+                    <td>@obj.EndTime.ToString("MMM dd, yyyy hh:mm tt")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <a asp-action="Facilities" class="btn btn-success" style="padding:5px; position:fixed">Back to List</a>
+</div>

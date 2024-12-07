@@ -59,7 +59,16 @@
                         url = Url.Action("Announcements", "UserMenu");
                     }
                 <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-bell nav-icon'></i> <span class="nav_name">Announcements</span> </a>
-                    
+
+                @{
+                    url = Url.Action("Facilities", "UserMenu");
+                }
+                <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-bell nav-icon'></i> <span class="nav_name">Facilities</span> </a>
+                @{
+                    url = Url.Action("Events", "UserMenu");
+                }
+                <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-bell nav-icon'></i> <span class="nav_name">Events</span> </a>
+    
                     @{url = Url.Action("VehiclesList", "UserMenu");}
                 <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-car nav-icon'></i> <span class="nav_name">Vehicles List</span></a>
                 @{

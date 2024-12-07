@@ -24,6 +24,10 @@ var setmin = DateTime.Now.ToString("yyyy-MM-dd");;
         <input asp-for="@Model.dues.Amount" name="Amount" class="form-control input" id="Amount" readonly />
     </div>
     <div class="form-group">
+        <label asp-for="@Model.dues.Penalty" class="control-label"></label>
+        <input asp-for="@Model.dues.Penalty" name="Penalty" class="form-control input" id="Penalty" readonly />
+    </div>
+    <div class="form-group">
         <label asp-for="@Model.dues.TypeOfFee" class="control-label">Type of Due</label>
         <select asp-for="@Model.dues.TypeOfFee" name="TypeofDues" class="form-select" onclick="CheckAmount()" id="Typeoffees" class="form-control">
             <option></option>
@@ -91,7 +95,8 @@ var setmin = DateTime.Now.ToString("yyyy-MM-dd");;
                 }
                 else {
 
-                    $("#Amount").val(data);
+                    $("#Amount").val(data.amount);
+                    $("#Penalty").val(data.penalty);
                 }
             });
     }

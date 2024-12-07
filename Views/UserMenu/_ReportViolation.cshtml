@@ -1,0 +1,60 @@
+﻿@model ViolationSanction
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<head>
+    <title>
+        @{
+            ViewData["Title"] = "Report Violation";
+        }
+    </title>
+
+</head>
+<div class="card mb-4">
+    <div class="card-header">Request Details</div>
+    <div class="card-body">
+        <form asp-action="_ReportViolation">
+            <input asp-for="ViolationID" hidden/>
+            <input asp-for="AccountID" hidden/>
+            <input asp-for="Complainant" class="form-control" type="text" hidden>
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="Respondent">Respondent</label>
+                    <input asp-for="Respondent" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="Witness">Witness</label>
+                    <input asp-for="Witness" class="form-control"/>
+                </div>
+            </div>
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="Subject">Subject</label>
+                    <input asp-for="Subject" class="form-control"/>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Violation" class="control-label">Violation</label>
+                    <input asp-for="Violation" class="form-control" />
+                    <span asp-validation-for="Violation"></span>
+                </div>
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="Details">Details</label>
+                    <textarea asp-for="Details" class="form-control"></textarea>
+                </div>
+            </div>
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="Sanction">Sanction</label>
+                    <input asp-for="Sanction" class="form-control" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="small mb-1" asp-for="Remarks">Remarks</label>
+                    <textarea asp-for="Remarks" class="form-control" readonly></textarea>
+                </div>
+            </div>
+            <input type="submit" value="Save" class="btn btn-primary" />
+            
+        </form>
+        <a asp-action="Violation" class="btn btn-primary">Back To List</a>
+    </div>
+</div>

@@ -1,0 +1,74 @@
+﻿@model Expenses
+@{
+    string[] choices = { "Electricity", "Water", "Maintenance", "Manpower", "Other" };
+}
+<Button runat="server" id="bution" class="btn btn-success" style="position:sticky;">Add Expense</Button>
+<form asp-action="_AddExpense" asp-controller="MainMenu" class="form" id="thisform">
+    <p class="title">Add Expense</p>
+    <input asp-for="ExpenseID" class="form-control" hidden />
+    <div class="form-group">
+        <label asp-for="EzpenseDate" class="control-label">Date</label>
+        <input asp-for="EzpenseDate" type="date" class="form-control" />
+        <span asp-validation-for="EzpenseDate"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PaymentMethod" class="control-label">Payment Method</label>
+        <input asp-for="PaymentMethod" class="form-control" />
+        <span asp-validation-for="PaymentMethod"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Description" class="control-label">Description</label>
+        <input asp-for="Description" class="form-control input" />
+        <span asp-validation-for="Description"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Category" class="control-label">Description</label>
+        <select asp-for="Category" class="form-control input" >
+            @foreach (var item in choices)
+            {
+               <option value="@item">@item</option>
+            }
+        </select>
+        <span asp-validation-for="Category"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Amount" class="control-label">Amount</label>
+        <input asp-for="Amount" class="form-control input" number />
+        <span asp-validation-for="Amount"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-success" />
+    </div>
+</form>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    var btn = document.getElementById("bution")
+    $("#thisform").css("display", "none");
+    btn.onclick = function () {
+        if ($("#thisform").css("display") == "block") {
+            $("#thisform").css("display", "none");
+            $("#UserPartial").css("display", "block");
+            $("#PaidDues").css("display", "block");
+            $(".CreateMultiple").css("display", "block");
+            $(".ExportPDF").css("display", "block");
+            $(".ExportExcel").css("display", "block");
+            $("#bution").html('Add Expense');
+            $("body").css("background", "rgba(0, 0, 0, 0)");
+            $('#forpass').val("")
+            $("#forpass").attr('disabled', 'disabled');
+        }
+        else {
+            this.blur();
+            $("#thisform").css("display", "block");
+            $("#UserPartial").css("display", "none");
+            $("#PaidDues").css("display", "none");
+            $(".CreateMultiple").css("display", "none");
+            $(".ExportPDF").css("display", "none");
+            $(".ExportExcel").css("display", "none");
+            $("#bution").html('Hide');
+            $("body").css("background", "rgba(0, 0, 0, 0.4)");
+
+        }
+    }
+
+</script>

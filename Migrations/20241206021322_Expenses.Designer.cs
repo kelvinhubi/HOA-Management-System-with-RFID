@@ -4,6 +4,7 @@ using Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241206021322_Expenses")]
+    partial class Expenses
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,9 +154,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                         .HasMaxLength(8)
                         .HasColumnType("varchar(8)");
 
-                    b.Property<string>("Penalty")
-                        .HasColumnType("longtext");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -263,8 +263,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("ExpenseID");
 
@@ -281,8 +280,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
 
                     b.Property<string>("FacilityName")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("RentalFee")
                         .IsRequired()
@@ -341,11 +339,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                     b.Property<string>("FeesName")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Penalty")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("varchar(8)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -670,11 +663,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                     b.Property<int>("IDFees")
                         .HasColumnType("int");
 
-                    b.Property<string>("Penalty")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("varchar(8)");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -761,55 +749,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Migrations
                         .IsUnique();
 
                     b.ToTable("Vehicle_Information");
-                });
-
-            modelBuilder.Entity("Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models.ViolationSanction", b =>
-                {
-                    b.Property<int>("ViolationID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ViolationID"));
-
-                    b.Property<int>("AccountID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Complainant")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Details")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("IncidentReportDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Remarks")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Respondent")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Sanction")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Subject")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Violation")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Witness")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("ViolationID");
-
-                    b.ToTable("Violation");
                 });
 #pragma warning restore 612, 618
         }

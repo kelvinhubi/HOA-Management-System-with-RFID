@@ -43,6 +43,7 @@
   <ItemGroup>
     <Folder Include="Migrations\" />
     <Folder Include="wwwroot\ExportedFiles\" />
+    <Folder Include="wwwroot\Downloadable\" />
   </ItemGroup>
 
   <ItemGroup>

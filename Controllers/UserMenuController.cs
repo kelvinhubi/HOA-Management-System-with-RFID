@@ -307,7 +307,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             NewModel model = new NewModel();
             model.facilities = _db.Facilities.ToList();
             model.facilitiesreserved = _db.FacilitiesReserved.ToList();
-            model.Homeacc = _db.Homeowner_Details.Where(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+            model.Homeacc = _db.Homeowner_Details.ToList();
             return View(model);
         }
         public IActionResult _ReserveFacility(int? id) {
@@ -323,6 +323,50 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             _db.FacilitiesReserved.Add(info);
             _db.SaveChanges();
             return RedirectToAction("Facilities");
+        }
+
+        //ViolationSanction
+        public IActionResult Violation() {
+            return View(_db.Violation.ToList());
+        }
+        public IActionResult _ReportViolation() { return View(); }
+        [HttpPost]
+        public IActionResult _ReportViolation(ViolationSanction info) {
+            var result = _db.Homeowner_Details.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+            info.AccountID = Convert.ToInt32(HttpContext.Session.GetString("SessionID"));
+            info.Complainant = result.FullName;
+            _db.Violation.Add(info);
+            _db.SaveChanges();
+            return RedirectToAction("Violation");
+        }
+        public IActionResult _EditViolation(int? id)
+        {
+            var result = _db.Violation.FirstOrDefault(_ => _.ViolationID == id);
+            if (result == null) { return NotFound(); }
+            return View(result);
+        }
+        [HttpPost]
+        public IActionResult _EditViolation(ViolationSanction info)
+        {
+            _db.Violation.Update(info);
+            _db.SaveChanges();
+            return RedirectToAction("Violation");
+        }
+        public IActionResult _DeleteViolation(int? id)
+        {
+            var result = _db.Violation.FirstOrDefault(_ => _.ViolationID == id);
+            if (result == null) { return NotFound(); }
+            _db.Violation.Remove(result);
+            _db.SaveChanges();
+            return RedirectToAction("Violation");
+        }
+
+        //Download ByLaws
+        public IActionResult RulesRegulation() { return View(); }
+        public IActionResult DownloadByLaws()
+        {
+            string filepath = "wwwroot\\Downloadable\\file.pdf";
+            return File(System.IO.File.ReadAllBytes(filepath), "application/pdf", "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "ByLaws.pdf");
         }
         public bool CheckRole()
         {

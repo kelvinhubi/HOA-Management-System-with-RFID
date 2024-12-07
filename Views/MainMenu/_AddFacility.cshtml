@@ -1,6 +1,6 @@
 ﻿@model Facilities
 
-<Button runat="server" id="bution" class="btn btn-success" style="position:sticky;">Add Event</Button>
+<Button runat="server" id="bution" class="btn btn-success" style="position:sticky;">Add Facility</Button>
 <form asp-action="_AddFacility" asp-controller="MainMenu" class="form" id="thisform">
     <p class="title">Add Facility</p>
     <input asp-for="FacilityID" class="form-control" hidden />
@@ -27,7 +27,7 @@
         if ($("#thisform").css("display") == "block") {
             $("#thisform").css("display", "none");
             $("#UserPartial").css("display", "block");
-            $("#bution").html('Add Home');
+            $("#bution").html('Add Facility');
             document.getElementById("bution").style.cssText = "display: block; position: inherit;";
             $("body").css("background", "rgba(0, 0, 0, 0)");
         }

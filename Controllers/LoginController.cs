@@ -245,6 +245,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                         IDFees = x.IDFees,
                         TypeOfFees = x.TypeOfFees,
                         Amount = x.Amount,
+                        Penalty = x.Penalty,
                         Status = x.Status
                     };
                     _db.userFeesStatuses.Add(data2);

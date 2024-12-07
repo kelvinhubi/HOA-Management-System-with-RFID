@@ -20,6 +20,11 @@
         <input asp-for="Amount" class="form-control" class="input"/>
         <span asp-validation-for="Amount" class="text-danger"></span>
     </div>
+    <div class="form-group">
+        <label asp-for="Penalty" class="control-label"></label>
+        <input asp-for="Penalty" class="form-control" class="input" />
+        <span asp-validation-for="Penalty" class="text-danger"></span>
+    </div>
     <div class="form-group" style="margin-top:5px">
         <input asp-controller="MainMenu" asp-action="_CreateFees" type="submit" id="button1" value="Create" class="btn btn-primary" style="background-color:#16a085;color:black;" />
     </div>

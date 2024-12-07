@@ -7,13 +7,12 @@
     --first-color-light: #000f;
     --white-color: #F7F6FB;
     --body-font: 'Nunito', sans-serif;
-    --normal-font-size: 1rem;
+    --normal-font-size: .5rem;
     --z-fixed: 100
 }
 *, ::before, ::after {
     box-sizing: border-box
 }
-
 body {
     position: relative;
     margin: var(--header-height) 0 0 0;
@@ -21,7 +20,6 @@ body {
     font-family: var(--body-font);
     font-size: var(--normal-font-size);
     transition: .5s;
-    
 }
 
 a {
@@ -90,11 +88,11 @@ a {
 }
 
 .nav_logo {
-    margin-bottom: .5rem
+    margin-bottom: 5px
 }
 
 .nav_logo-icon {
-    font-size: .5rem;
+    font-size: 2rem;
     color: var(--white-color)
 }
 
@@ -106,7 +104,7 @@ a {
 .nav_link {
     position: relative;
     color: var(--first-color-light);
-    margin-bottom: .5rem;
+    margin-bottom: 5px;
     transition: .3s
 }
 

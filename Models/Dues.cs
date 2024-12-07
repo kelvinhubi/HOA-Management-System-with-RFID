@@ -11,6 +11,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         [RegularExpression(@"^[0-9]*$", ErrorMessage = "Error pls only enter numbers")]
         public string Invoice { get; set; } = string.Empty;
         public string? Amount { get; set; } = string.Empty;
+        public string? Penalty { get; set; } = string.Empty;
         public string FeesName { get; set; } = string.Empty;
         [Required(ErrorMessage = "Please Select a type of due")]
         public string TypeOfFee { get; set; } = string.Empty;

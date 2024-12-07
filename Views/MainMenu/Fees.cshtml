@@ -18,6 +18,7 @@
                 <th>Fees Name</th>
                 <th>Type of Fee</th>
                 <th>Amount</th>
+                <th>Penalty</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -29,6 +30,7 @@
                     <td>@obj.FeesName</td>
                     <td>@obj.TypeOfFees</td>
                     <td>@obj.Amount</td>
+                    <td>@obj.Penalty</td>
                     <td>@obj.Status</td>
                     <td style="white-space:nowrap;">
                         <a asp-action="_EditFees" asp-route-id="@obj.IDFees" class="btn btn-success btn-sm">Edit<i class='bx bxs-edit-alt'></i></a>

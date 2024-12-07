@@ -15,6 +15,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         [Required, MaxLength(8)]
         [RegularExpression(@"^[0-9]*$", ErrorMessage = "Error pls only enter numbers")]
         public string Amount { get; set; } = string.Empty;
+        [Required, MaxLength(8)]
+        [RegularExpression(@"^[0-9]*$", ErrorMessage = "Error pls only enter numbers")]
+        public string Penalty { get; set; } = string.Empty;
         [Required]
         public string Status { get; set; } = "Disabled";
     }

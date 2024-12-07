@@ -27,6 +27,36 @@
     <div class="container-fluid">
         <!--begin::Row-->
         <div class="row">
+            <div class="col-lg-3 col-6">
+                <!--begin::Small Box Widget 1-->
+                <div class="small-box text-bg-primary">
+                    <div class="inner">
+                        <h3>@HoaMembers</h3>
+                        <p>HOA Memebrs</p>
+                    </div>
+                </div> <!--end::Small Box Widget 1-->
+            </div> <!--end::Col-->
+
+            <div class="col-lg-3 col-6">
+                <!--begin::Small Box Widget 1-->
+                <div class="small-box text-bg-primary">
+                    <div class="inner">
+                        <h3>@DeliquentMembers</h3>
+                        <p>Deliquent Members</p>
+                    </div>
+                </div> <!--end::Small Box Widget 1-->
+            </div> <!--end::Col-->
+
+            <div class="col-lg-3 col-6">
+                <!--begin::Small Box Widget 2-->
+                <div class="small-box text-bg-warning">
+                    <div class="inner">
+                        <h3>@PendingPaymentsCount</h3>
+                        <p>Total number of homeowners with unpaid dues</p>
+                    </div>
+                </div> <!--end::Small Box Widget 2-->
+            </div> <!--end::Col-->
+
             <!--begin::Col-->
             <div class="col-lg-3 col-6">
                 <!--begin::Small Box Widget 1-->
@@ -40,25 +70,14 @@
                 </div> <!--end::Small Box Widget 1-->
             </div> <!--end::Col-->
 
-
-            <div class="col-lg-3 col-6">
-                <!--begin::Small Box Widget 1-->
-                <div class="small-box text-bg-primary">
-                    <div class="inner">
-                        <h3>@HoaMembers</h3>
-                        <p>HOA Memebrs</p>
-                    </div>  <a asp-action="UserManagement" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
-                        More info <i class="bi bi-link-45deg"></i>
-                    </a>
-                </div> <!--end::Small Box Widget 1-->
-            </div> <!--end::Col-->
+            
                 <div class="col-lg-3 col-6">
                     <!--begin::Small Box Widget 1-->
                     <div class="small-box text-bg-primary">
                         <div class="inner">
                             <h3>@TotalVechicles</h3>
                             <p>Total Number of Vehicles</p>
-                        </div>  <a asp-action="UserManagement" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+                        </div>  <a asp-action="VehicleManagement" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
                             More info <i class="bi bi-link-45deg"></i>
                         </a>
                     </div> <!--end::Small Box Widget 1-->
@@ -69,23 +88,13 @@
                             <div class="inner">
                                 <h3>@pets</h3>
                                 <p>Pets</p>
-                            </div>  <a asp-action="UserManagement" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+                            </div> <a asp-action="Pets" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
                                 More info <i class="bi bi-link-45deg"></i>
                             </a>
                         </div> <!--end::Small Box Widget 1-->
                     </div> <!--end::Col-->
 
-                        <div class="col-lg-3 col-6">
-                            <!--begin::Small Box Widget 1-->
-                            <div class="small-box text-bg-primary">
-                                <div class="inner">
-                                    <h3>@DeliquentMembers</h3>
-                                    <p>Deliquent Members</p>
-                                </div>  <a asp-action="UserManagement" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
-                                    More info <i class="bi bi-link-45deg"></i>
-                                </a>
-                            </div> <!--end::Small Box Widget 1-->
-                        </div> <!--end::Col-->
+                        
                             <div class="col-lg-3 col-6">
                                 <!--begin::Small Box Widget 1-->
                                 <div class="small-box text-bg-primary">
@@ -103,30 +112,20 @@
                                         <div class="inner">
                                             <h3>@setofofficers</h3>
                                             <p>Set of Officers</p>
-                                        </div>  <a asp-action="UserManagement" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+                                        </div>  <a asp-action="Officers" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
                                             More info <i class="bi bi-link-45deg"></i>
                                         </a>
                                     </div> <!--end::Small Box Widget 1-->
                                 </div> <!--end::Col-->
 
-            <div class="col-lg-3 col-6">
-                <!--begin::Small Box Widget 2-->
-                <div class="small-box text-bg-warning">
-                    <div class="inner">
-                        <h3>@PendingPaymentsCount</h3>
-                        <p>Total number of homeowners with unpaid dues</p>
-                    </div>  <a asp-action="AssociationDues" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
-                        More info <i class="bi bi-link-45deg"></i>
-                    </a>
-                </div> <!--end::Small Box Widget 2-->
-            </div> <!--end::Col-->
+            
             <div class="col-lg-3 col-6">
                 <!--begin::Small Box Widget 2-->
                 <div class="small-box text-bg-info">
                     <div class="inner">
                         <h3>@RFIDRegisterdCount</h3>
                         <p>Homeowners/Residents With Vehicles</p>
-                    </div>  <a asp-action="AssociationDues" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+                    </div>  <a asp-action="VehicleManagement" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
                         More info <i class="bi bi-link-45deg"></i>
                     </a>
                 </div> <!--end::Small Box Widget 2-->

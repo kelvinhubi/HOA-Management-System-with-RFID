@@ -59,9 +59,15 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return RedirectToAction("AccessDenied", "ResidentMenu");
         }
 
-
+        //Download ByLaws
+        public IActionResult RulesRegulation() { return View(); }
+        public IActionResult DownloadByLaws()
+        {
+            string filepath = "wwwroot\\Downloadable\\file.pdf";
+            return File(System.IO.File.ReadAllBytes(filepath), "application/pdf", "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "ByLaws.pdf");
+        }
         //Profile
-       public IActionResult _ChangeUserPass()
+        public IActionResult _ChangeUserPass()
         {
             if (CheckRole()) {
                 var result = _db.User_Accounts.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));

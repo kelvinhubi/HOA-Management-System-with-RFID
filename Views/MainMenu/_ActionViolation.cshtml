@@ -1,0 +1,62 @@
+﻿@model ViolationSanction
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+    ViewData["Title"] = "Report Violation";
+}
+<form asp-action="_ActionViolation" class="form" id="thisform" style="bottom:29rem; display:block">
+    <p class="title">Action Violation</p>
+    <input asp-for="ViolationID" class="form-control" hidden />
+    <input asp-for="AccountID" class="form-control" hidden />
+    <div class="form-group">
+        <label asp-for="Complainant" class="control-label"></label>
+        <input asp-for="Complainant" class="form-control" readonly/>
+        <span asp-validation-for="Complainant"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Respondent" class="control-label"></label>
+        <input asp-for="Respondent" class="form-control" readonly />
+        <span asp-validation-for="Respondent"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Witness" class="control-label"></label>
+        <input asp-for="Witness" class="form-control" readonly />
+        <span asp-validation-for="Witness"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Subject" class="control-label"></label>
+        <input asp-for="Subject" class="form-control input" readonly/>
+        <span asp-validation-for="Subject"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Violation" class="control-label"></label>
+        <input asp-for="Violation" class="form-control input"  readonly/>
+        <span asp-validation-for="Violation"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Details" class="control-label"></label>
+        <textarea asp-for="Details" class="form-control input" readonly></textarea>
+        <span asp-validation-for="Details"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Sanction" class="control-label"></label>
+        <input asp-for="Sanction" class="form-control input"/>
+        <span asp-validation-for="Sanction"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Remarks" class="control-label"></label>
+        <textarea asp-for="Remarks" class="form-control input"></textarea>
+        <span asp-validation-for="Remarks"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn btn-success"/>
+    </div>
+</form>
+
+<div>
+    <a asp-action="Violation" class="btn btn-success" style="padding:5px; position:fixed">Back to List</a>
+</div>
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
