@@ -21,6 +21,9 @@ using Microsoft.AspNetCore.SignalR;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using QuestPDF.Companion;
 using Humanizer;
+using DocumentFormat.OpenXml.Bibliography;
+using Microsoft.VisualBasic;
+using System.Globalization;
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
 
@@ -597,7 +600,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
 
         [HttpPost]
-        public IActionResult _ExportDuesPDF(string startDate, string frequency) {
+        public IActionResult _ExportDuesPDF(string startDate,string endDate, string frequency) {
             string nameformat = string.Empty;
             var Dues = (from dues in _db.Due_Details
                         join
@@ -624,128 +627,335 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             {
                 container.Border(5).Table(table =>
                 {
-
-                    table.ColumnsDefinition(columns =>
-                    {
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                    });
-
-                    table.Header(header =>
-                    {
-                        header.Cell().ColumnSpan(7).Element(Block).Text("Collected Dues");
-                        header.Cell().Element(Block).Text("Homeowner Name");
-                        header.Cell().Element(Block).Text("Invoice");
-                        header.Cell().Element(Block).Text("Fee Name");
-                        header.Cell().Element(Block).Text("Type of Due");
-                        header.Cell().Element(Block).Text("Amount");
-                        header.Cell().Element(Block).Text("Date");
-                        header.Cell().Element(Block).Text("Status");
-
-                    });
-
-
                     var result = Dues.ToList();
+                    int total = 0;
                     switch (frequency)
                     {
                         case "Daily":
-                            result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(startDate) && _.Status == "Paid").ToList();
-                            Console.WriteLine(result);
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate) && _.Status == "Paid").ToList();
+
+                            var dailySummary = result
+                            .GroupBy(d => d.Date)
+                            .Select(g => new Daily
+                            {
+                                Date = g.Key,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Date).ToList();
+
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(2).Element(Block).Text("Collected Dues");
+                                header.Cell().Element(Block).Text("Date");
+                                header.Cell().Element(Block).Text("Amount");
+                            });
+
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in dailySummary)
+                                {
+
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Date.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(2).Element(Block).Text("Total Collected Dues: " + total.ToString()).FontSize(11);
+                            }
                             break;
                         case "Weekly":
-                            result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(startDate).AddDays(7) && _.Status == "Paid").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate) && _.Status == "Paid").ToList();
+
+                            var weeklySummary = result
+                            .GroupBy(d => new { Week = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(d.Date.ToDateTime(TimeOnly.MinValue), CalendarWeekRule.FirstDay, DayOfWeek.Monday), Months = d.Date.Month, Years= d.Date.Year })
+                            .Select(g => new Weekly
+                            {
+                                Year = g.Key.Years,
+                                Month = g.Key.Months,
+                                Week = g.Key.Week,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Year).ThenBy(_ => _.Year).ThenBy(_ => _.Week).ToList();
+
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(4).Element(Block).Text("Collected Dues");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Week");
+                                header.Cell().Element(Block).Text("Amount");
+                            });
+
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in weeklySummary)
+                                {
+                                    var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Week.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(4).Element(Block).Text("Total Collected Dues: " + total.ToString()).FontSize(11);
+                            }
                             break;
                         case "Monthly":
-                            result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(startDate).AddMonths(1) && _.Status == "Paid").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate) && _.Status == "Paid").ToList();
+                            var monthlySummary = result
+                            .GroupBy(d => new { d.Date.Year, d.Date.Month })
+                            .Select(g => new Monthly
+                            {
+                                Year = g.Key.Year,
+                                Month = g.Key.Month,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Year).ThenBy(_ => _.Month).ToList();
+
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(3).Element(Block).Text("Collected Dues");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Amount");
+                            });
+
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in monthlySummary)
+                                {
+                                    var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(3).Element(Block).Text("Total Collected Dues: " + total.ToString()).FontSize(11);
+                            }
                             break;
                         case "Yearly":
-                            result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(startDate).AddYears(1) && _.Status == "Paid").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate) && _.Status == "Paid").ToList();
+                            var yearlySummary = result
+                            .GroupBy(d => d.Date.Year)
+                            .Select(group => new Yearly
+                            {
+                            Year = group.Key,
+                            Amount = group.Sum(d => decimal.Parse(d.Amount ?? "0")) // Handle potential null Amount values
+                            })
+                            .OrderBy(_ => _.Year).ToList();
+
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(2).Element(Block).Text("Collected Dues");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Amount");
+                            });
+
+
+
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in yearlySummary)
+                                {
+
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(2).Element(Block).Text("Total Collected Dues: " + total.ToString()).FontSize(11);
+                            }
                             break;
                     }
-                    var total = result.Sum(_ => Convert.ToInt32(_.Amount));
-                    if (result.Count != 0)
-                    {
-                        foreach (var item in result)
-                        {
 
-                            table.Cell().RowSpan(2).Element(Block).Text(item.FullName.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Invoice.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.FeesName.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.TypeOfFee.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Date.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Status.ToString()).FontSize(11);
-
-                        }
-                        table.Cell().ColumnSpan(7).Element(Block).Text("Total Collected Dues: " + total.ToString()).FontSize(11);
-                    }
+                    
                 });
                 container2.Border(5).Table(table =>
                 {
-                    table.ColumnsDefinition(columns =>
-                    {
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                    });
-
-                    table.Header(header =>
-                    {
-                        header.Cell().ColumnSpan(7).Element(Block).Text("Non Collected Dues");
-                        header.Cell().Element(Block).Text("Homeowner Name");
-                        header.Cell().Element(Block).Text("Invoice");
-                        header.Cell().Element(Block).Text("Fee Name");
-                        header.Cell().Element(Block).Text("Type of Due");
-                        header.Cell().Element(Block).Text("Amount");
-                        header.Cell().Element(Block).Text("Date");
-                        header.Cell().Element(Block).Text("Status");
-
-                    });
-
 
                     var result = Dues.ToList();
+                    int total = 0;
                     switch (frequency)
                     {
                         case "Daily":
-                            result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(startDate).AddDays(1) && _.Status == "Unpaid").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate) && _.Status == "Unpaid").ToList();
+
+                            var dailySummary = result
+                            .GroupBy(d => d.Date)
+                            .Select(g => new Daily
+                            {
+                                Date = g.Key,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Date).ToList();
+
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(2).Element(Block).Text("Non Collected Dues");
+                                header.Cell().Element(Block).Text("Date");
+                                header.Cell().Element(Block).Text("Amount");
+                            });
+
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in dailySummary)
+                                {
+
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Date.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(2).Element(Block).Text("Total Non Collected Dues: " + total.ToString()).FontSize(11);
+                            }
                             break;
                         case "Weekly":
-                            result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(startDate).AddDays(7) && _.Status == "Unpaid").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate) && _.Status == "Unpaid").ToList();
+                            var weeklySummary = result
+                            .GroupBy(d => new { Week = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(d.Date.ToDateTime(TimeOnly.MinValue), CalendarWeekRule.FirstDay, DayOfWeek.Monday), Months = d.Date.Month, Years = d.Date.Year })
+                            .Select(g => new Weekly
+                            {
+                                Year = g.Key.Years,
+                                Month = g.Key.Months,
+                                Week = g.Key.Week,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Year).ThenBy(_ => _.Year).ThenBy(_ => _.Week).ToList();
+
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(4).Element(Block).Text("Non Collected Dues");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Week");
+                                header.Cell().Element(Block).Text("Amount");
+                            });
+
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in weeklySummary)
+                                {
+
+                                    var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Week.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(4).Element(Block).Text("Total Non Collected Dues: " + total.ToString()).FontSize(11);
+                            }
                             break;
                         case "Monthly":
-                            result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(startDate).AddMonths(1) && _.Status == "Unpaid").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate) && _.Status == "Unpaid").ToList();
+                            var monthlySummary = result
+                            .GroupBy(d => new { d.Date.Year, d.Date.Month })
+                            .Select(g => new Monthly
+                            {
+                                Year = g.Key.Year,
+                                Month = g.Key.Month,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Year).ThenBy(_ => _.Month).ToList();
+
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(3).Element(Block).Text("Non Collected Dues");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Amount");
+                            });
+
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in monthlySummary)
+                                {
+
+                                    var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(3).Element(Block).Text("Total Non Collected Dues: " + total.ToString()).FontSize(11);
+                            }
                             break;
                         case "Yearly":
-                            result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(startDate).AddYears(1) && _.Status == "Unpaid").ToList();
-                            break;
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate) && _.Status == "Unpaid").ToList();
+                            var yearlySummary = result
+                            .GroupBy(d => d.Date.Year)
+                            .Select(group => new Yearly
+                            {
+                                Year = group.Key,
+                                Amount = group.Sum(d => decimal.Parse(d.Amount ?? "0")) // Handle potential null Amount values
+                            })
+                            .OrderBy(_ => _.Year).ToList();
+
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(2).Element(Block).Text("Non Collected Dues");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Amount");
+                            });
+
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in yearlySummary)
+                                {
+
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(2).Element(Block).Text("Total Non Collected Dues: " + total.ToString()).FontSize(11);
+                            }
+                            break; 
                     }
-                    var total = result.Sum(_ =>Convert.ToInt32(_.Amount));
-                    if (result.Count != 0)
-                    {
-                        foreach (var item in result)
-                        {
-
-                            table.Cell().RowSpan(2).Element(Block).Text(item.FullName.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Invoice.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.FeesName.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.TypeOfFee.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Date.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Status.ToString()).FontSize(11);
-
-                        }
-                        table.Cell().ColumnSpan(7).Element(Block).Text("Total Non Collected Dues: "+total.ToString()).FontSize(11);
-                    }
-
                 });
                 
             }
@@ -773,7 +983,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     .Column(c =>ComposeTable(c.Item().PaddingBottom(25).PaddingTop(25),c.Item()));
                     page.Size(PageSizes.A4);
                 });
-            }).GeneratePdf(filepath); //RENAMING USING RANDOM WORDS ShowInCompanion(12500)
+            }).ShowInCompanion(12500); //RENAMING USING RANDOM WORDS ShowInCompanion(12500) GeneratePdf(filepath)
             _db.logsLists.Add(new LogsList
             {
                 LogName = "Export Dues",

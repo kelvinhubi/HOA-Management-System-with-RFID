@@ -9,6 +9,7 @@ var setmin = DateTime.Now.ToString("yyyy-MM-dd");;
     <input asp-for="@Model.dues.AccountID" name="AccountID" id="AccountID" class="form-control" hidden />
     <input asp-for="@Model.dues.Status" name="Status" class="form-control" hidden />
     <input asp-for="@Model.dues.FeesName" name="FeesName" id="FeesName" hidden/>
+    <input asp-for="@Model.dues.Penalty" name="Penalty" class="form-control input" id="Penalty" hidden />
     <div class="form-group">
         <label asp-for="@Model.dues.FullName" class="control-label">Select Homeowner</label>
         <select asp-for="@Model.dues.FullName" onclick="CheckName();CheckFees()" id="FullName" class="form-control">
@@ -22,10 +23,6 @@ var setmin = DateTime.Now.ToString("yyyy-MM-dd");;
     <div class="form-group">
         <label asp-for="@Model.dues.Amount" class="control-label"></label>
         <input asp-for="@Model.dues.Amount" name="Amount" class="form-control input" id="Amount" readonly />
-    </div>
-    <div class="form-group">
-        <label asp-for="@Model.dues.Penalty" class="control-label"></label>
-        <input asp-for="@Model.dues.Penalty" name="Penalty" class="form-control input" id="Penalty" readonly />
     </div>
     <div class="form-group">
         <label asp-for="@Model.dues.TypeOfFee" class="control-label">Type of Due</label>
