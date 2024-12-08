@@ -1,0 +1,31 @@
+﻿@model IEnumerable<Announcements>
+@{
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+}
+<h2>Announcements</h2>
+@{
+    foreach (var items in Model)
+    {
+        <div class="app-content" style="margin-bottom:12px;">
+            <!--begin::Container-->
+            <div class="container-fluid">
+                <!--begin::Row-->
+                <div class="row">
+                    <div class="col-12">
+                        <!-- Default box -->
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title">@items.AnnouncementTitle</h3>
+                                <div class="card-tools"> <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse" title="Collapse"><i data-lte-icon="expand" class='bx bx-plus-circle'></i><i data-lte-icon="collapse" class='bx bx-minus-circle'></i> </button> <button type="button" class="btn btn-tool" data-lte-toggle="card-remove" title="Remove"> <i class="bi bi-x-lg"></i> </button> </div>
+                            </div>
+                            <div class="card-body">
+                                @items.Description
+                            </div> <!-- /.card-body -->
+                            <div class="card-footer">Date Posted: @items.DatePosted.ToString("MMMM dd, yyyy h:mm tt")</div> <!-- /.card-footer-->
+                        </div> <!-- /.card -->
+                    </div>
+                </div> <!--end::Row-->
+            </div> <!--end::Container-->
+        </div> <!--end::App Content-->
+    }
+}

@@ -58,7 +58,143 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             return RedirectToAction("AccessDenied", "ResidentMenu");
         }
+        //Events
+        public IActionResult Events()
+        {
+            ViewData["SessionID"] = HttpContext.Session.GetString("SessionID");
+            NewModel model = new NewModel();
+            model.Events = _db.Events.ToList();
+            model.EventsReserved = _db.EventsReserved.ToList();
+            return View(model);
+        }
+        public IActionResult _EventDetails(int? id)
+        {
+            if (id == null) { return NotFound(); }
+            var result = _db.Events.FirstOrDefault(_ => _.EventID == id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return View(result);
+        }
+        public IActionResult JoinFree(int? EvID)
+        {
+            var result = _db.Homeowner_Details.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+            var EvResult = _db.Events.FirstOrDefault(_ => _.EventID == Convert.ToInt32(EvID));
+            if (result != null && EvResult != null)
+            {
+                var info = new EventsReserved { AccountID = result.AccountID, EventID = EvResult.EventID, Fee = null, Status = "Joined" };
+                _db.EventsReserved.Add(info);
+                _db.SaveChanges();
+                return RedirectToAction("Events");
+            }
+            return RedirectToAction("Events");
+        }
+        //Facility
 
+        public IActionResult Facilities()
+        {
+            NewModel model = new NewModel();
+            model.facilities = _db.Facilities.ToList();
+            model.facilitiesreserved = _db.FacilitiesReserved.ToList();
+            model.Homeacc = _db.Homeowner_Details.ToList();
+            return View(model);
+        }
+        public IActionResult _ReserveFacility(int? id)
+        {
+            var result = _db.Facilities.FirstOrDefault(_ => _.FacilityID == id);
+            if (result == null) { return NotFound(); }
+            FacilityReservation info = new FacilityReservation { AccountID = Convert.ToInt32(HttpContext.Session.GetString("SessionID")), FacilityID = result.FacilityID };
+            return View(info);
+        }
+        [HttpPost]
+        public IActionResult _ReserveFacility(FacilityReservation info)
+        {
+            info.PaymentStatus = "Paid";
+            _db.FacilitiesReserved.Add(info);
+            _db.SaveChanges();
+            return RedirectToAction("Facilities");
+        }
+
+        //Pets
+        public IActionResult Pets()
+        {
+            OwnerPetInfo model = new OwnerPetInfo();
+            model.Pets = _db.PetInformation.ToList();
+            return View(model);
+        }
+        public IActionResult _AddPets(OwnerPetInfo info)
+        {
+            foreach (var items in info.Pets)
+            {
+                items.AccountID = Convert.ToInt32(HttpContext.Session.GetString("SessionID"));
+                _db.PetInformation.Add(items);
+            }
+            _db.SaveChanges();
+            return RedirectToAction("Pets");
+        }
+        public IActionResult _EditPets(int? id)
+        {
+            if (id == null) { return NotFound(); }
+            var result = _db.PetInformation.FirstOrDefault(_ => _.PetId == id);
+            if (result == null) { return NotFound(); }
+            return View(result);
+        }
+        [HttpPost]
+        public IActionResult _EditPets(PetInformation info)
+        {
+            _db.PetInformation.Update(info);
+            _db.SaveChanges();
+            return RedirectToAction("Pets", "ResidentMenu");
+        }
+        public IActionResult _DeletePets(int? id)
+        {
+            if (id == null) { return NotFound(); }
+            var result = _db.PetInformation.FirstOrDefault(_ => _.PetId == id);
+            if (result == null) { return NotFound(); }
+            _db.PetInformation.Remove(result);
+            _db.SaveChanges();
+            return RedirectToAction("Pets");
+        }
+
+
+        //ViolationSanction
+        public IActionResult Violation()
+        {
+            return View(_db.Violation.ToList());
+        }
+        public IActionResult _ReportViolation() { return View(); }
+        [HttpPost]
+        public IActionResult _ReportViolation(ViolationSanction info)
+        {
+            var result = _db.Homeowner_Details.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
+            info.AccountID = Convert.ToInt32(HttpContext.Session.GetString("SessionID"));
+            info.Complainant = result.FullName;
+            _db.Violation.Add(info);
+            _db.SaveChanges();
+            return RedirectToAction("Violation");
+        }
+        public IActionResult _EditViolation(int? id)
+        {
+            var result = _db.Violation.FirstOrDefault(_ => _.ViolationID == id);
+            if (result == null) { return NotFound(); }
+            return View(result);
+        }
+        [HttpPost]
+        public IActionResult _EditViolation(ViolationSanction info)
+        {
+            _db.Violation.Update(info);
+            _db.SaveChanges();
+            return RedirectToAction("Violation");
+        }
+        public IActionResult _DeleteViolation(int? id)
+        {
+            var result = _db.Violation.FirstOrDefault(_ => _.ViolationID == id);
+            if (result == null) { return NotFound(); }
+            _db.Violation.Remove(result);
+            _db.SaveChanges();
+            return RedirectToAction("Violation");
+        }
         //Download ByLaws
         public IActionResult RulesRegulation() { return View(); }
         public IActionResult DownloadByLaws()
@@ -151,38 +287,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return RedirectToAction("HomeList","ResidentMenu");
         }
         //Events
-        //Events
-        public IActionResult Events()
-        {
-            ViewData["SessionID"] = HttpContext.Session.GetString("SessionID");
-            NewModel model = new NewModel();
-            model.Events = _db.Events.ToList();
-            model.EventsReserved = _db.EventsReserved.ToList();
-            return View(model);
-        }
-        public IActionResult _EventDetails(int? id)
-        {
-            if (id == null) { return NotFound(); }
-            var result = _db.Events.FirstOrDefault(_ => _.EventID == id);
-            if (result == null)
-            {
-                return NotFound();
-            }
-            return View(result);
-        }
-        public IActionResult JoinFree(int? EvID)
-        {
-            var result = _db.Homeowner_Details.FirstOrDefault(_ => _.AccountID == Convert.ToInt32(HttpContext.Session.GetString("SessionID")));
-            var EvResult = _db.Events.FirstOrDefault(_ => _.EventID == Convert.ToInt32(EvID));
-            if (result != null && EvResult != null)
-            {
-                var info = new EventsReserved { AccountID = result.AccountID, EventID = EvResult.EventID, Fee = null, Status = "Joined" };
-                _db.EventsReserved.Add(info);
-                _db.SaveChangesAsync();
-                return RedirectToAction("Events");
-            }
-            return RedirectToAction("Events");
-        }
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();

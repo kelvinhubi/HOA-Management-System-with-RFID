@@ -1,0 +1,31 @@
+﻿@model PetInformation
+@{
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+<head>
+    <style>p {margin-top: 5px;}
+        .btn-sm,.btn{margin-top:5px;}
+    </style>
+</head>
+<form asp-action="_EditPets" asp-controller="ResidentMenu" class="form" id="thisform" style="bottom:29rem; display:block">
+    <p class="title">Pet Information</p>
+    <input asp-for="AccountID" class="form-control" hidden />
+    <div id="pets">
+        <div class="form-group">
+            <label asp-for="Name" class="form-label">Name:</label>
+            <input asp-for="Name" class="form-control" type="text" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Species" class="form-label">Type of Pet:</label>
+            <input asp-for="Species" class="form-control" type="text" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Age" class="form-label">Age:</label>
+            <input asp-for="Age" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </div>
+</form>

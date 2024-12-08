@@ -1,0 +1,60 @@
+﻿@model IEnumerable<ViolationSanction>
+@{
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+
+}
+<head>
+    <title>
+        @{
+            ViewData["Title"] = "Violation Reports";
+        }
+    </title>
+</head>
+@Html.AntiForgeryToken();
+<div id="UserPartial">
+    <h2>Violation Reports</h2>
+    <table id="mytable" class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <td>Subject</td>
+                <td>Report Date</td>
+                <td>Violation</td>
+                <td>Sanction</td>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model)
+            {
+                <tr>
+                    <td>@obj.Subject</td>
+                    <td>@obj.IncidentReportDate</td>
+                    <td>@obj.Violation</td>
+                    @if (obj.Sanction != null)
+                    {
+                        <td>@obj.Sanction</td>
+                    }
+                    else
+                    {
+                        <td>No Action Yet</td>
+                    }
+                    <td>
+
+                        <a asp-action="_EditViolation" class="btn btn-success btn-sm" asp-route-id="@obj.ViolationID">View<i class='bx bxs-user-detail'></i></a>
+                        <a asp-action="_DeleteViolation" class="btn btn-danger btn-sm" asp-route-id="@obj.ViolationID">Delete<i class='bx bxs-trash'></i></a>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<a asp-action="_ReportViolation" class="btn btn-success ">Report a Violation<i class='bx bxs-user-detail'></i></a>
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
+<script>
+    new DataTable('#mytable');
+</script>

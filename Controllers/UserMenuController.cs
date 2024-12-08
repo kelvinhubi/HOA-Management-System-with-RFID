@@ -320,6 +320,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public IActionResult _ReserveFacility(FacilityReservation info)
         {
             info.PaymentStatus = "Paid";
+            var result = _db.FacilitiesReserved.Where(_ => (_.StartTime <= info.EndTime && _.EndTime >= info.StartTime) || (_.StartTime >= info.StartTime && _.StartTime <= info.EndTime)|| (_.EndTime >= info.StartTime && _.EndTime <= info.EndTime));
+            if (result.Count() != 0) {
+                ModelState.AddModelError("Reserved", "Sorry Date and time already reserved");
+                return View(info);
+            }
             _db.FacilitiesReserved.Add(info);
             _db.SaveChanges();
             return RedirectToAction("Facilities");
@@ -362,10 +367,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
 
         //Download ByLaws
-        public IActionResult RulesRegulation() { return View(); }
+        public IActionResult RulesRegulations() { return View(); }
         public IActionResult DownloadByLaws()
         {
-            string filepath = "wwwroot\\Downloadable\\file.pdf";
+            string filepath = "wwwroot\\Downloadable\\ByLaws.pdf";
             return File(System.IO.File.ReadAllBytes(filepath), "application/pdf", "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "ByLaws.pdf");
         }
         public bool CheckRole()

@@ -70,19 +70,23 @@
     <Button runat="server" id="bution2" class="btn btn-success" style="position:sticky;">Export as PDF</Button>
     <form asp-action="_ExportExpensePDF" class="form form3" id="thisform" style="bottom:29rem; display:block">
         <p class="title">Export As PDF</p>
-        <div class="form-group">
-            <label for="startDate" class="control-label">Start Date</label>
-            <input id="startDate" type="date" name="startDate" class="form-control input" required />
-        </div>
-        <div class="form-group">
-            <label for="endDate" class="control-label">Time Frequency</label>
-            <select name="frequency">
-                @foreach (var items in choices)
-                {
-                    <option value="@items">@items</option>
-                }
-            </select>
-        </div>
+            <div class="form-group">
+                <label for="startDate2" class="control-label">Start Date</label>
+                <input id="startDate2" type="date" name="startDate" class="form-control input" required />
+            </div>
+            <div class="form-group">
+                <label for="endDate2" class="control-label">End Date</label>
+                <input id="endDate2" type="date" name="endDate" class="form-control input" required />
+            </div>
+            <div class="form-group">
+                <label for="frequency" class="control-label">Time Frequency</label>
+                <select name="frequency">
+                    @foreach (var items in choices)
+                    {
+                        <option value="@items">@items</option>
+                    }
+                </select>
+            </div>
         <button class="btn btn-success" id="PdfButton" value="submit">Export</button>
     </form>
 </div>
@@ -123,4 +127,34 @@
 
         }
     }
+    $("#startDate").on('change', function () {
+
+        $("#endDate").removeAttr('disabled');
+    });
+    $(".form3").on('change', function () {
+        var fit_start_time = $("#startDate").val();
+        var fit_end_time = $("#endDate").val();
+        if (new Date(fit_end_time) < new Date(fit_start_time)) {
+            $("#PdfButton").attr('disabled', 'disabled');
+            alert("End Date must be greater than start date");
+        }
+        else {
+            $("#PdfButton").removeAttr('disabled');
+        }
+    });
+    $("#startDate2").on('change', function () {
+
+        $("#endDate2").removeAttr('disabled');
+    });
+    $(".form4").on('change', function () {
+        var fit_start_time = $("#startDate2").val();
+        var fit_end_time = $("#endDate2").val();
+        if (new Date(fit_end_time) < new Date(fit_start_time)) {
+            $("#ExcelButton").attr('disabled', 'disabled');
+            alert("End Date must be greater than start date");
+        }
+        else {
+            $("#ExcelButton").removeAttr('disabled');
+        }
+    });
 </script>

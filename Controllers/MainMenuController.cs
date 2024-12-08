@@ -24,6 +24,7 @@ using Humanizer;
 using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.VisualBasic;
 using System.Globalization;
+using SQLitePCL;
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
 
@@ -56,7 +57,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             {
 
                 ViewData["User Registrations"] = _db.Homeowner_Details.Count();
-                ViewData["RFID Registrations"] = _db.Vehicle_Information.Where(_=>_.RFID_number=="N/A").Count();
+                ViewData["RFID Registrations"] = _db.Vehicle_Information.Where(_=>_.RFID_number!="N/A").Count();
                 ViewData["Pending Payments"] = _db.Due_Details.Where(x => x.Status == "Unpaid").Count();
                 ViewData["HoaMembers"] = _db.Homeowner_Details.Where(_=>_.Role =="Homeowner").Count();
                 ViewData["DeliquentMembers"] = _db.Due_Details.Where(x => x.Status == "Unpaid" && DateOnly.FromDateTime(DateTime.Now) < x.Date).Count();
@@ -207,6 +208,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             }
             var model = new NewModel();
             var useracc = _db.Homeowner_Details.AsNoTracking().FirstOrDefault(m => m.AccountID == ID);
+            if (useracc == null)
+            {
+                return RedirectToAction("Error", "MainMenu", ID);
+            }
             var cars = _db.Vehicle_Information.AsNoTracking().Where(_ => _.AccountID == ID);
             if (useracc.Role.Equals("Homeowner"))
             {
@@ -223,10 +228,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 TypeOfFees = vm.TypeOfFees,
                 IsChecked = vm.Status.Equals("Enabled") ? true : false
             }).ToList();
-            if (useracc == null)
-            {
-                return RedirectToAction("Error", "MainMenu", ID);
-            }
+            
             model.Vehicles = cars;
             model.Homeowner = useracc;
             return View(model);
@@ -497,7 +499,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
 
         [HttpPost]
-        public IActionResult _ExportDuesExcel(string startDate, string frequency) {
+        public IActionResult _ExportDuesExcel(string startDate,string endDate ,string frequency) {
             string nameformat = string.Empty;
             var Dues = (from dues in _db.Due_Details
                         join
@@ -515,14 +517,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                         });
 
             DataTable dt = new DataTable("Student");
-            dt.Columns.AddRange(new DataColumn[7] {
-                                            new DataColumn("Homeowner Name"),
-                                            new DataColumn("Invoice"),
-                                            new DataColumn("Fee Name"),
-                                            new DataColumn("Type of Due"),
-                                            new DataColumn("Date"),
-                                            new DataColumn("Status"),
-                                            new DataColumn("Amount")});
+            
 
 
             var result = Dues.ToList();
@@ -530,57 +525,188 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             switch (frequency)
             {
                 case "Daily":
-                    result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(startDate) && _.Status == "Paid").ToList();
+                    dt.Columns.AddRange(new DataColumn[3] {
+                                            new DataColumn("Date"),
+                                            new DataColumn("Amount"),
+                                            new DataColumn("")});
+                    result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate) && _.Status == "Paid").ToList();
                     total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                    var dailySummary = result
+                            .GroupBy(d => d.Date)
+                            .Select(g => new Daily
+                            {
+                                Date = g.Key,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Date).ToList();
+                    foreach (var loglists in dailySummary)
+                    {
+                        dt.Rows.Add(loglists.Date, loglists.Amount);
+
+                    }
+                    dt.Rows.Add("", "Total Collected Dues: " + total);
+                    dt.Rows.Add();
                     break;
                 case "Weekly":
-                    result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(startDate).AddDays(7) && _.Status == "Paid").ToList();
+                    dt.Columns.AddRange(new DataColumn[] {
+                                            new DataColumn("Year"),
+                                            new DataColumn("Month"),
+                                            new DataColumn("Week"),
+                                            new DataColumn("Amount"),
+                                            new DataColumn("")});
+                    result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate) && _.Status == "Paid").ToList();
                     total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                    var weeklySummary = result
+                            .GroupBy(d => new { Week = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(d.Date.ToDateTime(TimeOnly.MinValue), CalendarWeekRule.FirstDay, DayOfWeek.Monday), Months = d.Date.Month, Years = d.Date.Year })
+                            .Select(g => new Weekly
+                            {
+                                Year = g.Key.Years,
+                                Month = g.Key.Months,
+                                Week = g.Key.Week,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Year).ThenBy(_ => _.Year).ThenBy(_ => _.Week).ToList();
+                    foreach (var loglists in weeklySummary)
+                    {
+                        var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(loglists.Month);
+                        dt.Rows.Add(loglists.Year,thismonth,loglists.Week, loglists.Amount);
+
+                    }
+                    dt.Rows.Add("", "", "", "Total Collected Dues: " + total);
+                    dt.Rows.Add();
                     break;
                 case "Monthly":
-                    result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(startDate).AddMonths(1) && _.Status == "Paid").ToList();
+                    dt.Columns.AddRange(new DataColumn[] {
+                                            new DataColumn("Year"),
+                                            new DataColumn("Month"),
+                                            new DataColumn("Amount"),
+                                            new DataColumn("")});
+                    result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate) && _.Status == "Paid").ToList();
                     total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                    var monthlySummary = result
+                            .GroupBy(d => new { d.Date.Year, d.Date.Month })
+                            .Select(g => new Monthly
+                            {
+                                Year = g.Key.Year,
+                                Month = g.Key.Month,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Year).ThenBy(_ => _.Month).ToList();
+                    foreach (var loglists in monthlySummary)
+                    {
+                        var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(loglists.Month);
+                        dt.Rows.Add(loglists.Year, thismonth, loglists.Amount);
+
+                    }
+                    dt.Rows.Add("", "", "Total Collected Dues: " + total);
+                    dt.Rows.Add();
                     break;
                 case "Yearly":
+                    dt.Columns.AddRange(new DataColumn[] {
+                                            new DataColumn("Year"),
+                                            new DataColumn("Amount"),
+                                            new DataColumn("")});
                     result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(startDate).AddYears(1) && _.Status == "Paid").ToList();
                     total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                    var yearlySummary = result
+                            .GroupBy(d => d.Date.Year)
+                            .Select(g => new Yearly
+                            {
+                                Year = g.Key,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Year).ToList();
+                    foreach (var loglists in yearlySummary)
+                    {
+                        dt.Rows.Add(loglists.Year, loglists.Amount);
+
+                    }
+                    dt.Rows.Add("", "Total Collected Dues: " + total);
+                    dt.Rows.Add();
                     break;
             }
-            foreach (var loglists in result)
-            {
-                dt.Rows.Add(loglists.FullName, loglists.Invoice, loglists.FeesName, loglists.TypeOfFee, loglists.Date, loglists.Status, loglists.Amount);
-                
-            }
-            dt.Rows.Add("", "", "", "", "", "","Total: "+total);
-            dt.Rows.Add("", "", "", "", "", "","");
+            
             result = Dues.ToList();
             switch (frequency)
             {
                 case "Daily":
                     result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(startDate) && _.Status == "Unpaid").ToList();
+                    
                     total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                    var dailySummary = result
+                            .GroupBy(d => d.Date)
+                            .Select(g => new Daily
+                            {
+                                Date = g.Key,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Date).ToList();
+                    foreach (var loglists in dailySummary)
+                    {
+                        dt.Rows.Add(loglists.Date, loglists.Amount);
+
+                    }
+                    dt.Rows.Add("", "Total Non Collected Dues: " + total);
+                    dt.Rows.Add("", "");
                     break;
                 case "Weekly":
                     result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(startDate).AddDays(7) && _.Status == "Unpaid").ToList();
                     total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                    var weeklySummary = result
+                            .GroupBy(d => new { Week = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(d.Date.ToDateTime(TimeOnly.MinValue), CalendarWeekRule.FirstDay, DayOfWeek.Monday), Months = d.Date.Month, Years = d.Date.Year })
+                            .Select(g => new Weekly
+                            {
+                                Year = g.Key.Years,
+                                Month = g.Key.Months,
+                                Week = g.Key.Week,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Year).ThenBy(_ => _.Year).ThenBy(_ => _.Week).ToList();
+                    foreach (var loglists in weeklySummary)
+                    {
+                        var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(loglists.Month);
+                        dt.Rows.Add(loglists.Year, thismonth, loglists.Week, loglists.Amount);
+
+                    }
+                    dt.Rows.Add("", "", "", "Total  Non Collected Dues: " + total);
+                    dt.Rows.Add();
                     break;
                 case "Monthly":
-                    result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(startDate).AddMonths(1) && _.Status == "Unpaid").ToList();
+                    result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate) && _.Status == "Unpaid").ToList();
                     total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                    var monthlySummary = result
+                            .GroupBy(d => new { d.Date.Year, d.Date.Month })
+                            .Select(g => new Monthly
+                            {
+                                Year = g.Key.Year,
+                                Month = g.Key.Month,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Year).ThenBy(_ => _.Month).ToList();
+                    foreach (var loglists in monthlySummary)
+                    {
+                        var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(loglists.Month);
+                        dt.Rows.Add(loglists.Year, thismonth, loglists.Amount);
+
+                    }
+                    dt.Rows.Add("", "", "Total: " + total);
+                    dt.Rows.Add();
                     break;
                 case "Yearly":
-                    result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(startDate).AddYears(1) && _.Status == "Unpaid").ToList();
+                    result = Dues.Where(_ => _.Date >= DateOnly.Parse(startDate) && _.Date <= DateOnly.Parse(endDate) && _.Status == "Unpaid").ToList();
                     total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                    total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                    var yearlySummary = result
+                            .GroupBy(d => d.Date.Year)
+                            .Select(g => new Yearly
+                            {
+                                Year = g.Key,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Year).ToList();
+                    foreach (var loglists in yearlySummary)
+                    {
+                        dt.Rows.Add(loglists.Year, loglists.Amount);
+
+                    }
+                    dt.Rows.Add("", "Total Non Collected Dues: " + total);
+                    dt.Rows.Add();
                     break;
             }
-            foreach (var loglists in result)
-            {
-                dt.Rows.Add(loglists.FullName, loglists.Invoice, loglists.FeesName, loglists.TypeOfFee, loglists.Date, loglists.Status, loglists.Amount);
-
-            }
-            dt.Rows.Add("", "", "", "", "", "", "Total: " + total);
-            dt.Rows.Add("", "", "", "", "", "", "");
-            dt.Rows.Add("Report Name: "+frequency+" Dues Report From "+startDate,"Generated By: ADMIN", "Generated Date: " + DateTime.Now.ToString("MMM dd, yyyy"));
+            
+            dt.Rows.Add("Report Name: " + frequency + " Dues Report From " + startDate +" To "+endDate, "Generated By: ADMIN", "Generated Date: " + DateTime.Now.ToString("MMM dd, yyyy"));
             using (XLWorkbook wb = new XLWorkbook())
             {
                 wb.Worksheets.Add(dt);
@@ -1762,9 +1888,482 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             return RedirectToAction("Events");
         }
         //Facilities
+        [HttpPost]
+        public IActionResult _ExportFacilityPDF(string startDate, string endDate, string frequency)
+        {
+            
+            string nameformat = string.Empty;
+            
+            if (nameformat == null)
+            {
+                nameformat = "ExportPdf";
+            }
+            string filepath = "wwwroot\\ExportedFiles\\" + nameformat + "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_Logs.pdf";
+            QuestPDF.Settings.License = LicenseType.Community;
+            void ComposeTable(IContainer container,IContainer container2)
+            {
+                container.Border(5).Table(table =>
+                {
+                    var facilities = _db.Facilities.ToList();
+                    var reservations = _db.FacilitiesReserved.ToList();
+                    var facilityUsageReports = new List<FacilityUsageReport>();
+                    switch (frequency)
+                    {
+                        case "Daily":
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            var dailyReports = new List<DailyFacilityUsageReport>();
+
+                            var dailyReservations = reservations
+                                .Where(_ => DateOnly.FromDateTime(_.StartTime) >= DateOnly.Parse(startDate) && DateOnly.FromDateTime(_.EndTime) <= DateOnly.Parse(endDate))
+                                .GroupBy(r => r.StartTime.Date);
+
+                            foreach (var group in dailyReservations)
+                            {
+                                var date = group.Key;
+                                var facilityUsages = new List<FacilityUsage>();
+
+                                foreach (var facility in facilities)
+                                {
+                                    var facilityReservations = group.Where(r => r.FacilityID == facility.FacilityID);
+                                    var totalUsageHours = facilityReservations.Sum(r => (r.EndTime - r.StartTime).TotalHours);
+
+                                    facilityUsages.Add(new FacilityUsage
+                                    {
+                                        FacilityName = facility.FacilityName,
+                                        TotalUsageHours = totalUsageHours
+                                    });
+                                }
+
+                                dailyReports.Add(new DailyFacilityUsageReport
+                                {
+                                    Date = date,
+                                    FacilityUsages = facilityUsages
+                                });
+                            }
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(3).Element(Block).Text("Daily Facility Usage");
+                                header.Cell().Element(Block).Text("Date");
+                                header.Cell().Element(Block).Text("Facility Name");
+                                header.Cell().Element(Block).Text("Total Usage Hours");
+
+                            });
+
+                            if (dailyReports.Count != 0)
+                            {
+                                foreach (var item in dailyReports)
+                                {
+
+                                    foreach (var item2 in item.FacilityUsages) {
+                                        table.Cell().RowSpan(2).Element(Block).Text(item.Date.ToString("yyyy-MM-dd")).FontSize(11);
+                                        table.Cell().RowSpan(2).Element(Block).Text(item2.FacilityName.ToString()).FontSize(11);
+                                        table.Cell().RowSpan(2).Element(Block).Text(item2.TotalUsageHours.ToString()).FontSize(11);
+                                    }
+
+                                }
+           
+                            }
+                            break;
+                        case "Weekly":
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            var weeklyReports = new List<WeeklyFacilityUsageReport>();
+
+                            // Group reservations by week
+                            var weeklyReservations = reservations
+                                .Where(_ => DateOnly.FromDateTime(_.StartTime) >= DateOnly.Parse(startDate) && DateOnly.FromDateTime(_.EndTime) <= DateOnly.Parse(endDate))
+                                .GroupBy(r => CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(r.StartTime, CalendarWeekRule.FirstDay, DayOfWeek.Monday));
+
+                            foreach (var group in weeklyReservations)
+                            {
+                                var weekNumber = group.Key;
+                                var facilityUsages = new List<FacilityUsage>();
+
+                                foreach (var facility in facilities)
+                                {
+                                    var facilityReservations = group.Where(r => r.FacilityID == facility.FacilityID);
+                                    var totalUsageHours = facilityReservations.Sum(r => (r.EndTime - r.StartTime).TotalHours);
+
+                                    facilityUsages.Add(new FacilityUsage
+                                    {
+                                        FacilityName = facility.FacilityName,
+                                        TotalUsageHours = totalUsageHours
+                                    });
+                                }
+
+                                weeklyReports.Add(new WeeklyFacilityUsageReport
+                                {
+                                    WeekNumber = weekNumber,
+                                    FacilityUsages = facilityUsages
+                                });
+                            }
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(3).Element(Block).Text("Weekly Facility Usage");
+                                header.Cell().Element(Block).Text("Week");
+                                header.Cell().Element(Block).Text("Facility Name");
+                                header.Cell().Element(Block).Text("Total Usage Hours");
+
+                            });
+
+                            if (weeklyReports.Count != 0)
+                            {
+                                foreach (var item in weeklyReports)
+                                {
+                                    foreach (var item2 in item.FacilityUsages) {
+                                        table.Cell().RowSpan(2).Element(Block).Text(item.WeekNumber.ToString()).FontSize(11);
+                                        table.Cell().RowSpan(2).Element(Block).Text(item2.FacilityName).FontSize(11);
+                                        table.Cell().RowSpan(2).Element(Block).Text(item2.TotalUsageHours.ToString()).FontSize(11);
+                                    }
+                                }
+                            }
+                            break;
+                        case "Monthly":
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            var monthlyReports = new List<MonthlyFacilityUsageReport>();
+
+                            var monthlyReservations = reservations
+                                .Where(_ => DateOnly.FromDateTime(_.StartTime) >= DateOnly.Parse(startDate) && DateOnly.FromDateTime(_.EndTime) <= DateOnly.Parse(endDate))
+                                .GroupBy(r => new {r.StartTime.Year, r.EndTime.Month });
+
+                            foreach (var group in monthlyReservations)
+                            {
+                                var year = group.Key.Year;
+                                var month = group.Key.Month;
+                                var facilityUsages = new List<FacilityUsage>();
+
+                                foreach (var facility in facilities)
+                                {
+                                    var facilityReservations = group.Where(r => r.FacilityID == facility.FacilityID);
+                                    var totalUsageHours = facilityReservations.Sum(r => (r.EndTime - r.StartTime).TotalHours);
+
+                                    facilityUsages.Add(new FacilityUsage
+                                    {
+                                        FacilityName = facility.FacilityName,
+                                        TotalUsageHours = totalUsageHours
+                                    });
+                                }
+
+                                monthlyReports.Add(new MonthlyFacilityUsageReport
+                                {
+                                    Year = year,
+                                    Month = month,
+                                    FacilityUsages = facilityUsages
+                                });
+                            }
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(4).Element(Block).Text("Monthly Facility Usage");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Facility Name");
+                                header.Cell().Element(Block).Text("Usage Hours");
+                            });
+                            if (monthlyReports.Count != 0)
+                            {
+                                foreach (var item in monthlyReports)
+                                {
+                                    foreach (var item2 in item.FacilityUsages) {
+                                        var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                        table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                        table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                        table.Cell().RowSpan(2).Element(Block).Text(item2.FacilityName).FontSize(11);
+                                        table.Cell().RowSpan(2).Element(Block).Text(item2.TotalUsageHours.ToString()).FontSize(11);
+                                    }
+
+                                }
+                            }
+                            break;
+                        case "Yearly":
+                            reservations = reservations.Where(_ => DateOnly.FromDateTime(_.StartTime) >= DateOnly.Parse(startDate) && DateOnly.FromDateTime(_.EndTime) <= DateOnly.Parse(endDate)).ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            foreach (var facility in facilities) {
+                               var result2 = reservations.Where(_ => _.FacilityID == facility.FacilityID);
+                                double totalUsageHours = 0;
+                                DateTime peakUsageDate = DateTime.MinValue;
+                                double peakUsageHours = 0;
+                                foreach (var reservation in result2) {
+                                    var usageHours = (reservation.EndTime - reservation.StartTime).TotalHours;
+                                    totalUsageHours += usageHours;
+                                    if (usageHours > peakUsageHours) {
+                                        peakUsageDate = reservation.StartTime;
+                                        peakUsageHours = usageHours;
+                                    }
+                                }
+                                var averageDailyUsage = totalUsageHours / 365;
+                                facilityUsageReports.Add(new FacilityUsageReport
+                                {
+                                    FacilityId = facility.FacilityID,
+                                    FacilityName = facility.FacilityName,
+                                    TotalUsageHours = totalUsageHours,
+                                    AverageDailyUsage = averageDailyUsage,
+                                    PeakUsageDate = peakUsageDate,
+                                    PeakUsageHours = peakUsageHours
+                                });
+                            }
+
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(5).Element(Block).Text("Facility Usage");
+                                header.Cell().Element(Block).Text("Facility Name");
+                                header.Cell().Element(Block).Text("Total Usage Hours");
+                                header.Cell().Element(Block).Text("Average Daily Usage");
+                                header.Cell().Element(Block).Text("Peak Usage Date");
+                                header.Cell().Element(Block).Text("Peak Usage Hours");
+                            });
+
+
+
+                            if (facilityUsageReports.Count != 0)
+                            {
+                                foreach (var item in facilityUsageReports)
+                                {
+
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.FacilityName.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.TotalUsageHours.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.AverageDailyUsage.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.PeakUsageDate.ToString("yyyy")).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.PeakUsageHours.ToString()).FontSize(11);
+
+                                }
+                               
+                            }
+                            break;
+                    }
+
+
+                });
+                container2.Border(5).Table(table =>
+                {
+                    var result = (from facility in _db.Facilities 
+                                  join facilityreserved in _db.FacilitiesReserved on facility.FacilityID equals facilityreserved.FacilityID
+                                  select new { 
+                                    FacilityName = facility.FacilityName,
+                                    StartTime = facilityreserved.StartTime,
+                                    EndTime = facilityreserved.EndTime,
+                                    Amount = facility.RentalFee,
+                                    Date = facilityreserved.DateOFReservation
+                                  }).ToList();
+                    var facilities = _db.Facilities.ToList();
+                    var reservations = _db.FacilitiesReserved.ToList();
+                    int total = 0;
+                    switch (frequency) {
+                        case "Daily":
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            
+                            var dailyIncome = result
+                                .Where(_ => DateOnly.FromDateTime(_.StartTime) >= DateOnly.Parse(startDate) && DateOnly.FromDateTime(_.EndTime) <= DateOnly.Parse(endDate))
+                                .GroupBy(d => DateOnly.FromDateTime(d.StartTime))
+                                .Select(g => new Daily
+                            {
+                                Date = g.Key,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Date).ToList();
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(2).Element(Block).Text("Facility Income");
+                                header.Cell().Element(Block).Text("Income Date");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count() != 0)
+                            {
+                                foreach (var item in dailyIncome)
+                                {
+
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Date.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(2).Element(Block).Text("Total Daily Income: " + total.ToString()).FontSize(11);
+                            }
+                            break;
+                        case "Weekly":
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+
+                            var weeklyIncome = result
+                            .Where(_ => DateOnly.FromDateTime(_.StartTime) >= DateOnly.Parse(startDate) && DateOnly.FromDateTime(_.EndTime) <= DateOnly.Parse(endDate))
+                                .GroupBy(d => new { Week = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(d.Date.ToDateTime(TimeOnly.MinValue), CalendarWeekRule.FirstDay, DayOfWeek.Monday), Months = d.Date.Month, Years = d.Date.Year })
+                                .Select(g => new Weekly
+                                {
+                                Year = g.Key.Years,
+                                Month = g.Key.Months,
+                                Week = g.Key.Week,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                                }).OrderBy(_ => _.Year).ThenBy(_ => _.Year).ThenBy(_ => _.Week).ToList();
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(4).Element(Block).Text("Facility Income");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Week");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count() != 0)
+                            {
+                                foreach (var item in weeklyIncome)
+                                {
+                                    var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Week.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(4).Element(Block).Text("Total Weekly Income: " + total.ToString()).FontSize(11);
+                            }
+                            break;
+                        case "Monthly":
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            var monthlyIncome = result
+                            .Where(_ => DateOnly.FromDateTime(_.StartTime) >= DateOnly.Parse(startDate) && DateOnly.FromDateTime(_.EndTime) <= DateOnly.Parse(endDate))
+                                .GroupBy(d => new { d.Date.Year, d.Date.Month })
+                           .Select(g => new Monthly
+                           {
+                               Year = g.Key.Year,
+                               Month = g.Key.Month,
+                               Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                           }).OrderBy(_ => _.Year).ThenBy(_ => _.Month).ToList();
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(3).Element(Block).Text("Facility Income");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count() != 0)
+                            {
+                                foreach (var item in monthlyIncome)
+                                {
+                                    var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(3).Element(Block).Text("Total Monthly Income: " + total.ToString()).FontSize(11);
+                            }
+                            break;
+                        case "Yearly":
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+
+                            var YearlyIncome = result.Where(_ => DateOnly.FromDateTime(_.StartTime) >= DateOnly.Parse(startDate) && DateOnly.FromDateTime(_.EndTime) <= DateOnly.Parse(endDate))
+                                .GroupBy(d => d.Date.Year)
+                                .Select(g => new Yearly
+                                {
+                                    Year = g.Key,
+                                    Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                                }).OrderBy(_ => _.Year).ToList();
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(2).Element(Block).Text("Facility Income");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count() != 0)
+                            {
+                                foreach (var item in YearlyIncome)
+                                {
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(2).Element(Block).Text("Total Yearly Income: " + total.ToString()).FontSize(11);
+                            }
+                            break;
+                    }
+
+                });
+            }
+            Document.Create(Print =>
+            {
+                Print.Page(page =>
+                {
+                    page.Margin(10);
+                    page.Header()
+                    .Row(row => {
+                        row.RelativeItem().Column(column => {
+                            column.Item()
+                            .Text("Report Name: " + frequency + " Facility Report Start Date: " + startDate).FontSize(11).AlignLeft();
+                            column.Item()
+                            .Text("Generated By: Admin").FontSize(11).AlignLeft();
+
+                        });
+                        row.RelativeItem().Column(column => {
+                            column.Item()
+                            .Text("Generated Date: " + DateTime.Now.ToString("MMM dd yyyy"))
+                            .FontSize(11).AlignRight();
+                        });
+                    });
+                    page.Content()
+                    .Column(c => ComposeTable(c.Item().PaddingBottom(25).PaddingTop(25), c.Item().PaddingBottom(25).PaddingTop(25)));
+                    page.Size(PageSizes.A4);
+                });
+            }).ShowInCompanion(12500); //RENAMING USING RANDOM WORDS ShowInCompanion(12500) GeneratePdf(filepath)
+            _db.logsLists.Add(new LogsList
+            {
+                LogName = "Export Facility",
+                LogDescription = "Export FileType: PDF " + "Logged In Username: " + HttpContext.Session.GetString("SessionUsername"),
+                LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+            });
+            _db.SaveChanges();
+            return File(System.IO.File.ReadAllBytes(filepath), "application/pdf", nameformat + "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_ExportDues.pdf");
+        }
+
+
         public IActionResult Facilities() {
             NewModel model = new NewModel();
             model.facilities = _db.Facilities.ToList();
+            model.facilitiesreserved = _db.FacilitiesReserved.ToList();
+            model.Homeacc = _db.Homeowner_Details.ToList();
             return View(model);
         }
         public IActionResult _FacilityDetails() {
@@ -1858,7 +2457,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
 
         [HttpPost]
-        public IActionResult _ExportExpensePDF(string startDate, string frequency)
+        public IActionResult _ExportExpensePDF(string startDate,string endDate, string frequency)
         {
             string nameformat = string.Empty;
             var Expense = _db.Expenses.ToList();
@@ -1874,290 +2473,806 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 container.Border(5).Table(table =>
                 {
 
-                    table.ColumnsDefinition(columns =>
-                    {
-
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                    });
-
-                    table.Header(header =>
-                    {
-                        header.Cell().ColumnSpan(5).Element(Block).Text("Electricity");
-                        header.Cell().Element(Block).Text("Expense Date");
-                        header.Cell().Element(Block).Text("Payment Method");
-                        header.Cell().Element(Block).Text("Description");
-                        header.Cell().Element(Block).Text("Amount");
-                        header.Cell().Element(Block).Text("Category");
-
-                    });
-
-
                     var result = Expense.ToList();
+                    int total = 0;
                     switch (frequency)
                     {
                         case "Daily":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate) &&_.Category == "Electricity").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(2).Element(Block).Text("Electricity");
+                                header.Cell().Element(Block).Text("Expense Date");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) &&_.Category == "Electricity").ToList();
+                            var dailySummary = result
+                            .GroupBy(d => d.EzpenseDate)
+                            .Select(g => new Daily
+                            {
+                                Date = g.Key,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Date).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in dailySummary)
+                                {
+
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Date.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(2).Element(Block).Text("Total Electricity Expense: " + total.ToString()).FontSize(11);
+                            }
+
                             break;
                         case "Weekly":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate).AddDays(7) && _.Category == "Electricity").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(4).Element(Block).Text("Electricity");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Week");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Electricity").ToList();
+                            var weeklySummary = result
+                            .GroupBy(d => new { Week = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(d.EzpenseDate.ToDateTime(TimeOnly.MinValue), CalendarWeekRule.FirstDay, DayOfWeek.Monday), Months = d.EzpenseDate.Month, Years = d.EzpenseDate.Year })
+                            .Select(g => new Weekly
+                            {
+                                Year = g.Key.Years,
+                                Month = g.Key.Months,
+                                Week = g.Key.Week,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Year).ThenBy(_ => _.Year).ThenBy(_ => _.Week).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in weeklySummary)
+                                {
+                                    var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Week.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(4).Element(Block).Text("Total Electricity Expense: " + total.ToString()).FontSize(11);
+                            }
                             break;
                         case "Monthly":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate).AddMonths(1) && _.Category == "Electricity").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(3).Element(Block).Text("Electricity");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Electricity").ToList();
+                            var monthlySummary = result
+                           .GroupBy(d => new { d.EzpenseDate.Year,d.EzpenseDate.Month })
+                           .Select(g => new Monthly
+                           {
+                               Year = g.Key.Year,
+                               Month = g.Key.Month,
+                               Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                           }).OrderBy(_ => _.Year).ThenBy(_ => _.Month).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in monthlySummary)
+                                {
+                                    var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(3).Element(Block).Text("Total Electricity Expense: " + total.ToString()).FontSize(11);
+                            }
                             break;
                         case "Yearly":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate).AddYears(1) && _.Category == "Electricity").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(2).Element(Block).Text("Electricity");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Electricity").ToList();
+                            var yearlySummary = result
+                           .GroupBy(d =>d.EzpenseDate.Year)
+                           .Select(g => new Yearly
+                           {
+                               Year = g.Key,
+                               Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                           }).OrderBy(_ => _.Year).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in yearlySummary)
+                                {
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(2).Element(Block).Text("Total Electricity Expense: " + total.ToString()).FontSize(11);
+                            }
                             break;
                     }
-                    var total = result.Sum(_ => Convert.ToInt32(_.Amount));
-                    if (result.Count != 0)
-                    {
-                        foreach (var item in result)
-                        {
-
-                            table.Cell().RowSpan(2).Element(Block).Text(item.EzpenseDate.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.PaymentMethod.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Description.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Category.ToString()).FontSize(11);
-
-                        }
-                        table.Cell().ColumnSpan(5).Element(Block).Text("Total Electricity Expense: " + total.ToString()).FontSize(11);
-                    }
+                    
                 });
                 //Water
                 container2.Border(5).Table(table =>
                 {
-
-                    table.ColumnsDefinition(columns =>
-                    {
-
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                    });
-
-                    table.Header(header =>
-                    {
-                        header.Cell().ColumnSpan(5).Element(Block).Text("Water");
-                        header.Cell().Element(Block).Text("Expense Date");
-                        header.Cell().Element(Block).Text("Payment Method");
-                        header.Cell().Element(Block).Text("Description");
-                        header.Cell().Element(Block).Text("Amount");
-                        header.Cell().Element(Block).Text("Category");
-
-                    });
-
-
                     var result = Expense.ToList();
+                    int total = 0;
                     switch (frequency)
                     {
                         case "Daily":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate) && _.Category == "Water").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(2).Element(Block).Text("Water");
+                                header.Cell().Element(Block).Text("Expense Date");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Water").ToList();
+                            var dailySummary = result
+                            .GroupBy(d => d.EzpenseDate)
+                            .Select(g => new Daily
+                            {
+                                Date = g.Key,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Date).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in dailySummary)
+                                {
+
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Date.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(2).Element(Block).Text("Total Water Expense: " + total.ToString()).FontSize(11);
+                            }
+
                             break;
                         case "Weekly":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate).AddDays(7) && _.Category == "Water").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(4).Element(Block).Text("Water");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Week");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Water").ToList();
+                            var weeklySummary = result
+                            .GroupBy(d => new { Week = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(d.EzpenseDate.ToDateTime(TimeOnly.MinValue), CalendarWeekRule.FirstDay, DayOfWeek.Monday), Months = d.EzpenseDate.Month, Years = d.EzpenseDate.Year })
+                            .Select(g => new Weekly
+                            {
+                                Year = g.Key.Years,
+                                Month = g.Key.Months,
+                                Week = g.Key.Week,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Year).ThenBy(_ => _.Year).ThenBy(_ => _.Week).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in weeklySummary)
+                                {
+                                    var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Week.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(4).Element(Block).Text("Total Water Expense: " + total.ToString()).FontSize(11);
+                            }
                             break;
                         case "Monthly":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate).AddMonths(1) && _.Category == "Water").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(3).Element(Block).Text("Water");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Water").ToList();
+                            var monthlySummary = result
+                           .GroupBy(d => new { d.EzpenseDate.Year, d.EzpenseDate.Month })
+                           .Select(g => new Monthly
+                           {
+                               Year = g.Key.Year,
+                               Month = g.Key.Month,
+                               Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                           }).OrderBy(_ => _.Year).ThenBy(_ => _.Month).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in monthlySummary)
+                                {
+                                    var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(3).Element(Block).Text("Total Water Expense: " + total.ToString()).FontSize(11);
+                            }
                             break;
                         case "Yearly":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate).AddYears(1) && _.Category == "Water").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(2).Element(Block).Text("Water");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Water").ToList();
+                            var yearlySummary = result
+                           .GroupBy(d => d.EzpenseDate.Year)
+                           .Select(g => new Yearly
+                           {
+                               Year = g.Key,
+                               Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                           }).OrderBy(_ => _.Year).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in yearlySummary)
+                                {
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(2).Element(Block).Text("Total Water Expense: " + total.ToString()).FontSize(11);
+                            }
                             break;
                     }
-                    var total = result.Sum(_ => Convert.ToInt32(_.Amount));
-                    if (result.Count != 0)
-                    {
-                        foreach (var item in result)
-                        {
 
-                            table.Cell().RowSpan(2).Element(Block).Text(item.EzpenseDate.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.PaymentMethod.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Description.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Category.ToString()).FontSize(11);
-
-                        }
-                        table.Cell().ColumnSpan(5).Element(Block).Text("Total Water Expense: " + total.ToString()).FontSize(11);
-                    }
                 });
                 //Maintenance
                 container3.Border(5).Table(table =>
                 {
 
-                    table.ColumnsDefinition(columns =>
-                    {
-
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                    });
-
-                    table.Header(header =>
-                    {
-                        header.Cell().ColumnSpan(5).Element(Block).Text("Maintenance");
-                        header.Cell().Element(Block).Text("Expense Date");
-                        header.Cell().Element(Block).Text("Payment Method");
-                        header.Cell().Element(Block).Text("Description");
-                        header.Cell().Element(Block).Text("Amount");
-                        header.Cell().Element(Block).Text("Category");
-
-                    });
-
-
                     var result = Expense.ToList();
+                    int total = 0;
                     switch (frequency)
                     {
                         case "Daily":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate) && _.Category == "Maintenance").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(2).Element(Block).Text("Maintenance");
+                                header.Cell().Element(Block).Text("Expense Date");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Maintenance").ToList();
+                            var dailySummary = result
+                            .GroupBy(d => d.EzpenseDate)
+                            .Select(g => new Daily
+                            {
+                                Date = g.Key,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Date).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in dailySummary)
+                                {
+
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Date.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(2).Element(Block).Text("Total Maintenance Expense: " + total.ToString()).FontSize(11);
+                            }
+
                             break;
                         case "Weekly":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate).AddDays(7) && _.Category == "Maintenance").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(4).Element(Block).Text("Maintenance");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Week");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Maintenance").ToList();
+                            var weeklySummary = result
+                            .GroupBy(d => new { Week = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(d.EzpenseDate.ToDateTime(TimeOnly.MinValue), CalendarWeekRule.FirstDay, DayOfWeek.Monday), Months = d.EzpenseDate.Month, Years = d.EzpenseDate.Year })
+                            .Select(g => new Weekly
+                            {
+                                Year = g.Key.Years,
+                                Month = g.Key.Months,
+                                Week = g.Key.Week,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Year).ThenBy(_ => _.Year).ThenBy(_ => _.Week).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in weeklySummary)
+                                {
+                                    var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Week.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(4).Element(Block).Text("Total Maintenance Expense: " + total.ToString()).FontSize(11);
+                            }
                             break;
                         case "Monthly":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate).AddMonths(1) && _.Category == "Maintenance").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(3).Element(Block).Text("Maintenance");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Maintenance").ToList();
+                            var monthlySummary = result
+                           .GroupBy(d => new { d.EzpenseDate.Year, d.EzpenseDate.Month })
+                           .Select(g => new Monthly
+                           {
+                               Year = g.Key.Year,
+                               Month = g.Key.Month,
+                               Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                           }).OrderBy(_ => _.Year).ThenBy(_ => _.Month).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in monthlySummary)
+                                {
+                                    var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(3).Element(Block).Text("Total Maintenance Expense: " + total.ToString()).FontSize(11);
+                            }
                             break;
                         case "Yearly":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate).AddYears(1) && _.Category == "Maintenance").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(2).Element(Block).Text("Maintenance");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Maintenance").ToList();
+                            var yearlySummary = result
+                           .GroupBy(d => d.EzpenseDate.Year)
+                           .Select(g => new Yearly
+                           {
+                               Year = g.Key,
+                               Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                           }).OrderBy(_ => _.Year).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in yearlySummary)
+                                {
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(2).Element(Block).Text("Total Maintenance Expense: " + total.ToString()).FontSize(11);
+                            }
                             break;
-                    }
-                    var total = result.Sum(_ => Convert.ToInt32(_.Amount));
-                    if (result.Count != 0)
-                    {
-                        foreach (var item in result)
-                        {
-
-                            table.Cell().RowSpan(2).Element(Block).Text(item.EzpenseDate.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.PaymentMethod.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Description.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Category.ToString()).FontSize(11);
-
-                        }
-                        table.Cell().ColumnSpan(5).Element(Block).Text("Total Maintenance Expense: " + total.ToString()).FontSize(11);
                     }
                 });
                 //Manpower
                 container4.Border(5).Table(table =>
                 {
 
-                    table.ColumnsDefinition(columns =>
-                    {
-
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                    });
-
-                    table.Header(header =>
-                    {
-                        header.Cell().ColumnSpan(5).Element(Block).Text("Manpower");
-                        header.Cell().Element(Block).Text("Expense Date");
-                        header.Cell().Element(Block).Text("Payment Method");
-                        header.Cell().Element(Block).Text("Description");
-                        header.Cell().Element(Block).Text("Amount");
-                        header.Cell().Element(Block).Text("Category");
-
-                    });
-
-
                     var result = Expense.ToList();
+                    int total = 0;
                     switch (frequency)
                     {
                         case "Daily":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate) && _.Category == "Manpower").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(2).Element(Block).Text("Manpower");
+                                header.Cell().Element(Block).Text("Expense Date");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Manpower").ToList();
+                            var dailySummary = result
+                            .GroupBy(d => d.EzpenseDate)
+                            .Select(g => new Daily
+                            {
+                                Date = g.Key,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Date).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in dailySummary)
+                                {
+
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Date.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(2).Element(Block).Text("Total Manpower Expense: " + total.ToString()).FontSize(11);
+                            }
+
                             break;
                         case "Weekly":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate).AddDays(7) && _.Category == "Manpower").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(4).Element(Block).Text("Manpower");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Week");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Manpower").ToList();
+                            var weeklySummary = result
+                            .GroupBy(d => new { Week = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(d.EzpenseDate.ToDateTime(TimeOnly.MinValue), CalendarWeekRule.FirstDay, DayOfWeek.Monday), Months = d.EzpenseDate.Month, Years = d.EzpenseDate.Year })
+                            .Select(g => new Weekly
+                            {
+                                Year = g.Key.Years,
+                                Month = g.Key.Months,
+                                Week = g.Key.Week,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Year).ThenBy(_ => _.Year).ThenBy(_ => _.Week).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in weeklySummary)
+                                {
+                                    var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Week.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(4).Element(Block).Text("Total Manpower Expense: " + total.ToString()).FontSize(11);
+                            }
                             break;
                         case "Monthly":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate).AddMonths(1) && _.Category == "Manpower").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(3).Element(Block).Text("Manpower");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Manpower").ToList();
+                            var monthlySummary = result
+                           .GroupBy(d => new { d.EzpenseDate.Year, d.EzpenseDate.Month })
+                           .Select(g => new Monthly
+                           {
+                               Year = g.Key.Year,
+                               Month = g.Key.Month,
+                               Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                           }).OrderBy(_ => _.Year).ThenBy(_ => _.Month).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in monthlySummary)
+                                {
+                                    var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(3).Element(Block).Text("Total Manpower Expense: " + total.ToString()).FontSize(11);
+                            }
                             break;
                         case "Yearly":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate).AddYears(1) && _.Category == "Manpower").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(2).Element(Block).Text("Manpower");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Manpower").ToList();
+                            var yearlySummary = result
+                           .GroupBy(d => d.EzpenseDate.Year)
+                           .Select(g => new Yearly
+                           {
+                               Year = g.Key,
+                               Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                           }).OrderBy(_ => _.Year).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in yearlySummary)
+                                {
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(2).Element(Block).Text("Total Manpower Expense: " + total.ToString()).FontSize(11);
+                            }
                             break;
-                    }
-                    var total = result.Sum(_ => Convert.ToInt32(_.Amount));
-                    if (result.Count != 0)
-                    {
-                        foreach (var item in result)
-                        {
-
-                            table.Cell().RowSpan(2).Element(Block).Text(item.EzpenseDate.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.PaymentMethod.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Description.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Category.ToString()).FontSize(11);
-
-                        }
-                        table.Cell().ColumnSpan(5).Element(Block).Text("Total Manpower Expense: " + total.ToString()).FontSize(11);
                     }
                 });
                 //Other
                 container5.Border(5).Table(table =>
                 {
 
-                    table.ColumnsDefinition(columns =>
-                    {
-
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                    });
-
-                    table.Header(header =>
-                    {
-                        header.Cell().ColumnSpan(5).Element(Block).Text("Other");
-                        header.Cell().Element(Block).Text("Expense Date");
-                        header.Cell().Element(Block).Text("Payment Method");
-                        header.Cell().Element(Block).Text("Description");
-                        header.Cell().Element(Block).Text("Amount");
-                        header.Cell().Element(Block).Text("Category");
-
-                    });
-
-
                     var result = Expense.ToList();
+                    int total = 0;
                     switch (frequency)
                     {
                         case "Daily":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate) && _.Category == "Other").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(2).Element(Block).Text("Other");
+                                header.Cell().Element(Block).Text("Expense Date");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Other").ToList();
+                            var dailySummary = result
+                            .GroupBy(d => d.EzpenseDate)
+                            .Select(g => new Daily
+                            {
+                                Date = g.Key,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Date).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in dailySummary)
+                                {
+
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Date.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(2).Element(Block).Text("Total Other Expense: " + total.ToString()).FontSize(11);
+                            }
+
                             break;
                         case "Weekly":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate).AddDays(7) && _.Category == "Other").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(4).Element(Block).Text("Other");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Week");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Other").ToList();
+                            var weeklySummary = result
+                            .GroupBy(d => new { Week = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(d.EzpenseDate.ToDateTime(TimeOnly.MinValue), CalendarWeekRule.FirstDay, DayOfWeek.Monday), Months = d.EzpenseDate.Month, Years = d.EzpenseDate.Year })
+                            .Select(g => new Weekly
+                            {
+                                Year = g.Key.Years,
+                                Month = g.Key.Months,
+                                Week = g.Key.Week,
+                                Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                            }).OrderBy(_ => _.Year).ThenBy(_ => _.Year).ThenBy(_ => _.Week).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in weeklySummary)
+                                {
+                                    var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Week.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(4).Element(Block).Text("Total Other Expense: " + total.ToString()).FontSize(11);
+                            }
                             break;
                         case "Monthly":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate).AddMonths(1) && _.Category == "Other").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(3).Element(Block).Text("Other");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Month");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Other").ToList();
+                            var monthlySummary = result
+                           .GroupBy(d => new { d.EzpenseDate.Year, d.EzpenseDate.Month })
+                           .Select(g => new Monthly
+                           {
+                               Year = g.Key.Year,
+                               Month = g.Key.Month,
+                               Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                           }).OrderBy(_ => _.Year).ThenBy(_ => _.Month).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in monthlySummary)
+                                {
+                                    var thismonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.Month);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(thismonth).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(3).Element(Block).Text("Total Other Expense: " + total.ToString()).FontSize(11);
+                            }
                             break;
                         case "Yearly":
-                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(startDate).AddYears(1) && _.Category == "Other").ToList();
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+
+                            });
+                            table.Header(header =>
+                            {
+                                header.Cell().ColumnSpan(2).Element(Block).Text("Other");
+                                header.Cell().Element(Block).Text("Year");
+                                header.Cell().Element(Block).Text("Amount");
+
+                            });
+                            result = Expense.Where(_ => _.EzpenseDate >= DateOnly.Parse(startDate) && _.EzpenseDate <= DateOnly.Parse(endDate) && _.Category == "Other").ToList();
+                            var yearlySummary = result
+                           .GroupBy(d => d.EzpenseDate.Year)
+                           .Select(g => new Yearly
+                           {
+                               Year = g.Key,
+                               Amount = g.Sum(d => decimal.Parse(d.Amount ?? "0"))
+                           }).OrderBy(_ => _.Year).ToList();
+                            total = result.Sum(_ => Convert.ToInt32(_.Amount));
+                            if (result.Count != 0)
+                            {
+                                foreach (var item in yearlySummary)
+                                {
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Year.ToString()).FontSize(11);
+                                    table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
+
+                                }
+                                table.Cell().ColumnSpan(2).Element(Block).Text("Total Other Expense: " + total.ToString()).FontSize(11);
+                            }
                             break;
-                    }
-                    var total = result.Sum(_ => Convert.ToInt32(_.Amount));
-                    if (result.Count != 0)
-                    {
-                        foreach (var item in result)
-                        {
-
-                            table.Cell().RowSpan(2).Element(Block).Text(item.EzpenseDate.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.PaymentMethod.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Description.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Amount.ToString()).FontSize(11);
-                            table.Cell().RowSpan(2).Element(Block).Text(item.Category.ToString()).FontSize(11);
-
-                        }
-                        table.Cell().ColumnSpan(5).Element(Block).Text("Total Other Expense: " + total.ToString()).FontSize(11);
                     }
                 });
 
@@ -2171,7 +3286,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     .Row(row => {
                         row.RelativeItem().Column(column => {
                             column.Item()
-                            .Text("Report Name: " + frequency + " Expense Report Start Date: " + startDate).FontSize(11).AlignLeft();
+                            .Text("Report Name: " + frequency + " Expense Report Start Date: " + startDate + " To"+ endDate).FontSize(11).AlignLeft();
                             column.Item()
                             .Text("Generated By: Admin").FontSize(11).AlignLeft();
 
@@ -2196,14 +3311,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             _db.SaveChanges();
             return File(System.IO.File.ReadAllBytes(filepath), "application/pdf", nameformat + "_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "_ExportExpense.pdf");
         }
-
-
-
-
-
-
-
-
 
         //ViolationSanction
         public IActionResult Violation() {
@@ -2232,9 +3339,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         }
 
         //Download ByLaws
-        public IActionResult RulesRegulation() { return View(); }
+        public IActionResult RulesRegulations() { return View(); }
         public IActionResult DownloadByLaws() {
-            string filepath = "wwwroot\\Downloadable\\file.pdf";
+            string filepath = "wwwroot\\Downloadable\\ByLaws.pdf";
             return File(System.IO.File.ReadAllBytes(filepath), "application/pdf","_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "ByLaws.pdf");
         }
         //Json Result

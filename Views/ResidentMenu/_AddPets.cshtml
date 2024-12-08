@@ -8,7 +8,7 @@
     </style>
 </head>
 <Button runat="server" id="bution" class="btn btn-success" style="position:sticky;">Add Pets</Button>
-<form asp-action="_AddPets" asp-controller="UserMenu" class="form" id="thisform">
+<form asp-action="_AddPets" asp-controller="ResidentMenu" class="form" id="thisform">
     <p class="title">Pet Information</p>
     <input asp-for="Pets[0].AccountID" class="form-control" value="" hidden />
     <div id="pets">

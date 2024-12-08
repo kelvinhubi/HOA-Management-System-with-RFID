@@ -27,17 +27,28 @@
         if ($("#thisform").css("display") == "block") {
             $("#thisform").css("display", "none");
             $("#UserPartial").css("display", "block");
-            $("#bution").html('Add Facility');
-            document.getElementById("bution").style.cssText = "display: block; position: inherit;";
+            $("#UserPartial2").css("display", "none");
+            $("#PaidDues").css("display", "block");
+            $(".CreateMultiple").css("display", "block");
+            $(".ExportPDF").css("display", "block");
+            $(".ExportExcel").css("display", "block");
+            $("#bution").html('Create Dues');
             $("body").css("background", "rgba(0, 0, 0, 0)");
+            $('#forpass').val("")
+            $("#forpass").attr('disabled', 'disabled');
         }
         else {
             this.blur();
             $("#thisform").css("display", "block");
-            document.getElementById("bution").style.cssText = "position: fixed;";
             $("#UserPartial").css("display", "none");
+            $("#UserPartial2").css("display", "none");
+            $("#PaidDues").css("display", "none");
+            $(".CreateMultiple").css("display", "none");
+            $(".ExportPDF").css("display", "none");
+            $(".ExportExcel").css("display", "none");
             $("#bution").html('Hide');
             $("body").css("background", "rgba(0, 0, 0, 0.4)");
+
         }
     }
 </script>

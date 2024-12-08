@@ -1,0 +1,45 @@
+﻿@model OwnerPetInfo
+
+@{
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+<head>
+    <title>
+        @{
+            ViewData["Title"] = "My Pets";
+        }
+    </title>
+</head>
+<div id="UserPartial">
+    <h2>My Pets</h2>
+    <table id="mytable" class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Pet ID</th>
+                <th>Name</th>
+                <th>Species</th>
+                <th>Age</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model.Pets)
+            {
+                <tr>
+                    <td>@obj.PetId</td>
+                    <td>@obj.Name</td>
+                    <td>@obj.Species</td>
+                    <td>@obj.Age</td>
+                    <td>
+                        <a asp-action="_EditPets" asp-route-id="@obj.PetId" class="btn btn-success btn-sm">Edit<i class='bx bxs-edit-alt'></i></a>
+                        <a asp-action="_DeletePets" asp-route-id="@obj.PetId" class="btn btn-danger btn-sm">Delete<i class='bx bxs-trash'></i></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@{
+    OwnerPetInfo user = new OwnerPetInfo();
+    <partial name="_AddPets" model="user" />
+}

@@ -14,6 +14,13 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Infrastructure
         {
             try
             {
+                var result2 = _db.FacilitiesReserved.ToList();
+                foreach (var item in result2) {
+                    if (item.EndTime < DateTime.Now) {
+                        _db.FacilitiesReserved.Remove(item);
+                        _db.SaveChanges();
+                    }
+                }
                 var result = _db.Homeowner_Details.ToList();
                 foreach (var user in result)
                 {

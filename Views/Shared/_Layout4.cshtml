@@ -60,7 +60,22 @@
                     url = Url.Action("VehiclesList", "ResidentMenu");
                 }
                 <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-car nav-icon'></i> <span class="nav_name">Vehicles List</span></a>
-
+                @{
+                    url = Url.Action("Facilities", "ResidentMenu");
+                }
+                <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-bell nav-icon'></i> <span class="nav_name">Facilities</span> </a>
+                @{
+                    url = Url.Action("Events", "ResidentMenu");
+                }
+                <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-bell nav-icon'></i> <span class="nav_name">Events</span> </a>
+                @{
+                    url = Url.Action("Pets", "ResidentMenu");
+                }
+                <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-car nav-icon'></i> <span class="nav_name">My Pets</span></a>
+                @{
+                    url = Url.Action("RulesRegulations", "ResidentMenu");
+                }
+                <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bxs-lock-alt nav-icon'></i> <span class="nav_name">By Laws</span></a>
                 @{
                     url = Url.Action("HomeList", "ResidentMenu");
                 }

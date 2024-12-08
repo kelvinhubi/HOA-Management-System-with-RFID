@@ -1,0 +1,48 @@
+﻿@model MaintenanceRequests
+
+<Button runat="server" id="bution" class="btn btn-success" style="position:sticky;">Add Request</Button>
+<form asp-action="_AddRequest" asp-controller="ResidentMenu" class="form" id="thisform">
+    <p class="title">Add Request</p>
+    <input asp-for="AccountID" class="form-control" hidden />
+    <input asp-for="RequestID" class="form-control" hidden />
+    <div class="form-group">
+        <label asp-for="RequestType" class="control-label">Request Type</label>
+        <input asp-for="RequestType" class="form-control input" />
+        <span asp-validation-for="RequestType"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="RequestDate" class="control-label">Request Date</label>
+        <input asp-for="RequestDate" type="date" class="form-control input" />
+        <span asp-validation-for="RequestDate"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="RequestDexcription" class="control-label">Home Type</label>
+        <textarea asp-for="RequestDexcription" class="form-control" ></textarea>
+        <span asp-validation-for="RequestDexcription"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Request" class="btn btn-primary" />
+    </div>
+</form>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    var btn = document.getElementById("bution")
+    $("#thisform").css("display", "none");
+    btn.onclick = function () {
+        if ($("#thisform").css("display") == "block") {
+            $("#thisform").css("display", "none");
+            $("#UserPartial").css("display", "block");
+            $("#bution").html('Add Home');
+            document.getElementById("bution").style.cssText = "display: block; position: inherit;";
+            $("body").css("background", "rgba(0, 0, 0, 0)");
+        }
+        else {
+            this.blur();
+            $("#thisform").css("display", "block");
+            document.getElementById("bution").style.cssText = "position: fixed;";
+            $("#UserPartial").css("display", "none");
+            $("#bution").html('Hide');
+            $("body").css("background", "rgba(0, 0, 0, 0.4)");
+        }
+    }
+ </script>

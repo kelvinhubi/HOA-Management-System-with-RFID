@@ -1,6 +1,6 @@
 ﻿@model NewModel
 @{
-    Layout = "~/Views/Shared/_Layout2.cshtml";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
     var myid = Convert.ToInt32(ViewData["SessionID"]);
 }
 <head>
@@ -61,11 +61,9 @@
             @foreach (var obj in Model.Events)
             {
                 var obj2 = Model.EventsReserved.Where(_ => obj.EventID == _.EventID);
-                if (obj.EventCapacity != obj2.Count() && (obj.EventDate<DateOnly.FromDateTime(DateTime.Now) && obj.EventDateEnd>DateOnly.FromDateTime(DateTime.Now)))
+                if (obj.EventCapacity != obj2.Count()&&(obj.EventStartDate<DateTime.Now && obj.EventEndDate>DateTime.Now) )
                 {
-                    if (obj.EventStartDate < DateTime.Now && obj.EventEndDate > DateTime.Now)
-                    {
-                        <tr>
+                    <tr>
                         <td>@obj.EventID</td>
                         <td>@obj.EventTitle</td>
                         @if (obj.EventFee != null)
@@ -110,34 +108,7 @@
                                 <a asp-action="_EventDetails" class="btn btn-success btn-sm" asp-route-id="@obj.EventID" model="@Model">Details<i class='bx bxs-user-detail'></i></a>
                             </td>
                         }
-                        </tr>
-                    }
-                    else
-                    {
-                        <tr>
-                        <td>@obj.EventID</td>
-                        <td>@obj.EventTitle</td>
-                        @if (obj.EventFee != null)
-                        {
-                            <td>@obj.EventFee</td>
-                            <td>@obj.EventDate</td>
-                            <td>@obj.EventStartDate</td>
-                            <td>@obj.EventEndDate</td>
-                             <td>
-                            </td>
-                        }
-                        else
-                        {
-                            <td>Free</td>
-                            <td>@obj.EventDate</td>
-                            <td>@obj.EventStartDate</td>
-                            <td>@obj.EventEndDate</td>    
-                            <td>
-                            </td>
-                        }
-                    </tr>    
-                    }
-
+                    </tr>
                     
                 }
             }

@@ -1,13 +1,8 @@
 ﻿@model NewModel
 @{
-    Layout = "~/Views/Shared/_Layout2.cshtml";
-    var model1 = Model.ListDues.Where(_ => _.Status.Equals("Unpaid")).ToList();
-    var model2 = Model.ListDues.Where(_ => _.Date >= DateOnly.FromDateTime(DateTime.Now)).Count();
-    var TotalAmountDue = model1.Sum(_ => Convert.ToInt32(_.Amount));
-    var OverDue = model2;
-    var PendingPaymentsCount = ViewData["Pending Payments"];
-    var vehicle = Model.Vehicles.Count();
-    var Homes = Model.Homes.Count();
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+    var joinedhomes = ViewData["JoinedHomes"];
+    var Vehicles = ViewData["Vehicles"];
 }
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -31,38 +26,26 @@
 
             <div class="col-lg-3 col-6">
                 <!--begin::Small Box Widget 1-->
+                <div class="small-box text-bg-primary">
+                    <div class="inner">
+                        <h3>@joinedhomes</h3>
+                        <p>Joined Homes</p>
+                    </div>  <a asp-action="HomeList" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+                        More info <i class="bi bi-link-45deg"></i>
+                    </a>
+                </div> <!--end::Small Box Widget 1-->
+            </div> <!--end::Col-->
+
+            <div class="col-lg-3 col-6">
+                <!--begin::Small Box Widget 1-->
                 <div class="small-box text-bg-success">
                     <div class="inner">
-                        <h3>@vehicle</h3>
+                        <h3>@Vehicles</h3>
                         <p>Vehicles</p>
                     </div>  <a asp-action="VehiclesList" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
                         More info <i class="bi bi-link-45deg"></i>
                     </a>
                 </div> <!--end::Small Box Widget 1-->
-            </div><!--end::Col-->
-
-            <div class="col-lg-3 col-6">
-                <!--begin::Small Box Widget 2-->
-                <div class="small-box text-bg-warning">
-                    <div class="inner">
-                        <h3>@Homes</h3>
-                        <p>Owned Homes</p>
-                    </div>  <a asp-action="HomeList" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
-                        More info <i class="bi bi-link-45deg"></i>
-                    </a>
-                </div> <!--end::Small Box Widget 2-->
-            </div>
-
-            <div class="col-lg-3 col-6">
-                <!--begin::Small Box Widget 2-->
-                <div class="small-box text-bg-warning">
-                    <div class="inner">
-                        <h3>@TotalAmountDue</h3>
-                        <p>Total Pending Payments</p>
-                    </div>  <a asp-action="AssociationDues" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
-                        More info <i class="bi bi-link-45deg"></i>
-                    </a>
-                </div> <!--end::Small Box Widget 2-->
             </div> <!--end::Col-->
 
         </div> <!--end::Row--> <!--begin::Row-->
