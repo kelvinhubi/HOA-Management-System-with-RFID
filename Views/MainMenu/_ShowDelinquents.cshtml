@@ -1,0 +1,31 @@
+﻿@model NewModel
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<div id="UserPartial">
+    <h2>List of Delinquents</h2>
+    <table id="mytable" class="table">
+        <thead class="table-light">
+            <tr>
+                <th>Full Name</th>
+                <th>Contact No.</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model.Homeacc)
+            {
+                var delinquents = Model.ListDues.FirstOrDefault(_ => _.AccountID == obj.AccountID && _.Date <= DateOnly.FromDateTime(DateTime.Now));
+                if (delinquents != null)
+                {
+                    <tr>
+                        <td>@obj.FullName</td>
+                        <td>@obj.PhoneNo</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+<script>
+    new DataTable('#mytable');
+ </script>

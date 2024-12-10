@@ -10,5 +10,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         public int EventID { get; set; }
         public string? Fee { get; set; }
         public string? Status { get; set; } = string.Empty;
+        public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
     }
 }

@@ -1,0 +1,135 @@
+﻿@model NewModel
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>@Model.reportinfo.CompanyName</h1>
+    Contact No: @Model.reportinfo.ContactNo
+    <br>
+    Address: @Model.reportinfo.Address
+    <br>
+    As of Date: @Model.reportinfo.startDate To @Model.reportinfo.endDate
+    <br>
+    <h2>Income Generating Projects</h2>
+    <br>
+    <table>
+        <thead>
+            <tr>
+                <th>Project</th>
+                <th>Revenue</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var result = Model.summary.Where(_ => _.ReportName != "Expenses" && _.ReportName != "NonIncome");
+                foreach (var obj in result)
+                {
+                    if (obj.Amount != 0)
+                    {
+                        <tr>
+                            <td>@obj.ReportName</td>
+                            <td>@obj.Amount</td>
+                        </tr>
+                    }
+                }
+               
+            }
+        </tbody>
+    </table>
+    <br>
+    <h2>Expenses</h2>
+    <br>
+    <table>
+        <thead>
+            <tr>
+                <th>Project</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var expense = Model.summary.Where(_ => _.ReportName == "Expenses");
+                foreach (var obj in expense)
+                {
+                    <tr>
+                        <td>@obj.ReportName</td>
+                        <td>@obj.Amount</td>
+                    </tr>
+                }
+
+            }
+        </tbody>
+    </table>
+    <br>
+    <h2>Non-Income Generating Projects</h2>
+    <br>
+    <table>
+        <thead>
+            <tr>
+                <th>Project</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var result2 = Model.summary.Where(_ => _.ReportName == "NonIncome");
+                foreach (var obj in result2)
+                {
+                    if (obj.nonIncomes != null)
+                    {
+
+                        foreach (var item in obj.nonIncomes)
+                        {
+                            <tr>
+                                <td>@item.EventName</td>
+                                <td>@item.EventDescription</td>
+                            </tr>
+
+                        }
+                    }
+
+                }
+
+            }
+        </tbody>
+    </table>
+
+    
+</body>
+<footer>
+    <br>
+    <br>
+    <br>
+    <br>
+    Prepared By: Admin
+    <br>
+    Date Issued: @DateOnly.FromDateTime(DateTime.Now);
+</footer>

@@ -61,9 +61,9 @@
             @foreach (var obj in Model.Events)
             {
                 var obj2 = Model.EventsReserved.Where(_ => obj.EventID == _.EventID);
-                if (obj.EventCapacity != obj2.Count() && (obj.EventDate<DateOnly.FromDateTime(DateTime.Now) && obj.EventDateEnd>DateOnly.FromDateTime(DateTime.Now)))
+                if (obj.EventCapacity != obj2.Count() && (obj.EventDate<=DateOnly.FromDateTime(DateTime.Now) && obj.EventDateEnd>=DateOnly.FromDateTime(DateTime.Now)))
                 {
-                    if (obj.EventStartDate < DateTime.Now && obj.EventEndDate > DateTime.Now)
+                    if (DateOnly.FromDateTime(obj.EventStartDate) <= DateOnly.FromDateTime(DateTime.Now) && DateOnly.FromDateTime(obj.EventEndDate) >= DateOnly.FromDateTime(DateTime.Now))
                     {
                         <tr>
                         <td>@obj.EventID</td>

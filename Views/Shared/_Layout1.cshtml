@@ -104,10 +104,6 @@
                         url = Url.Action("VehicleManagement", "MainMenu");
                     }
                 <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-car nav-icon'></i> <span class="nav_name">Vehicle Management</span> </a>
-                @{
-                    url = Url.Action("MaintenanceRequest", "MainMenu");
-                }
-                <a class="nav_link @(Context.Request.Path == url ? "active" : null)" href="@url"> <i class='bx bx-car nav-icon'></i> <span class="nav_name">Maintenance</span></a>
                     @{
                         url = Url.Action("Fees", "MainMenu");
                     }

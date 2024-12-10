@@ -116,6 +116,22 @@
             </div>
             <button class="btn btn-success" id="ExcelButton" value="submit">Export</button>
         </form>
+        <a asp-action="_ShowDelinquents" controller="MainMenu" class="btn btn-danger" style="margin-left:5px;">List of Delinquents</a><!--Make a page out of this-->
+    </div>
+    <div class="ExportOverallReportPDF" style="margin-left:5px;">
+        <Button runat="server" id="bution6" class="btn btn-success" style="position:sticky;">Show Overall Report</Button>
+        <form asp-action="HOAIncome_NonIncome" class="form form6" id="thisform" style="bottom:29rem; display:block">
+            <p class="title">Show Report</p>
+            <div class="form-group">
+                <label for="startDate3" class="control-label">Start Date</label>
+                <input id="startDate3" type="date" name="startDate" class="form-control input" required />
+            </div>
+            <div class="form-group">
+                <label for="endDate3" class="control-label">End Date</label>
+                <input id="endDate3" type="date" name="endDate" class="form-control input" required />
+            </div>
+            <button class="btn btn-success" id="Overall" value="submit">Export</button>
+        </form>
     </div>
     <a id="PaidDues" asp-action="ClearPaid" controller="MainMenu" class="btn btn-danger" style="margin-left:5px;">Clear Paid Dues</a>
 </div>
@@ -193,6 +209,7 @@
             $(".CreateMultiple").css("display", "block");
             $(".CreateSingle").css("display", "block");
             $(".ExportExcel").css("display", "block");
+            $(".ExportOverallReportPDF").css("display", "block");
             $("#bution2").html('Export as PDF');
             $("body").css("background", "rgba(0, 0, 0, 0)");
             $('#forpass').val("")
@@ -208,6 +225,7 @@
             $(".CreateMultiple").css("display", "none");
             $(".CreateSingle").css("display", "none");
             $(".ExportExcel").css("display", "none");
+            $(".ExportOverallReportPDF").css("display", "none");
             $("#bution2").html('Hide');
             $("body").css("background", "rgba(0, 0, 0, 0.4)");
 
@@ -224,6 +242,7 @@
             $(".CreateMultiple").css("display", "block");
             $(".CreateSingle").css("display", "block");
             $(".ExportPDF").css("display", "block");
+            $(".ExportOverallReportPDF").css("display", "block");
             $("#bution3").html('Export as Excel');
             $("body").css("background", "rgba(0, 0, 0, 0)");
             $('#forpass').val("");
@@ -239,10 +258,42 @@
             $(".CreateMultiple").css("display", "none");
             $(".CreateSingle").css("display", "none");
             $(".ExportPDF").css("display", "none");
+            $(".ExportOverallReportPDF").css("display", "none");
             $("#bution3").html('Hide');
             $("body").css("background", "rgba(0, 0, 0, 0.4)");
         }
     }
+
+    var btn13 = document.getElementById("bution6");
+    $(".form6").css("display", "none");
+    btn13.onclick = function () {
+        if ($(".form6").css("display") == "block") {
+            $(".form6").css("display", "none");
+            $("#UserPartial").css("display", "block");
+            $("#PaidDues").css("display", "block");
+            $(".CreateMultiple").css("display", "block");
+            $(".CreateSingle").css("display", "block");
+            $(".ExportPDF").css("display", "block");
+            $("#bution3").html('Show Overall Report');
+            $("body").css("background", "rgba(0, 0, 0, 0)");
+            $('#forpass').val("");
+            $("#forpass").attr('disabled', 'disabled');
+        }
+        else {
+            this.blur();
+            $(".form6").css("display", "block");
+            CheckName();
+            CheckFees();
+            $("#UserPartial").css("display", "none");
+            $("#PaidDues").css("display", "none");
+            $(".CreateMultiple").css("display", "none");
+            $(".CreateSingle").css("display", "none");
+            $(".ExportPDF").css("display", "none");
+            $("#bution3").html('Hide');
+            $("body").css("background", "rgba(0, 0, 0, 0.4)");
+        }
+    }
+
     $("#startDate").on('change', function () {
 
         $("#endDate").removeAttr('disabled');
@@ -271,6 +322,21 @@
         }
         else {
             $("#ExcelButton").removeAttr('disabled');
+        }
+    });
+    $("#startDate3").on('change', function () {
+
+        $("#endDate3").removeAttr('disabled');
+    });
+    $(".form6").on('change', function () {
+        var fit_start_time = $("#startDate3").val();
+        var fit_end_time = $("#endDate3").val();
+        if (new Date(fit_end_time) < new Date(fit_start_time)) {
+            $("#Overall").attr('disabled', 'disabled');
+            alert("End Date must be greater than start date");
+        }
+        else {
+            $("#Overall").removeAttr('disabled');
         }
     });
 </script>
