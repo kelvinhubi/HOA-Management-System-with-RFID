@@ -1,6 +1,6 @@
 ﻿@model NewModel
 @{
-    Layout = "~/Views/Shared/_Layout2.cshtml";
+    Layout = "~/Views/Shared/_Layout4.cshtml";
 }
 <head>
     <title>
@@ -61,7 +61,7 @@
                     <td>@obj.FacilityName</td>
                     <td>@obj.RentalFee</td>
                     <td>
-                        <button class="btn-sm btn-success pay">Pay</button>
+                        <button class="btn-sm btn-success pay">Reserve</button>
                         <a asp-action="_ReserveFacility" id="reserve" class="btn btn-success btn-sm" asp-route-id="@obj.FacilityID" hidden>Reserve<i class='bx bxs-user-detail'></i></a>
                     </td>
                 </tr>
@@ -130,15 +130,17 @@
         }, function (data) {
             if (data.success) {
                 alert("Payment Succesfull");
-                document.getElementById("reserve").click();
+                payvalue[0].click();
             }
             else {
                 alert("Payment Cancelled");
             }
         });
     }
-
+    let payvalue;
     $(document).on('click', '.pay', function () {
+        payvalue = $(this).closest("tr").find('a');
+        console.log(payvalue);
         var invoice = $(this).closest("tr").find('td:eq(0)').text();
         var amount = $(this).closest("tr").find('td:eq(1)').text();
         $.post('@Url.Action("Payout", "UserMenu")', {

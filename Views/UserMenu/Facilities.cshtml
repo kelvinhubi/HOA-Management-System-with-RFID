@@ -130,7 +130,7 @@
         }, function (data) {
             if (data.success) {
                 alert("Payment Succesfull");
-                document.getElementById("reserve").click();
+                payvalue[0].click();
             }
             else {
                 alert("Payment Cancelled");
@@ -138,7 +138,10 @@
         });
     }
 
+    let payvalue;
     $(document).on('click', '.pay', function () {
+        payvalue = $(this).closest("tr").find('a');
+        console.log(payvalue);
         var invoice = $(this).closest("tr").find('td:eq(0)').text();
         var amount = $(this).closest("tr").find('td:eq(1)').text();
         $.post('@Url.Action("Payout", "UserMenu")', {

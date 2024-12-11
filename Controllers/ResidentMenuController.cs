@@ -111,6 +111,12 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         public IActionResult _ReserveFacility(FacilityReservation info)
         {
             info.PaymentStatus = "Paid";
+            var result = _db.FacilitiesReserved.Where(_ =>_.FacilityID ==info.FacilityID && (_.StartTime <= info.EndTime && _.EndTime >= info.StartTime) || (_.StartTime >= info.StartTime && _.StartTime <= info.EndTime) || (_.EndTime >= info.StartTime && _.EndTime <= info.EndTime));
+            if (result.Count() != 0)
+            {
+                ModelState.AddModelError("Reserved", "Sorry Date and time already reserved");
+                return View(info);
+            }
             _db.FacilitiesReserved.Add(info);
             _db.SaveChanges();
             return RedirectToAction("Facilities");
