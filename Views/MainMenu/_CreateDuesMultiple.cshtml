@@ -56,8 +56,10 @@
             $("#UserPartial").css("display", "block");
             $("#PaidDues").css("display", "block");
             $(".CreateSingle").css("display", "block");
+            $(".ExportOverallReportPDF").css("display", "block");
             $(".ExportPDF").css("display", "block");
             $(".ExportExcel").css("display", "block");
+            $("#List").css("display", "block");
             $("#bution1").html('Add Multiple Dues');
             $("body").css("background", "rgba(0, 0, 0, 0)");
             $('#forpass').val("")
@@ -70,8 +72,10 @@
             $("#UserPartial").css("display", "none");
             $("#PaidDues").css("display", "none");
             $(".CreateSingle").css("display", "none");
+            $(".ExportOverallReportPDF").css("display", "none");
             $(".ExportPDF").css("display", "none");
             $(".ExportExcel").css("display", "none");
+            $("#List").css("display", "none");
             $("#bution1").html('Hide');
             $("body").css("background", "rgba(0, 0, 0, 0.4)");
 
@@ -117,6 +121,7 @@
             function (data) {
                 if (data == 0) {
                     alert("No Homeowners found in the specified dues");
+                    $("#populate").find('tr').remove().end();
                 }
                 else {
                     $("#populate").find('tr').remove().end();

@@ -1,6 +1,6 @@
 ﻿@model NewModel
 @{
-    Layout = "~/Views/Shared/_Layout1.cshtml";
+    Layout = null;
 }
 <head>
     <style>
@@ -62,7 +62,7 @@
                 }
                 <tr>
                     <td></td>
-                    <td>Total: @result.Sum(_ => _.Amount)</td>
+                    <td>Total: @result.Sum(_=>_.Amount)</td>
                 </tr>
             }
         </tbody>
@@ -127,12 +127,8 @@
             }
         </tbody>
     </table>
-    <br>
-    <br>
-    <a asp-action="OverAll" class="btn btn-success">Export to PDF</a>
-    <br>
-    <br>
-    <a asp-action="AssociationDues" class="btn btn-primary">Back</a>
+
+    
 </body>
 <footer>
     <br>

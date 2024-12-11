@@ -24,10 +24,13 @@ using Humanizer;
 using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.VisualBasic;
 using System.Globalization;
+using IronPdf;
 using SQLitePCL;
 using QuestPDF.Previewer;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
+using Razor;
+using Razor.Templating.Core;
 namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 {
 
@@ -1132,7 +1135,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                     
                     page.Size(PageSizes.A4);
                 });
-            }).ShowInCompanion(12500);// ShowInCompanion(12500) GeneratePdf(filepath)
+            }).GeneratePdf(filepath);// ShowInCompanion(12500) GeneratePdf(filepath)
             _db.logsLists.Add(new LogsList
             {
                 LogName = "Export Dues",
@@ -3404,6 +3407,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             string filepath = "wwwroot\\Downloadable\\ByLaws.pdf";
             return File(System.IO.File.ReadAllBytes(filepath), "application/pdf","_" + Guid.NewGuid().ToString() + "_" + DateTime.Now.ToString("yyyy-MMM-dd") + "ByLaws.pdf");
         }
+        public static NewModel summarymodel = new NewModel();
         //Reports Summary
         public IActionResult HOAIncome_NonIncome(string startDate, string endDate) {
             NewModel model = new NewModel();
@@ -3465,11 +3469,21 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                 Address = "M424+393, 2 L. De Guzman St, Marikina, 1807 Metro Manila"
 
             };
+            summarymodel = model;
             return View(model);//Continue
             decimal Total(string amount) {
                 decimal converted = decimal.Parse(amount);
                 return converted;
             }
+        }
+
+        
+        public async Task<IActionResult> OverAll() {
+            License.LicenseKey = "IRONSUITE.KRFORTIN15.GMAIL.COM.926-1C455F3414-G2GATI6VJNK7CH-SV2VG5X5HYAO-HD6G4TVAXD4J-LOP4XT4FUWN7-QX5Y5C4MRWKJ-LXPR5FCVQQG3-JEDKQJ-TK6YHGVKEWKOEA-DEPLOYMENT.TRIAL-F6WYHN.TRIAL.EXPIRES.10.JAN.2025";
+            var Renderer = new ChromePdfRenderer();
+            var html = await RazorTemplateEngine.RenderAsync("Views/MainMenu/Summary.cshtml", summarymodel);
+            using var PDF = Renderer.RenderHtmlAsPdf(html);
+            return File(PDF.BinaryData,"application/pdf","Summary.pdf");
         }
         //Json Result
         [HttpPost]

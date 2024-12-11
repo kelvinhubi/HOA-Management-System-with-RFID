@@ -18,9 +18,9 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
 		[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Enter only Letter")]
 		public string Firstname { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Please enter your Middlename"), MaxLength(20)]
+        [MaxLength(20)]
 		[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Enter only Letter")]
-		public string Middlename { get; set; } = string.Empty;
+		public string? Middlename { get; set; } = string.Empty;
 
         [Required]
         public DateOnly Birthdate { get; set; }

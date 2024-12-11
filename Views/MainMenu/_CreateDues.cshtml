@@ -52,6 +52,8 @@ var setmin = DateTime.Now.ToString("yyyy-MM-dd");;
             $(".CreateMultiple").css("display", "block");
             $(".ExportPDF").css("display", "block");
             $(".ExportExcel").css("display", "block");
+            $("#List").css("display", "block");
+            $(".ExportOverallReportPDF").css("display", "block");
             $("#bution").html('Create Dues'); 
             $("body").css("background", "rgba(0, 0, 0, 0)");
             $('#forpass').val("")
@@ -66,7 +68,9 @@ var setmin = DateTime.Now.ToString("yyyy-MM-dd");;
             $("#PaidDues").css("display", "none");
             $(".CreateMultiple").css("display", "none");
             $(".ExportPDF").css("display", "none");
+            $("#List").css("display", "none");
             $(".ExportExcel").css("display", "none");
+            $(".ExportOverallReportPDF").css("display", "none");
             $("#bution").html('Hide');
             $("body").css("background", "rgba(0, 0, 0, 0.4)");
 
