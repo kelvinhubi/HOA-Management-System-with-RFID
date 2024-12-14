@@ -20,8 +20,14 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             _env = Accessor.Value;
             var CheckAdmin = _db.Admin_Accounts.Count();
             var CheckGuard = _db.Guard_Information.Count();
+            var CheckSuperAdmin = _db.SuperAdmin_Accounts.Count();
             if (CheckAdmin == 0) {
                 _db.Admin_Accounts.Add(new Admin_Account { Username="ADMIN", Password = Encryption.Encrpyt("ADMIN1234", _env.EncryptionKey, _env.IVKey), Email = "krfortin15@gmail.com" });
+                _db.SaveChanges();
+            }
+            if (CheckSuperAdmin == 0)
+            {
+                _db.SuperAdmin_Accounts.Add(new SuperAdmin { Username = "SuperAdmin", Password = Encryption.Encrpyt("SADMIN1234", _env.EncryptionKey, _env.IVKey)});
                 _db.SaveChanges();
             }
         }
@@ -33,7 +39,20 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
         {
             return View();
         }
-
+        [Area("Admin")]
+        public IActionResult Admin() {
+            return RedirectToAction("Admin_LoginForm","Login");
+        }
+        [Area("Guard")]
+        public IActionResult Guard()
+        {
+            return RedirectToAction("GuardLoginForm", "Login");
+        }
+        [Area("SAdmin")]
+        public IActionResult SuperAdmin()
+        {
+            return RedirectToAction("SuperAdmin_LoginForm", "Login");
+        }
         public IActionResult Privacy()
         {
             return View();

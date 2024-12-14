@@ -1,11 +1,13 @@
-﻿
-@model Admin_Account
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model SuperAdmin
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
         @{
-            ViewData["Title"] = "Admin Login";
+            ViewData["Title"] = "Super Admin Login";
         }
     </title>
     <link rel="stylesheet" href="~/css/Login.css" asp-append-version="true" />
@@ -13,7 +15,7 @@
 </head>
 <div class="container">
     <div class="wrapper">
-        <div class="title"><span>Admin Login Form</span></div>
+        <div class="title"><span>Super Admin Login</span></div>
         @Html.AntiForgeryToken()
         <form method="post">
             <div class="row">
@@ -28,7 +30,7 @@
                 <span asp-validation-for="Username" class="text-danger" style="margin:auto;"></span>
                 @Html.ValidationMessage("PasswordError")
             </div>
-            <div class="pass" style="margin-top:10px;"><a asp-controller="Login" asp-action="AdminForgotPassword">Forgot password?</a></div>
+            <div class="pass" style="margin-top:10px;"><a asp-controller="Login" asp-action="SuperAdminForgotPassword">Forgot password?</a></div>
             <div class="row button">
                 <input type="submit" value="Login" onclick="Clear_validation">
             </div>

@@ -92,5 +92,13 @@ app.UseSession();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
+app.MapControllerRoute(
+    name: "SAdmin",
+    pattern: "{area:exists}/{controller=Home}/{action=SuperAdmin}/{id?}");
+app.MapControllerRoute(
+    name: "Admin",
+    pattern: "{area:exists}/{controller=Home}/{action=Admin}/{id?}");
+app.MapControllerRoute(
+    name: "Guard",
+    pattern: "{area:exists}/{controller=Home}/{action=Guard}/{id?}");
 app.Run();

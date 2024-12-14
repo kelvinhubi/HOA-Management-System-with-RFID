@@ -28,7 +28,8 @@
     <div class="form-group">
         <label asp-for="PlateNo" class="control-label"></label>
         <input asp-for="PlateNo" class="form-control input" id="PlateNo" oninput="UserCheck2()" />
-        <span asp-validation-for="PlateNo" id="Status" class="text-danger"></span>
+        <span asp-validation-for="PlateNo" class="text-danger"></span>
+        <span  id="Status" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="VehicleModel" class="control-label"></label>
@@ -50,7 +51,8 @@
     <div class="form-group">
         <label asp-for="RFID_number" class="control-label">RFID Number</label>
         <input asp-for="RFID_number"  id="RFIDnumber" class="form-control input" readonly />
-        <span asp-validation-for="RFID_number" id="Status1" class="text-danger"></span>
+        <span asp-validation-for="RFID_number" class="text-danger"></span>
+        <span  id="Status1" class="text-danger"></span>
     </div>
     <div class="form-group">
         <input type="submit" id="button1" value="Save" class="btn btn-primary" style="margin-top:10px;" />

@@ -1,0 +1,50 @@
+﻿@model NewModel
+@{
+    Layout = "~/Views/Shared/_Layout5.cshtml";
+
+}
+<head>
+    <title>
+        @{
+            ViewData["Title"] = "Admin Management";
+        }
+    </title>
+</head>
+@Html.AntiForgeryToken();
+<div id="UserPartial">
+    <h2>Admin Accounts</h2>
+    <table id="mytable" class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model.admin_Accounts)
+            {
+                <tr>
+                    <td>@obj.Username</td>
+                    <td>@obj.Email</td>
+                    <td>
+                        <a asp-action="_UserManagementDelete" class="btn btn-danger btn-sm" asp-route-id="@obj.AccountID">Delete<i class='bx bxs-trash'></i></a>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@{
+    User_Account user = new User_Account();
+    <partial name="_UserManagementCreate" model="user" />
+}
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
+<script>
+    new DataTable('#mytable');
+</script>

@@ -32,7 +32,48 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
             _env = Accessor.Value;
         }
 
+        public IActionResult SuperAdmin_LoginForm()
+        {
+            return View();
+        }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SuperAdmin_LoginForm(SuperAdmin info)
+        {
+            conn.Open();
+            MySqlCommand mySqlCommand = new MySqlCommand("Select Username,Password From superadmin_accounts", conn);
+            MySqlDataReader reader = mySqlCommand.ExecuteReader();
+            while (reader.Read())
+            {
+                if (reader["Username"].Equals(info.Username))
+                {
+                    string password = Encryption.Decrypt(reader["Password"].ToString(), _env.EncryptionKey, _env.IVKey);
+                    if (!password.Equals(info.Password))
+                    {
+
+                        ModelState.AddModelError("PasswordError", "Password failed!");
+                    }
+                    else
+                    {
+                        HttpContext.Session.SetString("SessionUsername", info.Username);
+                        var result = _db.SuperAdmin_Accounts.Where(_ => _.Username == info.Username && _.Password == Encryption.Encrpyt(info.Password, _env.EncryptionKey, _env.IVKey)).Select(_ => _.AccountID).FirstOrDefault();
+                        HttpContext.Session.SetString("SessionID", Convert.ToString(result));
+                        HttpContext.Session.SetString("UserType", "SuperAdmin");
+                        _db.logsLists.Add(new LogsList
+                        {
+                            LogName = "Log In",
+                            LogDescription = "Logged In Username:" + HttpContext.Session.GetString("SessionUsername"),
+                            LogUserRole = "" + HttpContext.Session.GetString("UserType"),
+                        });
+                        _db.SaveChanges();
+                        return RedirectToAction("Dashboard", "SuperAdmin");
+                    }
+                }
+            }
+            ModelState.AddModelError("UsernameError", "Username Not Found");
+            return View();
+        }
 
         public IActionResult Admin_LoginForm() {
             return View();

@@ -23,11 +23,19 @@
         <tbody>
             @foreach (var obj in Model.EventsReserved)
             {
-                var obj2 = Model.Homeacc.FirstOrDefault(_ => _.AccountID == obj.AccountID);
-                <tr>
-                    <td>@obj2.FullName</td>
-                    <td>@obj2.PhoneNo</td>
-                </tr>
+                if (obj != null)
+                {
+
+                    var obj2 = Model.Homeacc.FirstOrDefault(_ => _.AccountID == obj.AccountID);
+                    if (obj2 != null)
+                    {
+                        <tr>
+                            <td>@obj2.FullName</td>
+                            <td>@obj2.PhoneNo</td>
+                        </tr>
+
+                    }
+                }
             }
         </tbody>
     </table>

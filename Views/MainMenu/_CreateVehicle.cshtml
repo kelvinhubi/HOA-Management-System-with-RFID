@@ -32,7 +32,8 @@
     <div class="form-group">
         <label asp-for="@Model.Vehicle.PlateNo" class="control-label"></label>
         <input asp-for="@Model.Vehicle.PlateNo" class="form-control input" id="PlateNo" oninput="UserCheck2()" />
-        <span asp-validation-for="@Model.Vehicle.PlateNo" id="Status" class="text-danger"></span>
+        <span asp-validation-for="@Model.Vehicle.PlateNo" class="text-danger"></span>
+        <span id="Status" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="@Model.Vehicle.VehicleModel" class="control-label"></label>
@@ -55,6 +56,7 @@
         <label asp-for="@Model.Vehicle.RFID_number" class="control-label">RFID Number</label>
         <input asp-for="@Model.Vehicle.RFID_number"  id="RFIDnumber" class="form-control input" readonly />
         <span asp-validation-for="@Model.Vehicle.RFID_number" id="Status1" class="text-danger"></span>
+        <span id="Status1" class="text-danger"></span>
     </div>
     <div class="form-group">
         <input asp-controller="MainMenu" asp-action="_CreateVehicle" type="submit" id="button1" value="Create" class="btn btn-primary" style="background-color:#16a085;color:black;" />
