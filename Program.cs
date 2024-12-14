@@ -37,8 +37,8 @@ builder.Services.AddQuartz(options => {
     var jobkey3 = JobKey.Create("SetDailyPenalties");
     options.AddJob<DependencyInjection>(jobkey)
     .AddTrigger(Trigger=> Trigger.ForJob(jobkey).WithSimpleSchedule(s=>s.WithIntervalInSeconds(10).RepeatForever()));
-    options.AddJob<SyncEntryExitLogs>(jobkey2).
-    AddTrigger(Trigger => Trigger.ForJob(jobkey2).WithSimpleSchedule(s => s.WithIntervalInMinutes(2).RepeatForever()));
+    //options.AddJob<SyncEntryExitLogs>(jobkey2).
+    //AddTrigger(Trigger => Trigger.ForJob(jobkey2).WithSimpleSchedule(s => s.WithIntervalInMinutes(2).RepeatForever()));
     options.AddJob<SetDailyPenalties>(jobkey3).
     AddTrigger(Trigger => Trigger.ForJob(jobkey3).WithSimpleSchedule(s => s.WithIntervalInHours(24).RepeatForever()));
 });//SetDailyPenalties

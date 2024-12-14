@@ -156,8 +156,6 @@
         EventID = $(this).closest("tr").find('td:eq(0)').text();
         var invoice = $(this).closest("tr").find('td:eq(1)').text();
         var amount = $(this).closest("tr").find('td:eq(2)').text();
-        console.log(invoice);
-        console.log(amount);
 
         $.post('@Url.Action("Payout", "UserMenu")', {
             Amount: amount,

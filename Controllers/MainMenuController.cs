@@ -2136,7 +2136,6 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                                 columns.RelativeColumn();
                                 columns.RelativeColumn();
                                 columns.RelativeColumn();
-                                columns.RelativeColumn();
                             });
                             foreach (var facility in facilities) {
                                 var result2 = reservations.Where(_ => _.FacilityID == facility.FacilityID);
@@ -2165,11 +2164,11 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
 
                             table.Header(header =>
                             {
-                                header.Cell().ColumnSpan(5).Element(Block).Text("Facility Usage");
+                                header.Cell().ColumnSpan(4).Element(Block).Text("Facility Usage");
                                 header.Cell().Element(Block).Text("Facility Name");
                                 header.Cell().Element(Block).Text("Total Usage Hours");
-                                header.Cell().Element(Block).Text("Average Daily Usage");
-                                header.Cell().Element(Block).Text("Peak Usage Date");
+                                //header.Cell().Element(Block).Text("Average Daily Usage");
+                                header.Cell().Element(Block).Text("Peak Usage Year");
                                 header.Cell().Element(Block).Text("Peak Usage Hours");
                             });
 
@@ -2179,12 +2178,14 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                             {
                                 foreach (var item in facilityUsageReports)
                                 {
-
-                                    table.Cell().RowSpan(2).Element(Block).Text(item.FacilityName.ToString()).FontSize(11);
-                                    table.Cell().RowSpan(2).Element(Block).Text(item.TotalUsageHours.ToString()).FontSize(11);
-                                    table.Cell().RowSpan(2).Element(Block).Text(item.AverageDailyUsage.ToString()).FontSize(11);
-                                    table.Cell().RowSpan(2).Element(Block).Text(item.PeakUsageDate.ToString("yyyy")).FontSize(11);
-                                    table.Cell().RowSpan(2).Element(Block).Text(item.PeakUsageHours.ToString()).FontSize(11);
+                                    if (item.TotalUsageHours != 0) {
+                                        table.Cell().RowSpan(2).Element(Block).Text(item.FacilityName.ToString()).FontSize(11);
+                                        table.Cell().RowSpan(2).Element(Block).Text(item.TotalUsageHours.ToString()).FontSize(11);
+                                        //table.Cell().RowSpan(2).Element(Block).Text(item.AverageDailyUsage.ToString()).FontSize(11);
+                                        table.Cell().RowSpan(2).Element(Block).Text(item.PeakUsageDate.ToString("yyyy")).FontSize(11);
+                                        table.Cell().RowSpan(2).Element(Block).Text(item.PeakUsageHours.ToString()).FontSize(11);
+                                    }
+                                    
 
                                 }
 
@@ -3344,7 +3345,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Controllers
                                 .Text("Contact No: 09984874488")
                                 .FontSize(11).AlignLeft();
                                 column.Item()
-                                .Text(frequency + " Dues Report as of " + startDate + " To " + endDate)
+                                .Text(frequency + " Expense Report as of " + startDate + " To " + endDate)
                                 .FontSize(11).AlignCenter();
                             });
 

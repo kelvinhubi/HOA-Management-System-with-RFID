@@ -93,7 +93,6 @@
             return;
         }
 
-        console.log($("#dateinput").val);
         $.post('@Url.Action("AddDuesToUsers", "MainMenu")',
             {
                 userIds: selectedUserIds,

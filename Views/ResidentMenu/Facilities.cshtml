@@ -86,19 +86,24 @@
             @foreach (var obj in Model.facilitiesreserved)
             {
                 var obj2 = Model.Homeacc.FirstOrDefault(_ => _.AccountID == obj.AccountID);
-                var obj3 = Model.facilities.Where(_ => _.FacilityID == obj.FacilityID).FirstOrDefault();
-                <tr>
-                    <td>@obj2.FullName</td>
-                    @if (obj3 != null)
-                    {
-                        <td>@obj3.FacilityName</td>
-                    }else{
-                        <td></td>
-                    }
-                    <td>@obj.DateOFReservation</td>
-                    <td>@obj.StartTime.ToString("MMM dd, yyyy hh:mm tt")</td>
-                    <td>@obj.EndTime.ToString("MMM dd, yyyy hh:mm tt")</td>
-                </tr>
+                if (obj2 != null)
+                {
+                    var obj3 = Model.facilities.FirstOrDefault(_ => _.FacilityID == obj.FacilityID);
+                    <tr>
+                        <td>@obj2.FullName</td>
+                        @if (obj3 != null)
+                        {
+                            <td>@obj3.FacilityName</td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        <td>@obj.DateOFReservation</td>
+                        <td>@obj.StartTime.ToString("MMM dd, yyyy hh:mm tt")</td>
+                        <td>@obj.EndTime.ToString("MMM dd, yyyy hh:mm tt")</td>
+                    </tr>
+                }
             }
 
         </tbody>
@@ -140,7 +145,6 @@
     let payvalue;
     $(document).on('click', '.pay', function () {
         payvalue = $(this).closest("tr").find('a');
-        console.log(payvalue);
         var invoice = $(this).closest("tr").find('td:eq(0)').text();
         var amount = $(this).closest("tr").find('td:eq(1)').text();
         $.post('@Url.Action("Payout", "UserMenu")', {

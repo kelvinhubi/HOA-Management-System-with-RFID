@@ -87,7 +87,6 @@
     }
     function CheckName() {
         var initialid = $("#FullName").find($("select option:selected")).data('another');
-        console.log(initialid);
         $("#AccountID").val(initialid);
     }
     var isValue = false
@@ -100,9 +99,7 @@
     });
    async function readport() { 
         if (ports == null) {
-            console.log("port is null");
             ports = await requestport();
-            console.log(ports);
             await ports.open({ baudRate: 921600 });
         }
        if (ports.connected) { 
@@ -114,9 +111,9 @@
                 if (value) {
                     var text = textDecoder.decode(value)
                     $("#RFIDnumber").val(text.replace(/ /g, ""));
+                    UserCheck();
                 }
                 if (done) {
-                    console.log('[readLoop] DONE', done);
                     reader.releaseLock();
                     break;
                 }
@@ -139,7 +136,7 @@
                 if (data == 0) {
                     $("#Status1").html('<font color = "Green"> RFID Number Available.</font>');
                     $("#button1").removeAttr('disabled');
-                    PLATE = true;
+                    RFID = true;
                 }
                 else {
                     $("#Status1").html('<font color = "White"> RFID Number already Exist!.</font>');
@@ -156,12 +153,12 @@
             },
             function (data) {
                 if (data == 0) {
-                    $("#Status").html('<font color = "Green"> RFID Number Available.</font>');
+                    $("#Status").html('<font color = "Green"> Plate Number Available.</font>');
                     $("#button1").removeAttr('disabled');
                     PLATE = true;
                 }
                 else {
-                    $("#Status").html('<font color = "White"> RFID Number already Exist!.</font>');
+                    $("#Status").html('<font color = "White"> Plate Number already Exist!.</font>');
                     $("#button1").attr('disabled', 'disabled');
                     PLATE = false;
                 }

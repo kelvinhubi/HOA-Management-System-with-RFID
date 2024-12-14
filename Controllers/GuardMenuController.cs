@@ -353,7 +353,7 @@ public class GuardMenuController : Controller
                             PlateNo = vehicle.PlateNo,
                             FullName = vehicle.FullName,
                       }).ToList();
-        return Json(result);
+        return Json(result.OrderDescending());
     }
 
     [HttpGet]

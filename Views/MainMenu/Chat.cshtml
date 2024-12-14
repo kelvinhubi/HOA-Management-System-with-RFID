@@ -56,7 +56,6 @@
             $('#Nameval').val(data);
         });
         $.get('@Url.Action("LoadChatHistory","MainMenu")', function (data) {
-            console.log(data);
             if (data != 0) { 
                 var MainUser = $('#Nameval').val();
                 for (i = 0; i < data.length; i++) { 

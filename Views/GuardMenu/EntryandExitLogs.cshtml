@@ -47,7 +47,6 @@
         $('#mytable tbody').empty();
         $.get('@Url.Action("GetEntryLogs","GuardMenu")', 
         function (data1) {
-            console.log(data1);
             updatedvalue = data1.length;
             var table = $('#mytable').DataTable({
                     data: data1,
@@ -91,9 +90,7 @@ connection2.on("GetGuardLogFail", function (Message) {
     var ports;
     async function readport() {
         if (ports == null) {
-            console.log("port is null");
             ports = await requestport();
-            console.log(ports);
             await ports.open({ baudRate: 921600 });
         }
         if (ports.connected) {
@@ -105,7 +102,6 @@ connection2.on("GetGuardLogFail", function (Message) {
                 if (value) {
                     var text = textDecoder.decode(value)
                     var gettext = text.replace(/ /g, "");
-                    console.log(gettext);
                     $.post("@Url.Action("EntryLogging","GuardMenu")", 
                     {
                         rfid: gettext
