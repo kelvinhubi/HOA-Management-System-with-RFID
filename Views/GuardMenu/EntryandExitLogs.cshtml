@@ -36,6 +36,7 @@
     <a asp-action="PrintLogs" asp-controller="GuardMenu" id="Print" class="btn - btn-success" style="padding:5px;margin-right:5px;">Export as Pdf</a>
     <a asp-action="_ClearLogs" asp-controller="GuardMenu" class="btn - btn-danger" style="padding:5px;margin-right:5px;">Clear Logs</a>
 </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script>
 <script>
     populate();
@@ -65,10 +66,22 @@
     notification.classList.add('notification');
     notification.textContent = Message;
         populate();
+        showToast('<i class="bx bxs-alarm-exclamation"></i> Gate Opening');
     setTimeout(() => {
         notification.classList.remove('notification');
         notification.textContent = "";
     }, 5000);
+        setTimeout(() => {
+            showToast('<i class="bx bxs-check-circle"></i> Gate Opened!');
+            setTimeout(() => {
+                showToast('<i class="bx bxs-alarm-exclamation"></i> Gate Closing');
+                setTimeout(() => {
+                    showToast('<i class="bx bxs-x-circle"></i> Gate Closed!');
+                }, 3000);
+            }, 3000);
+        }, 3000);
+        
+
 });
 connection2.on("GetGuardLogFail", function (Message) {
     const notification = document.getElementById('notifications');
@@ -82,7 +95,7 @@ connection2.on("GetGuardLogFail", function (Message) {
         notification.textContent = "";
     }, 5000);
 });
-
+    var readelay= true;
 //read rfid
     $("#connect").on('click', function () { 
         readport();
@@ -95,33 +108,62 @@ connection2.on("GetGuardLogFail", function (Message) {
         }
         if (ports.connected) {
 
-            const textDecoder = new TextDecoder();
-            const reader = port.readable.getReader();
-            while (true) {
-                const { value, done } = await reader.read();
-                if (value) {
-                    var text = textDecoder.decode(value)
-                    var gettext = text.replace(/ /g, "");
-                    $.post("@Url.Action("EntryLogging","GuardMenu")", 
-                    {
-                        rfid: gettext
-                    }, 
-                    function (data) 
-                    { 
-                        
-                    });
+                const textDecoder = new TextDecoder();
+                const reader = port.readable.getReader();
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (value) {
+                    if (readelay) {
+                        var text = textDecoder.decode(value)
+                        var gettext = text.replace(/ /g, "");
+                        $.post("@Url.Action("EntryLogging", "GuardMenu")",
+                            {
+                                rfid: gettext
+                            },
+                            function (data) {
+                                if (data.success) {
+                                    readelay = false;
+                                    console.log(readelay);
+                                    setTimeout(delayread, 12000);
+                                }
+                            });
+                        }
+                    }
+                    if (done) {
+                        console.log('[readLoop] DONE', done);
+                        reader.releaseLock();
+                        break;
+                    }
                 }
-                if (done) {
-                    console.log('[readLoop] DONE', done);
-                    reader.releaseLock();
-                    break;
-                }
-            }
         }
 
+    }
+    function delayread() { 
+        readelay = true;
     }
     async function requestport() {
         port = await navigator.serial.requestPort();
         return port;
     }
+    let toastBox = document.getElementById('toastBox');
+    function showToast(Message) {
+        console.log(toastBox);
+       let toast = document.createElement('div');
+        toast.classList.add('toaster');
+        toast.innerHTML = Message;
+        toastBox.appendChild(toast);
+        if (Message.includes('!')) {
+            toast.classList.add('success');
+        }
+        if (Message.includes('Closed')) {
+            toast.classList.add('error');
+        }
+        if (Message.includes('ing')) {
+            toast.classList.add('invalid');
+        }
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
 </script>

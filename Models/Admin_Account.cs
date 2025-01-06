@@ -12,6 +12,7 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         [Required]
         public String? Password { get; set; }
         [Required]
+        [EmailAddress]
         public string? Email { get; set; }
     }
 }

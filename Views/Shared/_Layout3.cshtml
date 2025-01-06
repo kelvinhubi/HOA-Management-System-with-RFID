@@ -9,6 +9,7 @@
     <title>@ViewBag.Title</title>
     <link rel="stylesheet" href="~/css/Layout1.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/Modal.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/GateNotification.css" asp-append-version="true" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.1.8/b-3.1.2/r-3.0.3/sb-1.8.1/sp-2.3.3/sl-2.1.0/datatables.min.css" rel="stylesheet">
     <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.1.8/b-3.1.2/r-3.0.3/sb-1.8.1/sp-2.3.3/sl-2.1.0/datatables.min.js"></script>
@@ -26,6 +27,7 @@
     <link href="~/dist/css/adminlte.rtl.min.css" rel="stylesheet" />
     <script src="~/dist/js/adminlte.js"></script>
     <script src="~/dist/js/adminlte.min.js"></script>
+
     <style>
         .notification {
             background-color: #f0f0f0;
@@ -34,7 +36,8 @@
             position: fixed;
             border-radius: 5px;
             z-index: 2;
-        }</style>
+        }
+    </style>
 </head>
     <body id="body-pd">
         <header class="header" id="header">
@@ -72,9 +75,12 @@
         </div>
         <!--Container Main start-->
     <div class="height-100" style="margin-top:4rem">
+        <div id="toastBox"></div>
         <div id="notifications"></div>
             @RenderBody()
+        
         @await Html.PartialAsync("../MainMenu/Chat.cshtml")
+        
         </div>
         <!--Container Main end-->
     <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script>

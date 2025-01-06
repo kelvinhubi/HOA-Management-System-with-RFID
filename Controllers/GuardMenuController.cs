@@ -66,6 +66,7 @@ public class GuardMenuController : Controller
                                     context.accessLogs.Add(info);
                                     await context.SaveChangesAsync();
                                     await _hub.Clients.All.SendAsync("GetGuardLogSuccess", "RFID Scanned Successfully");
+                                    return Json(new { Success = true });
                                 }
                                 if (result2.LogType == "Entry")
                                 {
@@ -80,6 +81,7 @@ public class GuardMenuController : Controller
                                         context.accessLogs.Add(info);
                                         await context.SaveChangesAsync();
                                         await _hub.Clients.All.SendAsync("GetGuardLogSuccess", "RFID Scanned Successfully");
+                                        return Json(new { Success = true });
                                     }
                                 }
 
@@ -97,15 +99,18 @@ public class GuardMenuController : Controller
 
                                 await context.SaveChangesAsync();
                                 await _hub.Clients.All.SendAsync("GetGuardLogSuccess", "RFID Scanned Successfully");
-                            }
+                            return Json(new { Success = true });
+                        }
                         }
                         else if (result == null)
                         {
                             await _hub.Clients.All.SendAsync("GetGuardLogFail", "Scan Fail! RFID not Registered");
-                        }
+                        return Json(new { Success = false });
+                    }
                         else
                         {
                             await _hub.Clients.All.SendAsync("GetGuardLogFail", "Scan Fail! Due to Homeowner have pending payments");
+                        return Json(new { Success = false });
                         }
                     }
                 }
@@ -130,6 +135,7 @@ public class GuardMenuController : Controller
                                     context.accessLogs.Add(info);
                                     await context.SaveChangesAsync();
                                     await _hub.Clients.All.SendAsync("GetGuardLogSuccess", "RFID Scanned Successfully");
+                                    return Json(new { Success = true });
                                 }
                                 if (result2.LogType == "Entry")
                                 {
@@ -144,6 +150,7 @@ public class GuardMenuController : Controller
                                         context.accessLogs.Add(info);
                                         await context.SaveChangesAsync();
                                         await _hub.Clients.All.SendAsync("GetGuardLogSuccess", "RFID Scanned Successfully");
+                                        return Json(new { Success = true });
                                     }
                                 }
 
@@ -161,19 +168,22 @@ public class GuardMenuController : Controller
 
                                 await context.SaveChangesAsync();
                                 await _hub.Clients.All.SendAsync("GetGuardLogSuccess", "RFID Scanned Successfully");
+                            return Json(new {Success = true });
                             }
                         }
                         else if (result == null) {
                             await _hub.Clients.All.SendAsync("GetGuardLogFail", "Scan Fail! RFID not Registered");
-                        }
+                            return Json(new { Success = false });
+                    }
                         else
                         {
                             await _hub.Clients.All.SendAsync("GetGuardLogFail", "Scan Fail! Due to Homeowner have pending payments");
-                        }
+                            return Json(new { Success = false });
+                    }
                     }
                 }
             }
-        return Json(0);
+        return Json(new { Success = false });
     }
     public IActionResult EntryandExitLogs() {
         if (CheckRole()) {

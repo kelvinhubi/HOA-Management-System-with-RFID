@@ -1,0 +1,52 @@
+﻿#toastBox {
+    position:absolute;
+    top:20px;
+    right:30px;
+    display:flex;
+    align-items:flex-end;
+    flex-direction:column;
+    overflow:hidden;
+    padding:20px;
+    z-index:2;
+
+}
+.toaster {
+    width:250px;
+    height:50px;
+    background:#fff;
+    font-weight: 500;
+    margin: 15px 0;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    display:flex;
+    align-items:center;
+    position:relative;
+}
+    .toaster i {
+        margin: 0 20px;
+        font-size: 35px;
+    }
+    .success i{
+        color:green;
+    }
+    .error i{
+        color:red;
+    }
+    .invalid i{
+        color: orange;
+    }
+
+    .toaster::after {
+        content: '';
+        position:absolute;
+        left:0;
+        bottom:0;
+        width:100%;
+        height:5px;
+        background:green;
+        animation:anim 3s linear forwards;
+    }
+@keyframes anim {
+    100% {
+        width:0;
+    }
+}
