@@ -13,10 +13,10 @@ namespace Cessna_HOA_MANAGEMENT_SYSTEM_WITH_RFID.Models
         public string FullName { get; set; } = string.Empty;
         public int AccountID { get; set; }
         [Required]
-        [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = "Enter only Letter and Numbers")]
+        [RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "Enter only Letter and Numbers")]
         public string VehicleModel { get; set; } = string.Empty;
         [Required]
-        [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = "Enter only Letter and Numbers")]
+        [RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "Enter only Letter and Numbers")]
         public string VehicleType { get; set; } = string.Empty;
         public string? RFID_number { get; set; } = string.Empty;
 
